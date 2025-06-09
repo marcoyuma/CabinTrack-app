@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import Logo from "../../../CabinTrack app/src/ui/Logo/Logo";
 import { MainNav } from "../MainNav/MainNav";
+import Logo from "../Logo/Logo";
 
 const StyledSidebar = styled.aside`
     background-color: var(--color-grey-0);
