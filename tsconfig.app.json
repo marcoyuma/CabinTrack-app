@@ -22,5 +22,14 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true
     },
-    "include": ["src", "starter/utils", "starter/ui", "starter/hooks"]
+    "include": [
+        "src",
+        "starter/utils",
+        "starter/ui",
+        "starter/hooks",
+        "../starter/temp/ui",
+        "../starter/temp/styles",
+        "../starter/temp/pages",
+        "../starter/temp/data"
+    ]
 }
