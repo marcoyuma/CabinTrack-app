@@ -30,6 +30,7 @@
         "../starter/temp/ui",
         "../starter/temp/styles",
         "../starter/temp/pages",
-        "../starter/temp/data"
+        "../starter/temp/data",
+        "../temp/ui/MainNav"
     ]
 }
