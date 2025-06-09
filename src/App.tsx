@@ -3,6 +3,7 @@ import {
     Navigate,
     RouterProvider,
 } from "react-router-dom";
+import GlobalStyles from "./styles/GlobalStyles";
 
 export const App = () => {
     const router = createBrowserRouter([
@@ -25,6 +26,7 @@ export const App = () => {
     ]);
     return (
         <>
+            <GlobalStyles />
             <RouterProvider router={router} />
         </>
     );
