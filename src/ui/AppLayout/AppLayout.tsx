@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Header } from "../../../../temp/ui/Header/Header";
+import { Header } from "../Header/Header";
 import { Sidebar } from "../../../../temp/ui/SIdebar/Sidebar";
 import styled from "styled-components";
 
