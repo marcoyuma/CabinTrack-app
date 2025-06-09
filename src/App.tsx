@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Bookings from "./pages/Bookings/Bookings";
 import Cabins from "./pages/Cabins/Cabins";
 import { Users } from "./pages/Users/Users";
+import Settings from "./pages/Settings/Settings";
 
 export const App = () => {
     const router = createBrowserRouter([
