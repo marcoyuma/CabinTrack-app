@@ -8,6 +8,7 @@ import { AppLayout } from "./ui/AppLayout/AppLayout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Bookings from "./pages/Bookings/Bookings";
 import Cabins from "./pages/Cabins/Cabins";
+import { Users } from "./pages/Users/Users";
 
 export const App = () => {
     const router = createBrowserRouter([
