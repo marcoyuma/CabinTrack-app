@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 import GlobalStyles from "./styles/GlobalStyles";
 import { AppLayout } from "./ui/AppLayout/AppLayout";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 export const App = () => {
     const router = createBrowserRouter([
