@@ -6,6 +6,7 @@ import {
 import GlobalStyles from "./styles/GlobalStyles";
 import { AppLayout } from "./ui/AppLayout/AppLayout";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Bookings from "./pages/Bookings/Bookings";
 
 export const App = () => {
     const router = createBrowserRouter([
