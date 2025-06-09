@@ -11,6 +11,7 @@ import Cabins from "./pages/Cabins/Cabins";
 import { Users } from "./pages/Users/Users";
 import Settings from "./pages/Settings/Settings";
 import Account from "./pages/Account/Account";
+import Login from "./pages/Login/Login";
 
 export const App = () => {
     const router = createBrowserRouter([
