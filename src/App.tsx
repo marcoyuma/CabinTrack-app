@@ -12,6 +12,7 @@ import { Users } from "./pages/Users/Users";
 import Settings from "./pages/Settings/Settings";
 import Account from "./pages/Account/Account";
 import Login from "./pages/Login/Login";
+import PageNotFound from "./pages/PageNotFound/PageNotFound";
 
 export const App = () => {
     const router = createBrowserRouter([
