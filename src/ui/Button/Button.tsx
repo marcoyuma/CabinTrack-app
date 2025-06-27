@@ -14,6 +14,7 @@ const sizes = {
     `,
     medium: css`
         font-size: 1.4rem;
+        padding: 1.2rem 1.6rem;
         font-weight: 500;
     `,
     large: css`
@@ -32,6 +33,7 @@ const variations = {
         }
     `,
     secondary: css`
+        color: var(--color-grey-600);
         background: var(--color-grey-0);
         border: 1px solid var(--color-grey-200);
         &:hover {
@@ -51,6 +53,7 @@ const variations = {
 /* define styled component with add-on props type 'ButtonType' */
 export const Button = styled.button<ButtonType>`
     border: none;
+    border-radius: var(--border-radius-sm);
     box-shadow: var(--shadow-sm);
 
     ${(props) => sizes[props.size || "medium"]}
