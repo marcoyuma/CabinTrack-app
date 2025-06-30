@@ -4,4 +4,5 @@ export type FormDataType = {
     regularPrice: string;
     discount: string;
     description: string;
+    image: string | undefined;
 };
