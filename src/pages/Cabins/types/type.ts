@@ -1,8 +1,9 @@
 export type FormDataType = {
-    name: string;
-    maxCapacity: string;
-    regularPrice: string;
-    discount: string;
-    description: string;
-    image: File;
+    name: string | undefined;
+    maxCapacity: string | undefined;
+    regularPrice: string | undefined;
+    discount: string | undefined;
+    description: string | undefined;
+    // type for default file input
+    image: FileList;
 };
