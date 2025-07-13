@@ -90,10 +90,7 @@ export const createCabin = async (newCabin: CabinType<File>) => {
     return data;
 };
 
-export const updateCabin = async (
-    newCabin: CabinType<string | File>,
-    id?: number
-) => {
+export const updateCabin = async <T>(newCabin: CabinType<T>, id?: number) => {
     const isNewImage = newCabin.image instanceof File;
     console.log(isNewImage);
 
@@ -133,7 +130,7 @@ export const updateCabin = async (
     if (isNewImage) {
         const { error: storageError } = await supabase.storage
             .from("cabin-images")
-            .upload(imageName, newCabin.image);
+            .upload(imageName, newCabin.image as File);
 
         // delete cabin if there's a cabin data uploaded without image
         if (storageError) {
