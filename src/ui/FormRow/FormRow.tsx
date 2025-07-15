@@ -42,7 +42,7 @@ export const FormRow = ({
     children,
 }: {
     label?: {
-        htmlfor:
+        htmlfor?:
             | "name"
             | "maxCapacity"
             | "regularPrice"
@@ -54,9 +54,11 @@ export const FormRow = ({
     errors?: string | undefined;
     children: ReactNode;
 }) => {
+    const htmlFor = label?.htmlfor || "none";
+    const labelChild = label?.labelChild || "no label";
     return (
         <StyledFormRow>
-            <Label htmlFor={label?.htmlfor}>{label?.labelChild}</Label>
+            <Label htmlFor={htmlFor}>{labelChild}</Label>
             {children}
             {errors && <Error>{errors}</Error>}
         </StyledFormRow>
