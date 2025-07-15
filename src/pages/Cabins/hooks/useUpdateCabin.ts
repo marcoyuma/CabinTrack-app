@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import {
-    CabinType,
+    NewCabin,
     updateCabin as updateCabinApi,
 } from "../../../services/apiCabins";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ export const useUpdateCabin = () => {
             newCabinData,
             id,
         }: {
-            newCabinData: CabinType<string | File>;
+            newCabinData: NewCabin;
             id: number | undefined;
         }) => updateCabinApi(newCabinData, id),
         // when mutation is success then invalidate the query and force it to be stale, this will automatically re-fetch data from server so the UI will stay in sync with updated 'cabin' query data.
