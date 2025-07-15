@@ -13,7 +13,7 @@ function UpdateSettingsForm() {
         dataSettings,
     } = useSettings();
 
-    // take value returned
+    // non nullable value and type safe from 'sanitizeSettings'
     const {
         maxBookingLength,
         maxNumberGuestsPerBooking,
