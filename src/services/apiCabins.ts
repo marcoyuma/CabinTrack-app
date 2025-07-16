@@ -16,7 +16,10 @@ export interface NewCabin {
 // define get all data from 'cabins' table database
 export const getCabins = async () => {
     // destructure the data using 'supabase' client instance from 'cabins' table
-    const { data, error } = await supabase.from("cabins").select("*");
+    const { data, error } = await supabase
+        .from("cabins")
+        .select("*")
+        .order("created_at");
     if (error) {
         console.error(error);
         throw new Error("Cabins could not be loaded");
