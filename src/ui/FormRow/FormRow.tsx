@@ -54,8 +54,8 @@ export const FormRow = ({
     errors?: string | undefined;
     children: ReactNode;
 }) => {
-    const htmlFor = label?.htmlfor || "none";
-    const labelChild = label?.labelChild || "no label";
+    const htmlFor = label?.htmlfor || "";
+    const labelChild = label?.labelChild || "";
     return (
         <StyledFormRow>
             <Label htmlFor={htmlFor}>{labelChild}</Label>
