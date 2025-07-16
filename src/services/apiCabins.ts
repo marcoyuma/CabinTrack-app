@@ -57,14 +57,46 @@ export const deleteCabin = async (cabin: Cabin) => {
 };
 
 // create new cabins
-export const createCabin = async (newCabin: CabinType<File>) => {
+export const createCabin = async (
+    newCabin: // CabinType<File>
+    NewCabin
+) => {
     console.log(newCabin);
+
+    // isNewImage is a boolean to check if the image is a File type
+    const isNewImage = newCabin.image instanceof File;
+    console.log(isNewImage);
+
     // define variable to make a new image name path
-    const imageName = `${uuidv4()}-${newCabin.image.name}`.replaceAll("/", "");
+    let imageName;
+
+    // if image is a file then we need to create a new name for it
+    if (isNewImage) {
+        imageName = `${uuidv4()}-${(newCabin.image as File).name}`.replaceAll(
+            "/",
+            ""
+        );
+        console.log(imageName);
+    }
+    // if image is a string then we can use it as is
+    else {
+        imageName = newCabin.image as string;
+        console.log(imageName);
+    }
 
     // define image path based on supabaseUrl and image name
-    const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+    // if isNewImage then we need to create a new path for it
+    // if not then we can use the existing image name
+    // this is necessary to avoid uploading the same image again
+    // and to avoid using the same image name for different cabins
+    // this is necessary to avoid conflicts with existing images
+    const imagePath = isNewImage
+        ? `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`
+        : imageName;
 
+    // 1. insert cabin data into 'cabins' table
+    // using supabase client instance from 'cabins' table
+    // and select the data after insertion
     const { data, error } = await supabase
         .from("cabins")
         .insert([
@@ -85,17 +117,28 @@ export const createCabin = async (newCabin: CabinType<File>) => {
         console.error(error);
         throw new Error("cabin could not created");
     }
+
     // 2. upload image to storage
+    // if there's image file from input file
+    // if isNewImage then we need to upload the image to storage
+    // if not then we can skip this step
+    if (isNewImage) {
     const { error: storageError } = await supabase.storage
         .from("cabin-images")
         .upload(imageName, newCabin.image);
 
-    // delete cabin if there's a cabin data uploaded without image
+        // if there's an error while uploading the image
+        // then we need to delete the cabin data from 'cabins' table
+        // and throw an error
+        // this is necessary to avoid having a cabin without an image
+        // and to avoid having a cabin with an image that is not uploaded
     if (storageError) {
-        // await supabase.from("cabins").delete().eq("id", data[0].id);
         await supabase.from("cabins").delete().eq("id", data[0].id);
         console.error(storageError);
-        throw new Error("image could not uploaded and cabin was not created");
+            throw new Error(
+                "image could not uploaded and cabin was not created"
+            );
+        }
     }
     return data;
 };
