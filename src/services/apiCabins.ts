@@ -29,12 +29,7 @@ export const getCabins = async () => {
 };
 
 // delete cabin based on id using supabase client instance from 'cabins'
-export const deleteCabin = async (
-    // before
-    // id: number,
-    // after
-    cabin: Cabin
-) => {
+export const deleteCabin = async (cabin: Cabin) => {
     const { error } = await supabase.from("cabins").delete().eq("id", cabin.id);
     if (error) {
         console.error(error);
