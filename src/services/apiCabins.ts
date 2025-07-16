@@ -30,12 +30,14 @@ export const getCabins = async () => {
 
 // delete cabin based on id using supabase client instance from 'cabins'
 export const deleteCabin = async (cabin: Cabin) => {
+    // delete cabin data from 'cabins' table
+    // using supabase client instance from 'cabins' table
     const { error } = await supabase.from("cabins").delete().eq("id", cabin.id);
     if (error) {
         console.error(error);
         throw new Error("cabin could not be deleted");
     }
-    
+
     // delete image from supabase storage
     // using supabase client instance from 'cabin-images' storage
     // we need to split the image path by '/' and get the last element
@@ -123,18 +125,18 @@ export const createCabin = async (
     // if isNewImage then we need to upload the image to storage
     // if not then we can skip this step
     if (isNewImage) {
-    const { error: storageError } = await supabase.storage
-        .from("cabin-images")
-        .upload(imageName, newCabin.image);
+        const { error: storageError } = await supabase.storage
+            .from("cabin-images")
+            .upload(imageName, newCabin.image);
 
         // if there's an error while uploading the image
         // then we need to delete the cabin data from 'cabins' table
         // and throw an error
         // this is necessary to avoid having a cabin without an image
         // and to avoid having a cabin with an image that is not uploaded
-    if (storageError) {
-        await supabase.from("cabins").delete().eq("id", data[0].id);
-        console.error(storageError);
+        if (storageError) {
+            await supabase.from("cabins").delete().eq("id", data[0].id);
+            console.error(storageError);
             throw new Error(
                 "image could not uploaded and cabin was not created"
             );
