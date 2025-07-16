@@ -143,7 +143,10 @@ export const createCabin = async (
     return data;
 };
 
-export const updateCabin = async <T>(newCabin: CabinType<T>, id?: number) => {
+// update cabin data
+// this function will update the cabin data based on the id
+// and the new cabin data passed as a parameter
+export const updateCabin = async (newCabin: NewCabin, id?: number) => {
     const isNewImage = newCabin.image instanceof File;
     console.log(isNewImage);
 
@@ -162,6 +165,12 @@ export const updateCabin = async <T>(newCabin: CabinType<T>, id?: number) => {
     const imagePath = isNewImage
         ? `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`
         : (newCabin.image as string);
+
+    // 1. update cabin data into 'cabins' table
+    // using supabase client instance from 'cabins' table
+    // and select the data after update
+    // this will update the cabin data based on the id
+    // and the new cabin data passed as a parameter
     const { data, error } = await supabase
         .from("cabins")
         .update({
@@ -178,8 +187,10 @@ export const updateCabin = async <T>(newCabin: CabinType<T>, id?: number) => {
         console.error(error);
         throw new Error("cabin could not updated");
     }
-    console.log(error);
+
     // 2. upload image to storage if there's image file from input file
+    // if isNewImage then we need to upload the image to storage
+    // if not then we can skip this step
     if (isNewImage) {
         const { error: storageError } = await supabase.storage
             .from("cabin-images")
