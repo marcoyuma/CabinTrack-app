@@ -1,7 +1,7 @@
 import { Database } from "../supabase/types/database.types";
 
 // type for settings data with non nullable expected as return value
-type SanitizedSettings = {
+export type SanitizedSettingsData = {
     maxBookingLength: number;
     maxNumberGuestsPerBooking: number;
     minBookingLength: number;
@@ -13,7 +13,7 @@ type RawDataSettings = Database["public"]["Tables"]["settings"]["Row"];
 // sanitized 'dataSettings' value
 export const sanitizeSettings = (
     settings?: RawDataSettings
-): SanitizedSettings => ({
+): SanitizedSettingsData => ({
     maxBookingLength: settings?.maxBookingLength ?? 0,
     maxNumberGuestsPerBooking: settings?.maxNumberGuestsPerBooking ?? 0,
     minBookingLength: settings?.minBookingLength ?? 0,
