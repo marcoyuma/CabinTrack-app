@@ -7,7 +7,7 @@ import GlobalStyles from "./styles/GlobalStyles";
 import { AppLayout } from "./ui/AppLayout/AppLayout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Bookings from "./pages/Bookings/Bookings";
-import Cabins from "./pages/Cabins/Cabins";
+import Cabins from "./pages/Cabins/Cabins/Cabins";
 import { Users } from "./pages/Users/Users";
 import Settings from "./pages/Settings/Settings";
 import Account from "./pages/Account/Account";
