@@ -35,6 +35,7 @@ export const deleteCabin = async (cabin: Cabin) => {
         console.error(error);
         throw new Error("cabin could not be deleted");
     }
+    
     // delete image from supabase storage
     // using supabase client instance from 'cabin-images' storage
     // we need to split the image path by '/' and get the last element
