@@ -13,6 +13,9 @@ import Settings from "./pages/Settings/Settings";
 import Account from "./pages/Account/Account";
 import Login from "./pages/Login/Login";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "react-hot-toast";
 
 export const App = () => {
     const router = createBrowserRouter([
