@@ -1,5 +1,4 @@
 import { Cabin } from "../pages/Cabins/CabinRow/CabinRow";
-import { FormDataType } from "../pages/Cabins/types/type";
 import supabase, { supabaseUrl } from "../supabase/supabase";
 import { v4 as uuidv4 } from "uuid";
 
