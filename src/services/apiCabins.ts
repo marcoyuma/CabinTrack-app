@@ -2,12 +2,16 @@ import { Cabin } from "../pages/Cabins/CabinRow/CabinRow";
 import supabase, { supabaseUrl } from "../supabase/supabase";
 import { v4 as uuidv4 } from "uuid";
 
-// Clone FormDataType with 'image' from default is 'FileList' field overridden as File (just one file)
-// generic type based on 'FormDataType' for image property
-export type CabinType<T = string> = Omit<FormDataType, "image"> & {
-    // image: File;
-    image: T;
-};
+// type for new cabin params
+export interface NewCabin {
+    name: string | undefined;
+    maxCapacity: number | string | undefined;
+    regularPrice: number | string | undefined;
+    discount: number | string | undefined;
+    description: string | undefined;
+    // type for default file input
+    image: File | string;
+}
 
 // define get all data from 'cabins' table database
 export const getCabins = async () => {
