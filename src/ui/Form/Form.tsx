@@ -26,7 +26,7 @@ const Form = styled.form<FormType>`
         css`
             width: 80rem;
         `}
-    
+
     /* way to define default props logic  */
     ${(props) => props.type || "regular"}
     
