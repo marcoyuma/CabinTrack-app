@@ -12,7 +12,7 @@ function Cabins() {
             </Row>
             <Row>
                 <CabinTable />
-                <AddCabin/>
+                <AddCabin />
             </Row>
         </>
     );
