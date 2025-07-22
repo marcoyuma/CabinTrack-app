@@ -25,9 +25,20 @@ export type EditedCabinData = {
     };
 };
 
+// This interface defines the props for the CreateCabinForm component.
+// It extends the EditedCabinData type to include the edited cabin data and a function to
+// close the modal after creating or editing a cabin.
+// The onCloseModal function is called when the form is successfully submitted to close the modal.
+interface CreateCabinFormProps extends EditedCabinData {
+    onCloseModal?: () => void;
+}
+
 // component for creating cabin with react hook form
 // no manual hookstate
-export const CreateCabinForm = ({ editedCabinData }: EditedCabinData) => {
+export const CreateCabinForm = ({
+    editedCabinData,
+    onCloseModal,
+}: CreateCabinFormProps) => {
     // destructure and rename data from props
     const { id: editId, ...editValues } = editedCabinData ?? {};
 
@@ -66,6 +77,7 @@ export const CreateCabinForm = ({ editedCabinData }: EditedCabinData) => {
                 {
                     onSuccess: (data) => {
                         console.log(data);
+                        onCloseModal?.();
                         reset();
                     },
                 }
@@ -81,6 +93,7 @@ export const CreateCabinForm = ({ editedCabinData }: EditedCabinData) => {
                 {
                     onSuccess: (data) => {
                         console.log(data);
+                        onCloseModal?.();
                         reset();
                     },
                 }
@@ -100,6 +113,10 @@ export const CreateCabinForm = ({ editedCabinData }: EditedCabinData) => {
                 // error input will prevent submitting and call this
                 onError
             )}
+            // type is used to determine the style of the form
+            // if onCloseModal is provided, then the form is used as a modal
+            // otherwise, it is a regular form
+            type={onCloseModal ? "modal" : "regular"}
         >
             <FormRow
                 label={{ htmlfor: "name", labelChild: "Cabin name" }}
@@ -227,6 +244,7 @@ export const CreateCabinForm = ({ editedCabinData }: EditedCabinData) => {
                     variation="secondary"
                     // 'type' property here is simply just regular html for resetting the form
                     type="reset"
+                    onClick={onCloseModal}
                 >
                     Cancel
                 </Button>
