@@ -26,3 +26,4 @@ dist-ssr
 # component
 CreateCabinFormv1.tsx
 Modalv1.tsx
+AddCabinv1.tsx
