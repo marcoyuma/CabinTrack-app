@@ -179,7 +179,7 @@ export const Window = ({ children, name }: WindowProps) => {
     return createPortal(
         <Overlay>
             <StyledModal>
-                <Button onClick={onClose}>
+                <Button onClick={close}>
                     <HiXMark />
                 </Button>
 
