@@ -26,6 +26,6 @@ export const AddCabin = () => {
             <Modal.Window name="table">
                 <CabinTable />
             </Modal.Window>
-                </Modal>
+        </Modal>
     );
 };
