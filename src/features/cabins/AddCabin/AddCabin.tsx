@@ -1,32 +1,31 @@
-import { useState } from "react";
 import { Button } from "../../../ui/Button/Button";
-import { Row } from "../../../ui/Row/Row";
 import { Modal } from "../../../ui/Modal/Modal";
+import { CabinTable } from "../CabinTable/CabinTable";
 import { CreateCabinForm } from "../CreateCabinForm/CreateCabinForm";
 
-// This component is used to add a new cabin by opening a modal with the CreateCabinForm.
-// It manages the state of whether the modal is open or closed.
-// When the button is clicked, it toggles the modal's visibility.
-// When the modal is closed, it will not be visible anymore.
-// The CreateCabinForm is rendered inside the modal, allowing users to fill out the form
-// to create a new cabin.
 export const AddCabin = () => {
-    const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-
     return (
-        <Row>
-            <Button
-                onClick={() => setIsOpenModal((isOpenModal) => !isOpenModal)}
-            >
-                Add new cabin
-            </Button>
-            {isOpenModal && (
-                <Modal onClose={() => setIsOpenModal(false)}>
-                    <CreateCabinForm
-                        onCloseModal={() => setIsOpenModal(false)}
-                    />
+        <Modal>
+            {/* This is the button that opens the modal to add a new cabin */}
+            {/* The Modal.Open component is used to open the modal when the button is clicked */}
+            {/* It receives a function that can be called to open the modal */}
+            <Modal.Open opens="cabin-form">
+                {(open) => <Button onClick={open}>Add new cabin</Button>}
+            </Modal.Open>
+
+            {/* The CreateCabinForm component is rendered inside the modal */}
+            <Modal.Window name="cabin-form">
+                {/* The onCloseModal prop is passed to the CreateCabinForm to close the modal
+                when the form is submitted or cancelled */}
+                {(close) => <CreateCabinForm onCloseModal={close} />}
+            </Modal.Window>
+
+            <Modal.Open opens="table">
+                {(open) => <Button onClick={open}>show tables</Button>}
+            </Modal.Open>
+            <Modal.Window name="table">
+                <CabinTable />
+            </Modal.Window>
                 </Modal>
-            )}
-        </Row>
     );
 };
