@@ -9,6 +9,8 @@ import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
 import { useCreateCabin } from "../hooks/useCreateCabin";
 import { useDeleteCabin } from "../hooks/useDeleteCabin";
 import { CreateCabinForm } from "../CreateCabinForm/CreateCabinForm";
+import { Modal } from "../../../ui/Modal/Modal";
+import { ConfirmDelete } from "../../../ui/ConfirmDelete/ConfirmDelete";
 // import { UpdateCabin } from "../UpdateCabin/UpdateCabin";
 
 export type Cabin = Database["public"]["Tables"]["cabins"]["Row"];
@@ -53,17 +55,8 @@ const Discount = styled.div`
 `;
 
 export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
-    // define hook state for showing edit form
-    const [showEditForm, setShowEditForm] = useState(false);
-    const {
-        id,
-        name,
-        maxCapacity,
-        regularPrice,
-        discount,
-        description,
-        image,
-    } = cabin;
+    const { name, maxCapacity, regularPrice, discount, description, image } =
+        cabin;
 
     const { isCreating, createCabin } = useCreateCabin();
 
@@ -102,24 +95,56 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                     <button onClick={handleDuplicate} disabled={isCreating}>
                         <HiSquare2Stack />
                     </button>
-                    <button onClick={() => setShowEditForm((show) => !show)}>
+
+                    {/* modal open for edit form */}
+                    <Modal>
+                        <Modal.Open opens="edit-form">
+                            {(open) => (
+                                <button onClick={() => open()}>
                         <HiPencil />
                     </button>
+                            )}
+                        </Modal.Open>
+
+                        {/* window modal for edit form */}
+                        <Modal.Window name="edit-form">
+                            {(close) => (
+                                <CreateCabinForm
+                                    editedCabinData={transformCabinDataTypeToFormValues(
+                                        cabin
+                                    )}
+                                    onCloseModal={close}
+                                />
+                            )}
+                        </Modal.Window>
+
+                        {/* modal open for showing delete confirmation */}
+                        <Modal.Open opens="confirm-deletion">
+                            {(open) => (
                     <button
-                        onClick={() => deleteCabin(cabin)}
-                        disabled={isDeleting}
+                                    onClick={() => {
+                                        open();
+                                    }}
                     >
                         <HiTrash />
                     </button>
+                            )}
+                        </Modal.Open>
+
+                        {/* window modal for delete confirmation */}
+                        <Modal.Window name="confirm-deletion">
+                            {(close) => (
+                                <ConfirmDelete
+                                    resourceName={name ?? "resource"}
+                                    onConfirm={() => deleteCabin(cabin)}
+                                    onCancel={() => close()}
+                                    disabled={isDeleting}
+                                />
+                            )}
+                        </Modal.Window>
+                    </Modal>
                 </div>
             </TableRow>
-            {/* not yet implemented */}
-            {/* <UpdateCabin cabin={cabin} /> */}
-            {showEditForm && (
-                <CreateCabinForm
-                    editedCabinData={transformCabinDataTypeToFormValues(cabin)}
-                />
-            )}
         </>
     );
 };
