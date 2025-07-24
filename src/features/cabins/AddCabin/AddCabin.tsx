@@ -1,6 +1,5 @@
 import { Button } from "../../../ui/Button/Button";
 import { Modal } from "../../../ui/Modal/Modal";
-import { CabinTable } from "../CabinTable/CabinTable";
 import { CreateCabinForm } from "../CreateCabinForm/CreateCabinForm";
 
 export const AddCabin = () => {
@@ -18,13 +17,6 @@ export const AddCabin = () => {
                 {/* The onCloseModal prop is passed to the CreateCabinForm to close the modal
                 when the form is submitted or cancelled */}
                 {(close) => <CreateCabinForm onCloseModal={close} />}
-            </Modal.Window>
-
-            <Modal.Open opens="table">
-                {(open) => <Button onClick={open}>show tables</Button>}
-            </Modal.Open>
-            <Modal.Window name="table">
-                <CabinTable />
             </Modal.Window>
         </Modal>
     );
