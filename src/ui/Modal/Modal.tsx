@@ -2,6 +2,7 @@ import { createContext, ReactNode, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 
 // This component is a modal that can be used to display content in a popup window.
 const StyledModal = styled.div`
@@ -169,6 +170,12 @@ export const Window = ({ children, name }: WindowProps) => {
     // It calls the 'close' function from the modal context to reset the open name.
     // It also provides a way to close the modal from within the children function.
     const handleClose = () => close();
+
+    // This hook is used to handle outside click events.
+    // It provides a ref that can be attached to the modal element.
+    // When a click occurs outside of the modal, it calls the 'handleClose' function to close the modal.
+    // The 'listenCapturing' parameter is set to true to ensure that the click event
+    const { ref } = useOutsideClick(handleClose);
 
     // If the current open name does not match the provided name, return null to avoid rendering the modal.
     if (openName !== name) return null;
