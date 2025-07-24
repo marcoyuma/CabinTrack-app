@@ -140,7 +140,6 @@ interface OpenProps {
  */
 const Open = ({ opens, children }: OpenProps) => {
     const { open } = useModalContext();
-    console.log(opens);
 
     const handleClick = () => open(opens);
     return <>{children(handleClick)}</>;
@@ -186,15 +185,13 @@ export const Window = ({ children, name }: WindowProps) => {
     // parent component's styling or layout.
     return createPortal(
         <Overlay>
-            <StyledModal>
-                <Button onClick={close}>
+            <StyledModal ref={ref}>
+                <Button onClick={handleClose}>
                     <HiXMark />
                 </Button>
 
                 {/* Render the children of the modal, passing the handleClose function if children is a function */}
-                {/* This allows the children to have access to the close function, enabling them to close the modal when needed */}
                 {/* If children is a function, call it with handleClose, otherwise just render the children directly */}
-                {/* This allows for flexibility in how the modal content is rendered */}
                 <div>
                     {typeof children === "function"
                         ? children(handleClose)
