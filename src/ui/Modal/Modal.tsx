@@ -169,6 +169,7 @@ export const Window = ({ children, name }: WindowProps) => {
     // This function is called when the modal is closed.
     // It calls the 'close' function from the modal context to reset the open name.
     // It also provides a way to close the modal from within the children function.
+    // This allows the modal to be closed by clicking outside of it or by clicking the close button.
     const handleClose = () => close();
 
     // This hook is used to handle outside click events.
