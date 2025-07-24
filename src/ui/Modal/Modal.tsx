@@ -1,8 +1,10 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { ReactNode, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
+import { ModalContext } from "./context/ModalContext";
+import { useModalContext } from "./hooks/useModalContext";
 
 // This component is a modal that can be used to display content in a popup window.
 const StyledModal = styled.div`
@@ -57,23 +59,6 @@ const Button = styled.button`
         color: var(--color-grey-500);
     }
 `;
-
-// This is the context that will be used to manage the modal's open state.
-// It provides functions to 'open' and 'close' the modal, as well as the 'name' of the currently
-const ModalContext = createContext<{
-    openName: string;
-    close: () => void;
-    open: (name: string) => void;
-} | null>(null);
-
-// This hook is used to access the modal context.
-const useModalContext = () => {
-    const context = useContext(ModalContext);
-    if (context === null) {
-        throw new Error("cannot use context outside parent element");
-    }
-    return context;
-};
 
 // interface for Modal props
 interface ModalProps {
