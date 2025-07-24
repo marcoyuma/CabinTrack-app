@@ -1,4 +1,4 @@
-import { Cabin } from "../pages/Cabins/CabinRow/CabinRow";
+import { Cabin } from "../features/cabins/CabinRow/CabinRow";
 import supabase, { supabaseUrl } from "../supabase/supabase";
 import { v4 as uuidv4 } from "uuid";
 
@@ -47,9 +47,12 @@ export const deleteCabin = async (cabin: Cabin) => {
     // we need to delete the image by its name
     // this is necessary to avoid having an image in the storage that is not used by any
     const { data, error: storageError } = await supabase.storage
+
         // supabase storage name
         .from("cabin-images")
-        // supabase method
+
+        // remove the image by its name
+        // we need to split the image path by '/' and get the last element
         .remove([cabin.image?.split("/").pop() ?? ""]);
     if (storageError) {
         console.error(storageError);
