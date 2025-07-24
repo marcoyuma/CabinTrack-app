@@ -101,8 +101,8 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                         <Modal.Open opens="edit-form">
                             {(open) => (
                                 <button onClick={() => open()}>
-                        <HiPencil />
-                    </button>
+                                    <HiPencil />
+                                </button>
                             )}
                         </Modal.Open>
 
@@ -121,13 +121,13 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                         {/* modal open for showing delete confirmation */}
                         <Modal.Open opens="confirm-deletion">
                             {(open) => (
-                    <button
+                                <button
                                     onClick={() => {
                                         open();
                                     }}
-                    >
-                        <HiTrash />
-                    </button>
+                                >
+                                    <HiTrash />
+                                </button>
                             )}
                         </Modal.Open>
 
