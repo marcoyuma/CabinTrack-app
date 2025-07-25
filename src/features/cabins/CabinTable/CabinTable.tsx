@@ -1,33 +1,16 @@
-import styled from "styled-components";
 import Spinner from "../../../ui/Spinner/Spinner";
 import { CabinRow } from "../CabinRow/CabinRow";
 import { useCabins } from "../hooks/useCabins";
 import { Table } from "../../../ui/Table/Table";
 
-// const Table = styled.div`
-//     border: 1px solid var(--color-grey-200);
-
-//     font-size: 1.4rem;
-//     background-color: var(--color-grey-0);
-//     border-radius: 7px;
-//     overflow: hidden;
-// `;
-
-// const TableHeader = styled.header`
-//     display: grid;
-//     grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-//     column-gap: 2.4rem;
-//     align-items: center;
-
-//     background-color: var(--color-grey-50);
-//     border-bottom: 1px solid var(--color-grey-100);
-//     text-transform: uppercase;
-//     letter-spacing: 0.4px;
-//     font-weight: 600;
-//     color: var(--color-grey-600);
-//     padding: 1.6rem 2.4rem;
-// `;
-
+/**
+ * CabinTable component that renders a table of cabins
+ * It uses the Table component to wrap the header and rows
+ * The 'columns' prop is passed to define the grid template columns
+ * This allows child components to access the 'columns' prop via context and render the header and rows accordingly
+ *
+ * @returns - A styled table component with the cabins data passed to it
+ */
 export const CabinTable = () => {
     // destructuring the cabins data from custom hooks that calls 'getCabins' api
     const { isPending, cabins } = useCabins();
@@ -36,17 +19,18 @@ export const CabinTable = () => {
     // early validation while data still on fetching, then the spinner rendered
     if (isPending) return <Spinner />;
     return (
-        // wrap the content and make sure browser knows the rule cuz we styled it with div
-        <Table role="table">
+        // using Table component to wrap the header and rows. passing the 'columns' prop to define the grid template columns
+        // this allows child components to access the 'columns' prop via context and render the header and rows accordingly
+        <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
             {/* wrap child into 6 columns */}
-            <TableHeader role="row">
+            <Table.Header>
                 <div></div>
                 <div>Cabin</div>
                 <div>Capacity</div>
                 <div>Price</div>
                 <div>Discount</div>
                 <div></div>
-            </TableHeader>
+            </Table.Header>
             {cabins?.map((cabin) => (
                 <CabinRow cabin={cabin} key={cabin.id} />
             ))}
