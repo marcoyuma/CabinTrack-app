@@ -32,6 +32,8 @@ export const CabinTable = () => {
     // destructuring the cabins data from custom hooks that calls 'getCabins' api
     const { isPending, cabins } = useCabins();
     console.log(isPending, cabins);
+
+    // early validation while data still on fetching, then the spinner rendered
     if (isPending) return <Spinner />;
     return (
         // wrap the content and make sure browser knows the rule cuz we styled it with div
