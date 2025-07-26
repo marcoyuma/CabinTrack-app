@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import { JSX, ReactNode } from "react";
 import styled from "styled-components";
 import { TableContext } from "./context/TableContext";
 import { useTableContext } from "./context/useTableContext";
+import { Cabin } from "../../features/cabins/CabinRow/CabinRow";
 
 const StyledTable = styled.div`
     border: 1px solid var(--color-grey-200);
@@ -128,7 +129,31 @@ const Row = ({ children }: { children: ReactNode }) => {
         </StyledRow>
     );
 };
-const Body = ({ children }) => {};
+
+interface BodyProps<T> {
+    data: T[];
+    render: (item: T) => JSX.Element;
+}
+
+/**
+ * Body component that accepts data and a render function to render the table body
+ *
+ * @param data - The data to be rendered in the table body
+ * @param render - A function that takes an item of type T and returns a JSX element
+ * This allows us to render any type of data in the table body
+ * The render function is used to render each item in the data array
+ * It allows us to render any type of data in the table body, making it reusable for different types of data
+ *
+ * @returns - A styled body component with the data passed to it
+ */
+const Body = ({ data, render }: BodyProps<Cabin>) => {
+    // validation to check if data is empty
+    if (!data.length) return <Empty>No data to show at the moment</Empty>;
+
+    // map through the data and render each item using the render function passed as a prop
+    // this allows us to render any type of data in the table body
+    return <StyledBody>{data.map(render)}</StyledBody>;
+};
 
 // assign
 Table.Header = Header;
