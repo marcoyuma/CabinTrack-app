@@ -15,6 +15,8 @@ const StyledTable = styled.div`
 // It accepts a prop 'columns' to define the grid template columns. This allows us to reuse the same styles for both header and row components
 const CommonRow = styled.div<{ columns: string }>`
     display: grid;
+
+    /* 'CommonRow' component receive one props named 'columns' and it'll implemented as grid style value */
     grid-template-columns: ${(props) => props.columns};
     column-gap: 2.4rem;
     align-items: center;
