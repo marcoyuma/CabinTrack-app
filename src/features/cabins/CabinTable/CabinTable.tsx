@@ -1,7 +1,7 @@
 import Spinner from "../../../ui/Spinner/Spinner";
-import { CabinRow } from "../CabinRow/CabinRow";
 import { useCabins } from "../hooks/useCabins";
 import { Table } from "../../../ui/Table/Table";
+import { CabinRow } from "../CabinRow/CabinRow";
 
 /**
  * CabinTable component that renders a table of cabins
@@ -31,9 +31,13 @@ export const CabinTable = () => {
                 <div>Discount</div>
                 <div></div>
             </Table.Header>
-            {cabins?.map((cabin) => (
-                <CabinRow cabin={cabin} key={cabin.id} />
-            ))}
+
+            {/* using Table.Body to render the cabins data */}
+            {/* passing the cabins data to render the CabinRow component for each cabin */}
+            <Table.Body
+                data={cabins ?? []}
+                render={(cabin) => <CabinRow cabin={cabin} key={cabin.name} />}
+            />
         </Table>
     );
 };
