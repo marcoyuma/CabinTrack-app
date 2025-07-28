@@ -35,7 +35,9 @@ export const CabinTable = () => {
             {/* using Table.Body to render the cabins data */}
             {/* passing the cabins data to render the CabinRow component for each cabin */}
             <Table.Body
+                // passing the cabin data to the CabinRow component
                 data={cabins ?? []}
+                // using the render prop to render the CabinRow component for each cabin
                 render={(cabin) => <CabinRow cabin={cabin} key={cabin.name} />}
             />
         </Table>
