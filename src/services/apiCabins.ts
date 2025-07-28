@@ -45,7 +45,8 @@ export const deleteCabin = async (cabin: Cabin) => {
     // this is necessary to remove the image from the storage
     // since we can't delete the image by its path
     // we need to delete the image by its name
-    // this is necessary to avoid having an image in the storage that is not used by any
+    // this is necessary to avoid having an image in the storage that is not used by any cabin
+    // and to avoid having an image that is not deleted when the cabin is deleted
     const { data, error: storageError } = await supabase.storage
 
         // supabase storage name
