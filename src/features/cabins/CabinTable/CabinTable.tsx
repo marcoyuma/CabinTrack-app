@@ -2,6 +2,7 @@ import Spinner from "../../../ui/Spinner/Spinner";
 import { useCabins } from "../hooks/useCabins";
 import { Table } from "../../../ui/Table/Table";
 import { CabinRow } from "../CabinRow/CabinRow";
+import { Menus } from "../../../ui/Menus/Menus";
 
 /**
  * CabinTable component that renders a table of cabins
