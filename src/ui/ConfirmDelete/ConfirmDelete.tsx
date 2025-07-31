@@ -32,6 +32,8 @@ export const ConfirmDelete = ({
     onConfirm,
     onCancel,
 }: ConfirmDeleteProps) => {
+    const handleDelete = () => onConfirm();
+    const handleCancel = () => onCancel();
     return (
         <StyledConfirmDelete>
             <Heading as="h3">Delete {resourceName}</Heading>
@@ -44,14 +46,14 @@ export const ConfirmDelete = ({
                 <Button
                     variation="secondary"
                     disabled={disabled}
-                    onClick={onCancel}
+                    onClick={handleCancel}
                 >
                     Cancel
                 </Button>
                 <Button
                     variation="danger"
                     disabled={disabled}
-                    onClick={onConfirm}
+                    onClick={handleDelete}
                 >
                     Delete
                 </Button>
