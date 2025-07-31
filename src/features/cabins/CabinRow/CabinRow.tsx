@@ -80,18 +80,18 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
 
     return (
         <Table.Row>
-                <Img src={image ?? ""} />
-                <Cabin>{name}</Cabin>
-                <p>Fits up to {maxCapacity} guests</p>
-                <Price>{formatCurrency(regularPrice)}</Price>
-                {discount ? (
-                    <Discount>{formatCurrency(discount)}</Discount>
-                ) : (
-                    <span>&mdash;</span>
-                )}
-                <div>
-                    {/* modal open for edit form */}
-                    <Modal>
+            <Img src={image ?? ""} />
+            <Cabin>{name}</Cabin>
+            <p>Fits up to {maxCapacity} guests</p>
+            <Price>{formatCurrency(regularPrice)}</Price>
+            {discount ? (
+                <Discount>{formatCurrency(discount)}</Discount>
+            ) : (
+                <span>&mdash;</span>
+            )}
+            <div>
+                {/* modal open for edit form */}
+                <Modal>
                     <Menus.Menu>
                         <Menus.Toggle id={cabinId} />
 
@@ -107,15 +107,15 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                             {/* modal open for showing delete confirmation */}
                             <Modal.Open opens="confirm-deletion">
                                 {/* delete */}
-                            {(open) => (
+                                {(open) => (
                                     <Menus.Button
                                         icon={<HiTrash />}
                                         onClick={open}
                                     >
                                         delete
                                     </Menus.Button>
-                            )}
-                        </Modal.Open>
+                                )}
+                            </Modal.Open>
 
                             {/* edit */}
                             <Modal.Open opens="edit-form">
@@ -154,8 +154,8 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                             )}
                         </Modal.Window>
                     </Menus.Menu>
-                    </Modal>
-                </div>
+                </Modal>
+            </div>
         </Table.Row>
     );
 };
