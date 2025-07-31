@@ -92,13 +92,43 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                 <div>
                     {/* modal open for edit form */}
                     <Modal>
-                        <Modal.Open opens="edit-form">
+                    <Menus.Menu>
+                        <Menus.Toggle id={cabinId} />
+
+                        <Menus.List id={cabinId}>
+                            {/* duplicate */}
+                            <Menus.Button
+                                icon={<HiSquare2Stack />}
+                                onClick={handleDuplicate}
+                            >
+                                duplicate
+                            </Menus.Button>
+
+                            {/* modal open for showing delete confirmation */}
+                            <Modal.Open opens="confirm-deletion">
+                                {/* delete */}
                             {(open) => (
-                                <button onClick={() => open()}>
-                                    <HiPencil />
-                                </button>
+                                    <Menus.Button
+                                        icon={<HiTrash />}
+                                        onClick={open}
+                                    >
+                                        delete
+                                    </Menus.Button>
                             )}
                         </Modal.Open>
+
+                            {/* edit */}
+                            <Modal.Open opens="edit-form">
+                                {(open) => (
+                                    <Menus.Button
+                                        icon={<HiPencil />}
+                                        onClick={open}
+                                    >
+                                        edit
+                                    </Menus.Button>
+                                )}
+                            </Modal.Open>
+                        </Menus.List>
 
                         {/* window modal for edit form */}
                         <Modal.Window name="edit-form">
@@ -118,14 +148,14 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                                 <ConfirmDelete
                                     resourceName={name ?? "resource"}
                                     onConfirm={() => deleteCabin(cabin)}
-                                    onCancel={() => close()}
+                                    onCancel={close}
                                     disabled={isDeleting}
                                 />
                             )}
                         </Modal.Window>
+                    </Menus.Menu>
                     </Modal>
                 </div>
-            </TableRow>
-        </>
+        </Table.Row>
     );
 };
