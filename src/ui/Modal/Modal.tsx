@@ -114,7 +114,7 @@ interface OpenProps {
  * This allows the parent component to control when the modal opens.
  * It is used in conjunction with the `Modal.Window` component to display the modal content.
  *
- * @returns {ReactNode} - A function that returns a ReactNode.
+ * @returns - {ReactNode} - A function that returns a ReactNode.
  * @example
  * <Modal.Open opens="cabin-form">
  *   {(open) => <Button onClick={open}>Open Modal</Button>}
@@ -124,7 +124,9 @@ const Open = ({ opens, children }: OpenProps) => {
     const { open } = useModalContext();
 
     const handleClick = () => open(opens);
-    return <>{children(handleClick)}</>;
+    return (
+        <>{typeof children === "function" ? children(handleClick) : children}</>
+    );
 };
 
 // This is the main Modal component that accepts 'children' and an 'onClose' function as props.
