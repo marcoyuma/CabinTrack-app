@@ -142,18 +142,14 @@ export const Window = ({ children, name }: WindowProps) => {
     // This allows the modal to be closed by clicking outside of it or by clicking the close button.
     const handleClose = () => close();
 
-    // This hook is used to handle outside click events.
-    // It provides a ref that can be attached to the modal element.
-    // When a click occurs outside of the modal, it calls the 'handleClose' function to close the modal.
-    // The 'listenCapturing' parameter is set to true to ensure that the click event
-    const { ref } = useOutsideClick(handleClose);
+    // This hook is used to handle outside click events. It provides a ref that can be attached to the modal element.
+    // When a click occurs outside of the modal, it calls the 'handleClose' function to close the modal. The 'listenCapturing' parameter is set to true to ensure that the click event is captured before it bubbles up.
+    const { ref } = useOutsideClick<HTMLDivElement>(handleClose);
 
     // If the current open name does not match the provided name, return null to avoid rendering the modal.
     if (openName !== name) return null;
 
-    // Render the modal using createPortal to render it in the body of the document.
-    // This allows the modal to be displayed on top of other content without being affected by the
-    // parent component's styling or layout.
+    // Render the modal using createPortal to render it in the body of the document. This allows the modal to be displayed on top of other content without being affected by the parent component's styling or layout.
     return createPortal(
         <Overlay>
             <StyledModal ref={ref}>
