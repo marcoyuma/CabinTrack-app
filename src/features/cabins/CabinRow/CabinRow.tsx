@@ -11,7 +11,8 @@ import { useDeleteCabin } from "../hooks/useDeleteCabin";
 import { CreateCabinForm } from "../CreateCabinForm/CreateCabinForm";
 import { Modal } from "../../../ui/Modal/Modal";
 import { ConfirmDelete } from "../../../ui/ConfirmDelete/ConfirmDelete";
-// import { UpdateCabin } from "../UpdateCabin/UpdateCabin";
+import { Table } from "../../../ui/Table/Table";
+import { Menus } from "../../../ui/Menus/Menus";
 
 export type Cabin = Database["public"]["Tables"]["cabins"]["Row"];
 
@@ -43,10 +44,20 @@ const Discount = styled.div`
 `;
 
 export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
-    const { name, maxCapacity, regularPrice, discount, description, image } =
-        cabin;
+    const {
+        id,
+        name,
+        maxCapacity,
+        regularPrice,
+        discount,
+        description,
+        image,
+    } = cabin;
 
-    const { isCreating, createCabin } = useCreateCabin();
+    // convert id into string for Menus props compatible
+    const cabinId = id.toString();
+
+    const { createCabin } = useCreateCabin();
 
     // ensure the image is not null before using as a string.
     const finalImage = (image ?? "") as string;
@@ -68,8 +79,7 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
     const { isDeleting, deleteCabin } = useDeleteCabin();
 
     return (
-        <>
-            <TableRow>
+        <Table.Row>
                 <Img src={image ?? ""} />
                 <Cabin>{name}</Cabin>
                 <p>Fits up to {maxCapacity} guests</p>
@@ -80,10 +90,6 @@ export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
                     <span>&mdash;</span>
                 )}
                 <div>
-                    <button onClick={handleDuplicate} disabled={isCreating}>
-                        <HiSquare2Stack />
-                    </button>
-
                     {/* modal open for edit form */}
                     <Modal>
                         <Modal.Open opens="edit-form">
