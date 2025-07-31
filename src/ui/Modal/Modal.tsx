@@ -94,17 +94,14 @@ interface OpenProps {
      * @description This function is called when the modal is opened.
      * It receives a function that can be called to open the modal.
      * This allows the parent component to control when the modal opens.
-     * @returns {ReactNode} - A function that returns a ReactNode.
+     * @returns - {ReactNode} - A function that returns a ReactNode.
      * @example
      * <Modal.Open opens="cabin-form">
      *   {(open) => <Button onClick={open}>Open Modal</Button>}
      * </Modal.Open>
-     * @see Modal.Window for the modal content.
-     * @see Modal for the modal context.
-     * @see ModalContext for the modal context.
-     * @see useModalContext for accessing the modal context.
+    
      */
-    children: (open: () => void) => ReactNode;
+    children: ((open: () => void) => ReactNode) | ReactNode;
 }
 
 /**
