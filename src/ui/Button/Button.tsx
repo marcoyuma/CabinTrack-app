@@ -1,9 +1,5 @@
 import styled, { css } from "styled-components";
 
-type ButtonType = {
-    size?: "small" | "medium" | "large";
-    variation?: "primary" | "secondary" | "danger";
-};
 const sizes = {
     small: css`
         font-size: 1.2rem;
@@ -51,6 +47,10 @@ const variations = {
 };
 
 /* define styled component with add-on props type 'ButtonType' */
+type ButtonType = {
+    size?: "small" | "medium" | "large";
+    variation?: "primary" | "secondary" | "danger";
+};
 export const Button = styled.button<ButtonType>`
     border: none;
     border-radius: var(--border-radius-sm);
