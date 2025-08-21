@@ -3,6 +3,7 @@ import { useCabins } from "../hooks/useCabins";
 import { Table } from "../../../ui/Table/Table";
 import { CabinRow } from "../CabinRow/CabinRow";
 import { Menus } from "../../../ui/Menus/Menus";
+import { useSearchParams } from "react-router-dom";
 
 /**
  * CabinTable component that renders a table of cabins
@@ -15,6 +16,21 @@ import { Menus } from "../../../ui/Menus/Menus";
 export const CabinTable = () => {
     // destructuring the cabins data from custom hooks that calls 'getCabins' api
     const { isPending, cabins } = useCabins();
+
+    // destructuring URLsearchParams hooks
+    const [URLSearchParams] = useSearchParams();
+
+    // get query key named 'discount'
+    const filterValue = URLSearchParams.get("discount") || "all";
+
+    let filteredCabins: typeof cabins;
+    if (filterValue === "all") {
+        filteredCabins = cabins;
+    } else if (filterValue === "with-discount") {
+        filteredCabins = cabins?.filter((value) => (value.discount ?? 0) > 0);
+    } else {
+        filteredCabins = cabins?.filter((value) => (value.discount ?? 0) === 0);
+    }
 
     // early validation while data still on fetching, then the spinner rendered
     if (isPending) return <Spinner />;
@@ -38,7 +54,7 @@ export const CabinTable = () => {
                 {/* passing the cabins data to render the CabinRow component for each cabin */}
                 <Table.Body
                     // passing the cabin data to the CabinRow component
-                    data={cabins ?? []}
+                    data={filteredCabins ?? []}
                     // using the render prop to render the CabinRow component for each cabin
                     render={(cabin) => (
                         <CabinRow cabin={cabin} key={cabin.name} />
