@@ -70,7 +70,6 @@ interface ModalProps {
 // The 'children' of this component will have access to the modal context.
 export const Modal = ({ children }: ModalProps) => {
     const [openName, setOpenName] = useState("");
-    console.log(openName);
 
     // This function sets the open name to the provided name, effectively opening the modal.
     // The 'close' function resets the open name to an empty string, closing the modal.
