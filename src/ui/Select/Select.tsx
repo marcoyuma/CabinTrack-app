@@ -1,3 +1,4 @@
+import { ChangeEvent } from "react";
 import styled from "styled-components";
 
 type SelectType = { type?: "white" };
@@ -17,11 +18,16 @@ const StyledSelect = styled.select<SelectType>`
 
 interface SelectPropsType {
     options: { value: string; label: string }[];
+    // value for controlled option input element
     value: string;
+    type: "white";
+    onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
 }
-export const Select = ({ options, value }: SelectPropsType) => {
+export const Select = ({ options, value, type, onChange }: SelectPropsType) => {
+    console.log(type);
+
     return (
-        <StyledSelect value={value}>
+        <StyledSelect value={value} type={type} onChange={onChange}>
             {options.map((option) => (
                 <option value={option.value} key={option.value}>
                     {option.label}
