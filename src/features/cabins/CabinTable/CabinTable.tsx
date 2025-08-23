@@ -3,7 +3,7 @@ import { useCabins } from "../hooks/useCabins";
 import { Table } from "../../../ui/Table/Table";
 import { CabinRow } from "../CabinRow/CabinRow";
 import { Menus } from "../../../ui/Menus/Menus";
-import { useSearchParams } from "react-router-dom";
+import { useURL } from "../../../hooks/useURL";
 
 /**
  * CabinTable component that renders a table of cabins
@@ -17,19 +17,24 @@ export const CabinTable = () => {
     // destructuring the cabins data from custom hooks that calls 'getCabins' api
     const { isPending, cabins } = useCabins();
 
-    // destructuring URLsearchParams hooks
-    const [URLSearchParams] = useSearchParams();
+    // filter cabin data
+    // get value from custom hooks by defining params query key name
+    const { valueFromParams: discountValueFromParams } = useURL("discount");
 
-    // get query key named 'discount'
-    const filterValue = URLSearchParams.get("discount") || "all";
+    // get value from params, if null set to 'all' as default
+    const filterValue = discountValueFromParams || "all";
 
-    let filteredCabins: typeof cabins;
+    let filteredCabinsByDiscount: typeof cabins;
     if (filterValue === "all") {
-        filteredCabins = cabins;
+        filteredCabinsByDiscount = cabins;
     } else if (filterValue === "with-discount") {
-        filteredCabins = cabins?.filter((value) => (value.discount ?? 0) > 0);
+        filteredCabinsByDiscount = cabins?.filter(
+            (value) => (value.discount ?? 0) > 0
+        );
     } else {
-        filteredCabins = cabins?.filter((value) => (value.discount ?? 0) === 0);
+        filteredCabinsByDiscount = cabins?.filter(
+            (value) => (value.discount ?? 0) === 0
+        );
     }
 
     // early validation while data still on fetching, then the spinner rendered
