@@ -44,16 +44,16 @@ interface FilterPropsType {
     options: { value: string; label: string }[];
 }
 export const Filter = ({ filterField, options }: FilterPropsType) => {
-    // hooks for storing relevan value into url
-    const [URLSearchParams, SetURLSearchParams] = useSearchParams();
-    const currentFilter =
-        URLSearchParams.get("discount") || options.at(0)?.value;
+    // custom hooks for storing relevan value into url based on using useSearchParams hook
+    const { valueFromParams, setParams } = useURL(filterField);
+
+    const currentFilter = valueFromParams || options.at(0)?.value;
+    console.log(currentFilter);
 
     // handle onClick event
     const handleClick = (value: string) => {
         // set url query key as 'discount' = 'value' into url
-        URLSearchParams.set(filterField, value);
-        SetURLSearchParams(URLSearchParams);
+        setParams(value);
     };
     return (
         <StyledFilter>
@@ -61,7 +61,7 @@ export const Filter = ({ filterField, options }: FilterPropsType) => {
                 <FilterButton
                     onClick={() => handleClick(value.value)}
                     key={value.value}
-                    active={currentFilter === value.value}
+                    $active={currentFilter === value.value}
                     disabled={currentFilter === value.value}
                 >
                     {value.label}
