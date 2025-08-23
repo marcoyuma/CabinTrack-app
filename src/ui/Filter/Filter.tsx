@@ -1,5 +1,5 @@
-import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components";
+import { useURL } from "../../hooks/useURL";
 
 const StyledFilter = styled.div`
     border: 1px solid var(--color-grey-100);
@@ -12,14 +12,15 @@ const StyledFilter = styled.div`
 `;
 
 interface FilterButtonType {
-    active?: boolean;
+    // props is not button properties
+    $active: boolean;
 }
 const FilterButton = styled.button<FilterButtonType>`
     background-color: var(--color-grey-0);
     border: none;
 
-    ${(props) =>
-        props.active &&
+    ${({ $active }) =>
+        $active &&
         css`
             background-color: var(--color-brand-600);
             color: var(--color-brand-50);
