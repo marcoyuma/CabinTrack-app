@@ -5,13 +5,7 @@ import { useURL } from "../../hooks/useURL";
 // type for SortBy Component props
 interface SortByPropsType {
     options: {
-        value:
-            | "name-asc"
-            | "name-desc"
-            | "regularPrice-asc"
-            | "regularPrice-desc"
-            | "maxCapacity-asc"
-            | "maxCapacity-desc";
+        value: string;
         label: string;
     }[];
 }
