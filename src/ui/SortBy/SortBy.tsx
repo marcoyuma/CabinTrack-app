@@ -2,6 +2,7 @@ import { Select } from "../Select/Select";
 import { ChangeEvent } from "react";
 import { useURL } from "../../hooks/useURL";
 
+// type for SortBy Component props
 interface SortByPropsType {
     options: {
         value:
@@ -14,6 +15,8 @@ interface SortByPropsType {
         label: string;
     }[];
 }
+
+// component for sorting data by specified options
 export const SortBy = ({ options }: SortByPropsType) => {
     // destructured custom hook that using 'useSearchParams'
     const { setParams, valueFromParams } = useURL("sortBy");
