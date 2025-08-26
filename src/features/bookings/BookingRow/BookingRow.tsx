@@ -57,8 +57,14 @@ const Amount = styled.div`
     font-weight: 500;
 `;
 
-function BookingRow({
-    booking: {
+function BookingRow({ booking }: { booking: Booking }) {
+    const statusToTagName = {
+        unconfirmed: "blue",
+        "checked-in": "green",
+        "checked-out": "silver",
+    };
+
+    const {
         id: bookingId,
         created_at,
         startDate,
