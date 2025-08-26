@@ -73,17 +73,13 @@ function BookingRow({ booking }: { booking: Booking }) {
         numGuests,
         totalPrice,
         status: bookingStatus,
-        guests: { fullName: guestName, email },
-        cabins: { name: cabinName },
-    },
-}: {
-    booking: Booking;
-}) {
-    const statusToTagName = {
-        unconfirmed: "blue",
-        "checked-in": "green",
-        "checked-out": "silver",
-    };
+        guests,
+        cabins,
+    } = booking;
+
+    const cabinName = cabins?.name ?? "-";
+    const guestName = guests?.fullName ?? "-";
+    const email = guests?.email ?? "-";
 
     // immediately invoke function to clean up 'status' as key for 'statusToTagName'
     const status = ((): keyof typeof statusToTagName => {
