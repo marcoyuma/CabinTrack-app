@@ -14,9 +14,20 @@ import {
 } from "../../../utils/helpers";
 
 // rejoin 3 table types
-type Booking = BookingType & {
-    guests: GuestType;
-    cabins: CabinType;
+// id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice
+type Booking = Pick<
+    BookingType,
+    | "id"
+    | "created_at"
+    | "startDate"
+    | "endDate"
+    | "numNights"
+    | "numGuests"
+    | "status"
+    | "totalPrice"
+> & {
+    cabins: Pick<CabinType, "name"> | null;
+    guests: Pick<GuestType, "fullName" | "email"> | null;
 };
 
 const Cabin = styled.div`
