@@ -1,4 +1,4 @@
-import { Cabin } from "../features/cabins/CabinRow/CabinRow";
+import { CabinType } from "../features/cabins/types/type";
 import supabase, { supabaseUrl } from "../supabase/supabase";
 import { v4 as uuidv4 } from "uuid";
 
