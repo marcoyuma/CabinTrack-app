@@ -14,7 +14,7 @@ export interface NewCabin {
 }
 
 // delete cabin based on id using supabase client instance from 'cabins'
-export const deleteCabin = async (cabin: Cabin) => {
+export const deleteCabin = async (cabin: CabinType) => {
     // delete cabin data from 'cabins' table
     // using supabase client instance from 'cabins' table
     const { error } = await supabase.from("cabins").delete().eq("id", cabin.id);
