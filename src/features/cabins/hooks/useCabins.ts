@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCabins } from "../../../services/apiCabins/getCabins";
 
+// hooks for cabins query
 export const useCabins = () => {
     const { isPending, data: cabins } = useQuery({
         // this will uniquely identify this data that we're gonna query. IT NEETS TO BE AN ARRAY
