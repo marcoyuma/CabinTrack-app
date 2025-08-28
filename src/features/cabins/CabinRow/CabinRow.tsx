@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { Database } from "../../../supabase/types/database.types";
 import {
     formatCurrency,
     transformCabinDataTypeToFormValues,
@@ -13,8 +12,7 @@ import { Modal } from "../../../ui/Modal/Modal";
 import { ConfirmDelete } from "../../../ui/ConfirmDelete/ConfirmDelete";
 import { Table } from "../../../ui/Table/Table";
 import { Menus } from "../../../ui/Menus/Menus";
-
-export type Cabin = Database["public"]["Tables"]["cabins"]["Row"];
+import { CabinType } from "../../../services/types/cabins.type";
 
 const Img = styled.img`
     display: block;
@@ -43,7 +41,7 @@ const Discount = styled.div`
     color: var(--color-green-700);
 `;
 
-export const CabinRow = ({ cabin }: { cabin: Cabin }) => {
+export const CabinRow = ({ cabin }: { cabin: CabinType }) => {
     const {
         id,
         name,
