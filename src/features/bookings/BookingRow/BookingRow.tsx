@@ -5,13 +5,13 @@ import { Table } from "../../../ui/Table/Table";
 import Tag from "../../../ui/Tag/Tag";
 import { BookingType } from "../types/type";
 import { GuestType } from "../../guests/types/type";
-import { CabinType } from "../../cabins/types/type";
 
 import {
     formatCurrency,
     formatDistanceFromNow,
     sanitizeNull,
 } from "../../../utils/helpers";
+import { CabinType } from "../../../services/types/cabins.type";
 
 // rejoin 3 table types
 // id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice
