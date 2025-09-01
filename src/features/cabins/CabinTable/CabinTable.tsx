@@ -4,6 +4,7 @@ import { Table } from "../../../ui/Table/Table";
 import { CabinRow } from "../CabinRow/CabinRow";
 import { Menus } from "../../../ui/Menus/Menus";
 import { useURL } from "../../../hooks/useURL";
+import Empty from "../../../ui/Empty/Empty";
 
 /**
  * CabinTable component that renders a table of cabins
@@ -95,6 +96,10 @@ export const CabinTable = () => {
 
     // early validation while data still on fetching, then the spinner rendered
     if (isPending) return <Spinner />;
+
+    // cabins length validation
+    if (!cabins?.length) return <Empty resourceName="cabins" />;
+    
     return (
         // using Menus component to wrap the Table component, so CabinRow component can use the value from menus context as child
         <Menus>
