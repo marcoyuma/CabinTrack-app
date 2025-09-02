@@ -1,6 +1,37 @@
 import supabase from "../supabase/supabase";
+import { getToday } from "../utils/helpers";
+import { bookingsReadSchema } from "./types/bookings.type";
 
-export async function getBooking(id) {
+// get all data from 'bookings', 1 data from 'cabins', and 2 data from 'guests' table
+export const getBookings = async (
+    filter: { field: string; value: string } | null,
+    sortBy: { field: string; direction: "asc" | "desc" }
+) => {
+    // assign 'query' as supabase client instance and sort by 'field' and 'direction' properties
+    let query = supabase
+        .from("bookings")
+        .select(
+            "id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, cabins(name), guests(fullName, email)"
+        )
+        .order(sortBy.field, {
+            ascending: sortBy.direction === "asc" ? true : false,
+        });
+
+    // get only specified by 'field' and 'value' filter properties with 'eq' method
+    if (filter) query = query.eq(filter.field, filter.value);
+
+    const { data: bookings, error } = await query;
+
+    if (error) {
+        console.error(error);
+        throw new Error("Booking could not be loaded");
+    }
+
+    // return non nullable data
+    return bookings.map((val) => bookingsReadSchema.parse(val));
+};
+
+export const getBooking = async (id: number) => {
     const { data, error } = await supabase
         .from("bookings")
         .select("*, cabins(*), guests(*)")
