@@ -1,9 +1,7 @@
 import toast from "react-hot-toast";
-import {
-    NewCabin,
-    updateCabin as updateCabinApi,
-} from "../../../services/apiCabins";
+import { updateCabin as updateCabinApi } from "../../../services/apiCabins/updateCabin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { NewCabin } from "../../../services/types/cabins.type";
 
 export const useUpdateCabin = () => {
     // define client for invalidate the new data
