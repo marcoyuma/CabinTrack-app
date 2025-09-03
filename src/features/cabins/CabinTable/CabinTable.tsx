@@ -1,10 +1,14 @@
-import Spinner from "../../../ui/Spinner/Spinner";
-import { useCabins } from "../hooks/useCabins";
-import { Table } from "../../../ui/Table/Table";
-import { CabinRow } from "../CabinRow/CabinRow";
-import { Menus } from "../../../ui/Menus/Menus";
-import { useURL } from "../../../hooks/useURL";
 import Empty from "../../../ui/Empty/Empty";
+import { Table } from "../../../ui/Table/Table";
+import { Menus } from "../../../ui/Menus/Menus";
+import Spinner from "../../../ui/Spinner/Spinner";
+
+import { CabinRow } from "../CabinRow/CabinRow";
+
+import { useCabins } from "../hooks/useCabins";
+import { useURL } from "../../../hooks/useURL";
+
+import { sortData } from "../../../utils/helpers";
 
 /**
  * CabinTable component that renders a table of cabins
