@@ -9,6 +9,7 @@ import { useCabins } from "../hooks/useCabins";
 import { useURL } from "../../../hooks/useURL";
 
 import { sortData } from "../../../utils/helpers";
+import { Pagination } from "../../../ui/Pagination/Pagination";
 
 /**
  * CabinTable component that renders a table of cabins
