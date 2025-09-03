@@ -85,6 +85,10 @@ export const CabinTable = () => {
                         <CabinRow cabin={cabin} key={cabin.name} />
                     )}
                 />
+
+                <Table.Footer>
+                    <Pagination count={sortedCabins.length} />
+                </Table.Footer>
             </Table>
         </Menus>
     );
