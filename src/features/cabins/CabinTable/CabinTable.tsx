@@ -57,7 +57,7 @@ export const CabinTable = () => {
 
     // cabins length validation
     if (!cabins?.length) return <Empty resourceName="cabins" />;
-    
+
     return (
         // using Menus component to wrap the Table component, so CabinRow component can use the value from menus context as child
         <Menus>
