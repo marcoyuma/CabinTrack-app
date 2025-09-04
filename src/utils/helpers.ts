@@ -66,13 +66,48 @@ export const transformInputsIntoCompatibleType = (
     image: dataToConvert.image[0],
 });
 
-// reusable sanitized
-// type NonNull<T> = { [K in keyof T]: T[K] };
-// interface NullData {
-//     id: null | number;
-//     name: null | string;
-// }
-// export const sanitize = <T>(data: T): NonNullable<T> => {
-//     return data;
-// };
-// console.log(sanitize({ id: null, name: "ags" }).id);
+export const sanitizeNull = <T>(value: T | undefined | null): T | undefined => {
+    return value ?? undefined;
+};
+// generic function for sorting data dynamically
+export const sortData = <T>(
+    // data is T[] or undefined
+    data: T[] | undefined,
+
+    // base string to sort data
+    sortBy: string
+): T[] => {
+    // early return if empty array received
+    if (!data) return [];
+
+    // desctructure that two splitted elements depends on '-' splitter. returned two length array
+    // Type assertion: force split returned value become tuple [string, "asc" | "desc"] for type safety
+    const [field, direction] = sortBy.split("-") as [string, "asc" | "desc"];
+
+    // return sorted shallow copy of 'data' array
+    return [...data].sort((a, b) => {
+        const aValue = a[field as keyof typeof a];
+        const bValue = b[field as keyof typeof b];
+
+        // sort undefined and null value to back of the list
+        if (!aValue) return 1;
+        if (!bValue) return -1;
+
+        // validation if type of value is string
+        if (typeof aValue === "string" && typeof bValue === "string") {
+            // return sorted value based on ternary 'direction' condition
+            return direction === "asc"
+                ? aValue.localeCompare(bValue)
+                : bValue.localeCompare(aValue);
+        }
+
+        // validation type of value is number
+        if (typeof aValue === "number" && typeof bValue === "number") {
+            // return sorted value conditionally
+            return direction === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        // value does not contain either string or number and there's no returned 'data' array
+        return 0;
+    });
+};
