@@ -23,7 +23,7 @@ export const getBookings = async (
             ascending: sortBy.direction === "asc" ? true : false,
         });
 
-    // get only specified by 'field' and 'value' filter properties with 'eq' method
+    // not executed or get only specified by 'field' and 'value' filter properties with 'eq' method
     if (filter) query = query.eq(filter.field, filter.value);
 
     const { data: bookings, error } = await query;
