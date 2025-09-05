@@ -26,7 +26,7 @@ export const getBookings = async (
     // not executed or get only specified by 'field' and 'value' filter properties with 'eq' method
     if (filter) query = query.eq(filter.field, filter.value);
 
-    const { data: bookings, error } = await query;
+    const { data, error, count } = await query;
 
     if (error) {
         console.error(error);
