@@ -1,6 +1,9 @@
 import supabase from "../supabase/supabase";
 import { getToday } from "../utils/helpers";
-import { bookingsReadSchema } from "./types/bookings.type";
+import {
+    bookingsDataLengthSchema,
+    bookingsReadSchema,
+} from "./types/bookings.type";
 
 // get all data from 'bookings', 1 data from 'cabins', and 2 data from 'guests' table
 export const getBookings = async (
