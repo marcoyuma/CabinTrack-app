@@ -33,6 +33,10 @@ export const getBookings = async (
         throw new Error("Booking could not be loaded");
     }
 
+    // parsing into eligible cleaner bookings data
+    const bookings = data.map((val) => bookingsReadSchema.parse(val));
+    const bookingsDataLength = bookingsDataLengthSchema.parse(count);
+
     // return non nullable data
     return bookings.map((val) => bookingsReadSchema.parse(val));
 };
