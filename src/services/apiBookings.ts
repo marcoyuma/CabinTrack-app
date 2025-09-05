@@ -38,7 +38,7 @@ export const getBookings = async (
     const bookingsDataLength = bookingsDataLengthSchema.parse(count);
 
     // return non nullable data
-    return bookings.map((val) => bookingsReadSchema.parse(val));
+    return { bookings, bookingsDataLength };
 };
 
 export const getBooking = async (id: number) => {
