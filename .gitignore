@@ -30,3 +30,6 @@ AddCabinv1.tsx
 CabinTablev1.tsx
 CabinRowv1.tsx
 sanitizeCabinData.ts
+
+# env
+.env
