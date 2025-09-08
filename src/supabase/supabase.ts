@@ -6,7 +6,8 @@ import { Database } from "./types/database.types";
  * This is the unique endpoint to access your Supabase instance.
  * You can find this in the Supabase dashboard under Project Settings > API > Project URL.
  */
-export const supabaseUrl = "https://ixlapibfddubweqrmtgh.supabase.co";
+
+export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 /**
  * Supabase public API key (anon key).
  *
@@ -16,8 +17,8 @@ export const supabaseUrl = "https://ixlapibfddubweqrmtgh.supabase.co";
  *
  * You can find this in Supabase dashboard under Project Settings > API > anon public key.
  */
-const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bGFwaWJmZGR1YndlcXJtdGdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNDcyNDMsImV4cCI6MjA2NTYyMzI0M30.BqtaqfVsWdDeMD3bLMG5GGhLoHaSWAaACgtqP6HNrlw";
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
+
 /**
  * Supabase client instance.
  *
