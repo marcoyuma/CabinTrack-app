@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+// custom interface for readability on supabase env
 interface ImportMetaEnv {
     readonly VITE_SUPABASE_URL: string;
     readonly VITE_SUPABASE_KEY: string;
