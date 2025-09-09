@@ -8,9 +8,10 @@ import FileInput from "../../../ui/FileInput/FileInput";
 import Input from "../../../ui/Input/Input";
 import { FormRow } from "../../../ui/FormRow/FormRow";
 
-import { FormDataType } from "../types/type";
 import { useUpdateCabin } from "../hooks/useUpdateCabin";
 import { useCreateCabin } from "../hooks/useCreateCabin";
+
+import { FormDataType } from "../../../services/types/cabins.type";
 
 export type EditedCabinData = {
     editedCabinData?: {
