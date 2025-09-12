@@ -11,28 +11,10 @@ import { FormRow } from "../../../ui/FormRow/FormRow";
 import { useUpdateCabin } from "../hooks/useUpdateCabin";
 import { useCreateCabin } from "../hooks/useCreateCabin";
 
-import { FormDataType } from "../../../services/types/cabins.type";
-
-export type EditedCabinData = {
-    editedCabinData?: {
-        created_at: string;
-        description?: string;
-        discount?: string;
-        id: number;
-        image?: FileList | string;
-        maxCapacity?: string;
-        name?: string;
-        regularPrice?: string;
-    };
-};
-
-// This interface defines the props for the CreateCabinForm component.
-// It extends the EditedCabinData type to include the edited cabin data and a function to
-// close the modal after creating or editing a cabin.
-// The onCloseModal function is called when the form is successfully submitted to close the modal.
-interface CreateCabinFormProps extends EditedCabinData {
-    onCloseModal?: () => void;
-}
+import {
+    CreateCabinFormProps,
+    FormDataType,
+} from "../../../services/types/cabins.type";
 
 // component for creating cabin with react hook form
 // no manual hookstate
