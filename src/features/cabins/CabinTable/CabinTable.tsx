@@ -21,7 +21,7 @@ import { Pagination } from "../../../ui/Pagination/Pagination";
  */
 export const CabinTable = () => {
     // destructuring the cabins data from custom hooks that calls 'getCabins' api
-    const { isPending, cabins } = useCabins();
+    const { isPending, cabins, cabinsLength } = useCabins();
 
     // filter cabin data
     // get value from custom hooks by defining params query key name
