@@ -132,6 +132,7 @@ const Toggle = ({ id }: { id: string }) => {
     );
 };
 
+// parent component component for grouping relevan button inside
 const List = ({ id, children }: { id: string; children: ReactNode }) => {
     const { openId, position, close } = useMenusContext();
     const { ref } = useOutsideClick<HTMLUListElement>(close);
