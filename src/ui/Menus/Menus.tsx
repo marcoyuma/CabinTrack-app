@@ -99,6 +99,7 @@ export const Menus = ({ children }: Menus) => {
 };
 
 // childrens of 'Menus' component
+// component for detecting click
 const Toggle = ({ id }: { id: string }) => {
     const { openId, open, close, setPosition } = useMenusContext();
 
