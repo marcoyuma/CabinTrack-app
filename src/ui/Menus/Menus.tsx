@@ -80,6 +80,7 @@ export interface PositionType {
 interface Menus {
     children: ReactNode;
 }
+
 // parent of the compound component
 export const Menus = ({ children }: Menus) => {
     const [openId, setOpenId] = useState("");
