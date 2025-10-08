@@ -2,9 +2,12 @@ import supabase from "../supabase/supabase";
 import { DATA_PER_PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import {
-    bookingsDataLengthSchema,
+    BookingFilterValue,
+    bookingsLengthSchema,
     bookingsReadSchema,
-} from "./types/bookings.type";
+    BookingsDataType,
+    BookingSortValue,
+} from "../types/bookings.type";
 
 // get all data from 'bookings', 1 data from 'cabins', and 2 data from 'guests' table
 export const getBookings = async (
