@@ -99,6 +99,19 @@ function BookingRow({ booking }: { booking: Booking }) {
             </Tag>
 
             <Amount>{formatCurrency(totalPrice)}</Amount>
+            <Menus>
+                <Menus.Menu>
+                    <Menus.Toggle id={bookingId.toString()} />
+                    <Menus.List id={bookingId.toString()}>
+                        <Menus.Button
+                            icon={<HiEye />}
+                            onClick={() => navigate(`/bookings/${bookingId}`)}
+                        >
+                            See details
+                        </Menus.Button>
+                    </Menus.List>
+                </Menus.Menu>
+            </Menus>
         </Table.Row>
     );
 }
