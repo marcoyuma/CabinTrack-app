@@ -9,11 +9,16 @@ import {
     BookingSortValue,
 } from "../types/bookings.type";
 
-// get all data from 'bookings', 1 data from 'cabins', and 2 data from 'guests' table
-export const getBookings = async (
-    filter: { field: string; value: string } | null,
-    sortBy: { field: string; direction: "asc" | "desc" }
-) => {
+// read all data from 'bookings', 1 data from 'cabins', and 2 data from 'guests' table
+export const readBookings = async (
+    filter: { field: "status"; value: BookingFilterValue } | null,
+    sortBy: BookingSortValue,
+    page: number
+): Promise<BookingsDataType> => {
+    // 'from' is first data index per each page (starting with zero index) and 'to' is the maximum data index per each page
+    const from = (page - 1) * DATA_PER_PAGE_SIZE;
+    const to = from + DATA_PER_PAGE_SIZE - 1;
+
     // assign 'query' as supabase client instance and sort by 'field' and 'direction' properties
     let query = supabase
         .from("bookings")
@@ -23,26 +28,32 @@ export const getBookings = async (
             // length of the data (supabase feature of counting total rows).
             { count: "exact" }
         )
+        // sort by 'direction' properties
         .order(sortBy.field, {
             ascending: sortBy.direction === "asc" ? true : false,
-        });
+        })
+        // took only from specified indexes
+        .range(from, to);
 
     // not executed or get only specified by 'field' and 'value' filter properties with 'eq' method
-    if (filter) query = query.eq(filter.field, filter.value);
+    if (filter) {
+        query = query.eq(filter.field, filter.value);
+    }
 
     const { data, error, count } = await query;
 
     if (error) {
         console.error(error);
-        throw new Error("Booking could not be loaded");
+        throw new Error(`Booking could not be loaded: ${error.message}`);
     }
 
     // parsing into eligible cleaner bookings data
     const bookings = data.map((val) => bookingsReadSchema.parse(val));
-    const bookingsDataLength = bookingsDataLengthSchema.parse(count);
+    const bookingsLength = bookingsLengthSchema.parse(count);
+    console.log(bookingsLength);
 
     // return non nullable data
-    return { bookings, bookingsDataLength };
+    return { bookings, bookingsLength };
 };
 
 export const getBooking = async (id: number) => {
