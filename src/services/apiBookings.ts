@@ -1,4 +1,5 @@
 import supabase from "../supabase/supabase";
+import { DATA_PER_PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import {
     bookingsDataLengthSchema,
