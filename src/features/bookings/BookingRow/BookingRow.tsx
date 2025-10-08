@@ -64,11 +64,7 @@ function BookingRow({ booking }: { booking: Booking }) {
         cabins,
     } = booking;
 
-    const cabinName = cabins?.name ?? "-";
-    const guestName = guests?.fullName ?? "-";
-    const email = guests?.email ?? "-";
-
-    // immediately invoke function to clean up 'status' as key for 'statusToTagName'
+    // immediately invoke function to clean up 'status' as key for 'statusToTagName'.
     const status = ((): keyof typeof statusToTagName => {
         const normalize = sanitizeNull(bookingStatus);
         return normalize && normalize in statusToTagName
