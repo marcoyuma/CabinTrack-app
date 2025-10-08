@@ -42,6 +42,9 @@ const Amount = styled.div`
 `;
 
 function BookingRow({ booking }: { booking: Booking }) {
+    // hooks for navigate
+    const navigate = useNavigate();
+
     const statusToTagName = {
         unconfirmed: "blue",
         "checked-in": "green",
