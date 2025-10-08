@@ -3,8 +3,6 @@ import { format, isToday } from "date-fns";
 
 import { Table } from "../../../ui/Table/Table";
 import Tag from "../../../ui/Tag/Tag";
-import { BookingType } from "../types/type";
-import { GuestType } from "../../guests/types/type";
 
 import {
     formatCurrency,
