@@ -9,24 +9,10 @@ import {
     formatDistanceFromNow,
     sanitizeNull,
 } from "../../../utils/helpers";
-import { CabinType } from "../../../services/types/cabins.type";
-
-// rejoin 3 table types
-// id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice
-type Booking = Pick<
-    BookingType,
-    | "id"
-    | "created_at"
-    | "startDate"
-    | "endDate"
-    | "numNights"
-    | "numGuests"
-    | "status"
-    | "totalPrice"
-> & {
-    cabins: Pick<CabinType, "name"> | null;
-    guests: Pick<GuestType, "fullName" | "email"> | null;
-};
+import { Booking } from "../../../types/bookings.type";
+import { Menus } from "../../../ui/Menus/Menus";
+import { HiEye } from "react-icons/hi2";
+import { useNavigate } from "react-router-dom";
 
 const Cabin = styled.div`
     font-size: 1.6rem;
