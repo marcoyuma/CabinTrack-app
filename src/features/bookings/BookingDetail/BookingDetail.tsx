@@ -18,7 +18,8 @@ const HeadingGroup = styled.div`
 
 function BookingDetail() {
     const { isBookingLoading, booking, error } = useBooking();
-    const status = "checked-in";
+
+    const { status, id: bookingId } = booking;
 
     const moveBack = useMoveBack();
 
