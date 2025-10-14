@@ -35,8 +35,17 @@ function BookingDetail() {
         <>
             <Row type="horizontal">
                 <HeadingGroup>
-                    <Heading as="h1">Booking #X</Heading>
-                    <Tag type={statusToTagName[status]}>
+                    <Heading as="h1">Booking #{bookingId}</Heading>
+                    <Tag
+                        type={
+                            statusToTagName[
+                                status as
+                                    | "unconfirmed"
+                                    | "checked-in"
+                                    | "checked-out"
+                            ]
+                        }
+                    >
                         {status.replace("-", " ")}
                     </Tag>
                 </HeadingGroup>
