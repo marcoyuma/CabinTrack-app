@@ -53,10 +53,12 @@ export const CreateCabinForm = ({
     const isWorking = isCreating || isUpdating;
 
     // submit handler
-    const onSubmit: SubmitHandler<FormDataType> = (data): void => {
+    // const onSubmit: SubmitHandler<FormDataType> = (data): void => {
+    const onSubmit: SubmitHandler<CabinFormSchemaType> = (data): void => {
         console.log(data);
         const image =
             typeof data.image === "string" ? data.image : data.image[0];
+
         if (isEditSession) {
             updateCabin(
                 {
