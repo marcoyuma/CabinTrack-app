@@ -35,6 +35,7 @@ export const CreateCabinForm = ({
     // on edit indicator
     const isEditSession = Boolean(editId);
 
+    // implementing useForm hook
     // Destructure 'register' and 'handleSubmit' from useForm to manage form inputs and submission
     const { register, handleSubmit, reset, getValues, formState } =
         // useForm<FormDataType>({
