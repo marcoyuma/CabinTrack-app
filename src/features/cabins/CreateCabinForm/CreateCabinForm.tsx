@@ -13,9 +13,10 @@ import { useUpdateCabin } from "../hooks/useUpdateCabin";
 import { useCreateCabin } from "../hooks/useCreateCabin";
 
 import {
+    cabinFormSchema,
+    CabinFormSchemaType,
     CreateCabinFormProps,
-    FormDataType,
-} from "../../../services/types/cabins.type";
+} from "../../../types/cabins.type";
 
 // component for creating cabin with react hook form
 // no manual hookstate
