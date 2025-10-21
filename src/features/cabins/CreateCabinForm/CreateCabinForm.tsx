@@ -93,7 +93,7 @@ export const CreateCabinForm = ({
     };
 
     // error handler
-    const onError: SubmitErrorHandler<FormDataType> = (errors) => {
+    const onError: SubmitErrorHandler<CabinFormSchemaType> = (errors) => {
         console.log(errors);
     };
     return (
