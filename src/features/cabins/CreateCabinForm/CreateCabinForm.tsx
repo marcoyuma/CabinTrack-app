@@ -24,8 +24,13 @@ export const CreateCabinForm = ({
     editedCabinData,
     onCloseModal,
 }: CreateCabinFormProps) => {
-    // destructure and rename data from props
-    const { id: editId, ...editValues } = editedCabinData ?? {};
+    // destructure editedCabinData if available for default values
+    let editId: undefined | number;
+    let editValues: Partial<CabinFormSchemaType> = {};
+    if (editedCabinData) {
+        ({ id: editId, ...editValues } = editedCabinData);
+    }
+    // const { id: editId, ...editValues } = editedCabinData ?? ({} as Cabin);
 
     // on edit indicator
     const isEditSession = Boolean(editId);
