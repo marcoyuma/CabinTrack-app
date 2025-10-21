@@ -1,5 +1,6 @@
 // external libraries
 import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import Form from "../../../ui/Form/Form";
 import { Button } from "../../../ui/Button/Button";
@@ -30,9 +31,14 @@ export const CreateCabinForm = ({
 
     // Destructure 'register' and 'handleSubmit' from useForm to manage form inputs and submission
     const { register, handleSubmit, reset, getValues, formState } =
-        useForm<FormDataType>({
-            // conditional logic for if on edit session then use 'editValues' as default value from cabins query
-            defaultValues: isEditSession ? editValues : {},
+        // useForm<FormDataType>({
+        useForm<CabinFormSchemaType>({
+            // integrate zod schema with react hook form resolver via zod resolver for input validation
+            resolver: zodResolver(cabinFormSchema),
+            // conditional logic for if on edit session then use 'editValues' as default value from cabins query in each input
+            defaultValues: isEditSession
+                ? editValues
+                : ({} as CabinFormSchemaType),
         }); // dont forget to give the hook generic type
 
     const { errors } = formState;
