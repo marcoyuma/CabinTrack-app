@@ -35,10 +35,7 @@ export const createCabin = async (newCabin: NewCabin): Promise<Cabin[]> => {
             throw new Error("Cabin could not created");
     }
 
-    // 2. upload image to storage
-    // if there's image file from input file
-    // if isNewImage then we need to upload the image to storage
-    // if not then we can skip this step
+        // 2. upload image to storage when met the condition
     if (isNewImage) {
         const { error: storageError } = await supabase.storage
             .from("cabin-images")
