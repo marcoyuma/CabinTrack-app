@@ -1,7 +1,11 @@
-import { v4 as uuidv4 } from "uuid";
-
-import supabase, { supabaseUrl } from "../../supabase/supabase";
-import { cabinSchema, NewCabin } from "../types/cabins.type";
+import supabase from "../../supabase/supabase";
+import {
+    Cabin,
+    cabinCreateSchema,
+    cabinReadSchema,
+    NewCabin,
+} from "../../types/cabins.type";
+import { formatImagePath } from "../../utils/formatImagePath";
 
 // create new cabins
 export const createCabin = async (
