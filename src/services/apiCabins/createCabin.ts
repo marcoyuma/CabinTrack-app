@@ -7,36 +7,19 @@ import {
 } from "../../types/cabins.type";
 import { formatImagePath } from "../../utils/formatImagePath";
 
-// create new cabins
-export const createCabin = async (
-    newCabin: // CabinType<File>
-    NewCabin
-) => {
-    // zod handle newCabin type
-    const parsedCabin = cabinSchema.parse(newCabin);
+// create new cabins function. used in useCreateCabin query mutation function
+export const createCabin = async (newCabin: NewCabin): Promise<Cabin[]> => {
+    try {
+        // zod handle newCabin type safety
+        const parsedCabin = cabinCreateSchema.parse(newCabin);
 
-    console.log(parsedCabin);
+        // destructured needed object
+        const { isNewImage, imageName, imagePath } = formatImagePath(
+            parsedCabin.image
+        );
 
-    // isNewImage is a boolean to check if the image is a File type
-    const isNewImage = parsedCabin.image instanceof File;
-    console.log(isNewImage);
-
-    // define dynamic image name based on type of image property
-    const imageName: string = isNewImage
-        ? `${uuidv4()}-${(parsedCabin.image as File).name}`.replaceAll("/", "")
-        : (parsedCabin.image as string);
-
-    // define image path based on supabaseUrl and image name purposely for prevent
-    const imagePath = isNewImage
-        ? `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`
-        : imageName;
-
-    console.log(imagePath);
-
-    // 1. insert cabin data into 'cabins' table
-    // using supabase client instance from 'cabins' table
-    // and select the data after insertion
-    const { data, error } = await supabase
+        // 1. insert cabin data into 'cabins' table. return new data including previous insert
+        const { data: cabins, error } = await supabase
         .from("cabins")
         .insert([
             {
@@ -46,10 +29,10 @@ export const createCabin = async (
             },
         ])
         .select();
-    console.log(error);
+
     if (error) {
         console.error(error);
-        throw new Error("cabin could not created");
+            throw new Error("Cabin could not created");
     }
 
     // 2. upload image to storage
