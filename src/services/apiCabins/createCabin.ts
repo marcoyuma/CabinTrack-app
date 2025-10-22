@@ -20,36 +20,36 @@ export const createCabin = async (newCabin: NewCabin): Promise<Cabin[]> => {
 
         // 1. insert cabin data into 'cabins' table. return new data including previous insert
         const { data: cabins, error } = await supabase
-        .from("cabins")
-        .insert([
-            {
-                // spread parsedCabin property except image
-                ...parsedCabin,
-                image: imagePath,
-            },
-        ])
-        .select();
+            .from("cabins")
+            .insert([
+                {
+                    // spread parsedCabin property except image
+                    ...parsedCabin,
+                    image: imagePath,
+                },
+            ])
+            .select();
 
-    if (error) {
-        console.error(error);
+        if (error) {
+            console.error(error);
             throw new Error("Cabin could not created");
-    }
+        }
 
         // 2. upload image to storage when met the condition
-    if (isNewImage) {
-        const { error: storageError } = await supabase.storage
-            .from("cabin-images")
-            .upload(imageName, parsedCabin.image);
+        if (isNewImage) {
+            const { error: storageError } = await supabase.storage
+                .from("cabin-images")
+                .upload(imageName, parsedCabin.image);
 
             // delete cabin if there's cabin uploaded without image
-        if (storageError) {
+            if (storageError) {
                 await supabase.from("cabins").delete().eq("id", cabins[0].id);
-            console.error(storageError);
-            throw new Error(
+                console.error(storageError);
+                throw new Error(
                     "Image could not uploaded and cabin was not created"
-            );
+                );
+            }
         }
-    }
 
         return cabins.map((val) => cabinReadSchema.parse(val));
     } catch (error) {
