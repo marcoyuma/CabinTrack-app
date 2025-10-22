@@ -41,18 +41,24 @@ export const createCabin = async (newCabin: NewCabin): Promise<Cabin[]> => {
             .from("cabin-images")
             .upload(imageName, parsedCabin.image);
 
-        // if there's an error while uploading the image
-        // then we need to delete the cabin data from 'cabins' table
-        // and throw an error
-        // this is necessary to avoid having a cabin without an image
-        // and to avoid having a cabin with an image that is not uploaded
+            // delete cabin if there's cabin uploaded without image
         if (storageError) {
-            await supabase.from("cabins").delete().eq("id", data[0].id);
+                await supabase.from("cabins").delete().eq("id", cabins[0].id);
             console.error(storageError);
             throw new Error(
-                "image could not uploaded and cabin was not created"
+                    "Image could not uploaded and cabin was not created"
             );
         }
     }
-    return data;
+
+        return cabins.map((val) => cabinReadSchema.parse(val));
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error in createCabin: ", error.message);
+            throw new Error("An error occured, create cabin failed");
+        } else {
+            console.error("Unknown error in createCabin: ", error);
+            throw new Error("Unknown error occured while creating the cabin");
+        }
+    }
 };
