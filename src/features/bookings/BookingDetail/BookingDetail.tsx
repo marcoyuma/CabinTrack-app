@@ -19,7 +19,11 @@ const HeadingGroup = styled.div`
 `;
 
 function BookingDetail() {
-    const { isBookingLoading, booking, error } = useBooking();
+    // hook for navigate programmatically
+    const navigate = useNavigate();
+
+    // custom hook to fetch booking data and its properties
+    const { isBookingLoading, booking /*, error*/ } = useBooking();
 
     const { status, id: bookingId } = booking;
 
