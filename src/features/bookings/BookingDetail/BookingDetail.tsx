@@ -9,6 +9,8 @@ import ButtonGroup from "../../../ui/ButtonGroup/ButtonGroup";
 import { Button } from "../../../ui/Button/Button";
 import { useBooking } from "../hooks/useBooking";
 import Spinner from "../../../ui/Spinner/Spinner";
+import { useNavigate } from "react-router-dom";
+import PageNotFound from "../../../pages/PageNotFound/PageNotFound";
 
 const HeadingGroup = styled.div`
     display: flex;
