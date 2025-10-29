@@ -36,6 +36,9 @@ function BookingDetail() {
         "checked-out": "silver",
     };
 
+    // ! TEMPORARY,
+    if (!bookingId) return <PageNotFound />;
+
     if (isBookingLoading) return <Spinner />;
 
     return (
