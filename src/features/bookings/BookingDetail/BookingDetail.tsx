@@ -25,6 +25,7 @@ function BookingDetail() {
     // custom hook to fetch booking data and its properties
     const { isBookingLoading, booking /*, error*/ } = useBooking();
 
+    // destructuring 'status' for 'Tag' component 'type' property and 'id' for displaying booking id
     const { status, id: bookingId } = booking;
 
     const moveBack = useMoveBack();
