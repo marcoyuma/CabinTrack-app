@@ -7,6 +7,8 @@ import {
     bookingsReadSchema,
     BookingsDataType,
     BookingSortValue,
+    detailedBookingReadSchema,
+    DetailedBookingDataType,
 } from "../types/bookings.type";
 
 // read all data from 'bookings', 1 data from 'cabins', and 2 data from 'guests' table
@@ -123,9 +125,16 @@ export async function getStaysTodayActivity() {
         throw new Error("Bookings could not get loaded");
     }
     return data;
-}
+};
 
-export async function updateBooking(id, obj) {
+// update booking
+export const updateBooking = async (
+    id: number,
+    obj: {
+        status: DetailedBookingDataType["status"];
+        isPaid: DetailedBookingDataType["isPaid"];
+    }
+) => {
     const { data, error } = await supabase
         .from("bookings")
         .update(obj)
@@ -138,7 +147,7 @@ export async function updateBooking(id, obj) {
         throw new Error("Booking could not be updated");
     }
     return data;
-}
+};
 
 export async function deleteBooking(id) {
     // REMEMBER RLS POLICIES
