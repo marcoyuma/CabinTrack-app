@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { updateCabin as updateCabinApi } from "../../../services/apiCabins/updateCabin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { NewCabin } from "../../../services/types/cabins.type";
+import { NewCabin } from "../../../types/cabins.type";
 
 export const useUpdateCabin = () => {
     // define client for invalidate the new data
@@ -13,16 +13,13 @@ export const useUpdateCabin = () => {
         // mutation function returned and renamed as 'createNewCabin' to trigger the actual mutation input data and call the callback function 'createCabin'
         mutate: updateCabin,
     } = useMutation({
-        // mutation function defined in '../../../services/apiCabins.ts'
-        // mutationFn: (id: number) => deleteCabin(id),
-        // ! react query only allow 1 argument on mutate function
-        // ! this still not clear
+        // mutation function
         mutationFn: ({
             newCabinData,
             id,
         }: {
             newCabinData: NewCabin;
-            id: number | undefined;
+            id: number;
         }) => updateCabinApi(newCabinData, id),
         // when mutation is success then invalidate the query and force it to be stale, this will automatically re-fetch data from server so the UI will stay in sync with updated 'cabin' query data.
         onSuccess: () => {
