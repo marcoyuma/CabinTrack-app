@@ -16,40 +16,40 @@ export const readCabins = async (
     page: number
 ): Promise<CabinsDataType> => {
     // indexes for getting specific cabins data
-        const from = (page - 1) * DATA_PER_PAGE_SIZE;
-        const to = from + DATA_PER_PAGE_SIZE - 1;
+    const from = (page - 1) * DATA_PER_PAGE_SIZE;
+    const to = from + DATA_PER_PAGE_SIZE - 1;
 
-        // define re-assignable variablel 'query'
-        let query = supabase
-            .from("cabins")
-            .select(
-                "id, name, description, discount, image, maxCapacity, regularPrice, created_at",
+    // define re-assignable variablel 'query'
+    let query = supabase
+        .from("cabins")
+        .select(
+            "id, name, description, discount, image, maxCapacity, regularPrice, created_at",
 
-                // length of the data (supabase feature of counting total rows).
-                { count: "exact" }
-            )
-            .order(sortBy.field, {
-                ascending: sortBy.direction === "asc" ? true : false,
-            })
-            .range(from, to);
+            // length of the data (supabase feature of counting total rows).
+            { count: "exact" }
+        )
+        .order(sortBy.field, {
+            ascending: sortBy.direction === "asc" ? true : false,
+        })
+        .range(from, to);
 
-        if (filter?.value) {
-            query =
-                filter.value === "no-discount"
-                    ? query.eq(filter.field, 0)
-                    : query.gt(filter.field, 0);
-            console.log(filter.value);
-            console.log("difilter....");
-        }
+    if (filter?.value) {
+        query =
+            filter.value === "no-discount"
+                ? query.eq(filter.field, 0)
+                : query.gt(filter.field, 0);
+        console.log(filter.value);
+        console.log("difilter....");
+    }
 
-        const { data, error, count } = await query;
+    const { data, error, count } = await query;
 
-        // handle error
-        if (error) {
+    // handle error
+    if (error) {
         throw new Error(`Cabins data could not be loaded: ${error}`);
-        }
+    }
 
-        // return clean 'cabins' data
+    // return clean 'cabins' data
     return {
         cabins: parseCabinList(data),
         cabinsLength: parseCabinCount(count),
