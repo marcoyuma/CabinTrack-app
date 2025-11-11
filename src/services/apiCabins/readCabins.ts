@@ -13,7 +13,7 @@ export const readCabins = async (
     sortBy: CabinSortValue,
     page: number
 ): Promise<CabinsDataType> => {
-    try {
+    // indexes for getting specific cabins data
         const from = (page - 1) * DATA_PER_PAGE_SIZE;
         const to = from + DATA_PER_PAGE_SIZE - 1;
         console.log(`from: ${from}`);
@@ -53,14 +53,8 @@ export const readCabins = async (
         }
 
         // return clean 'cabins' data
-        return { cabins, cabinsLength };
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error("Error fetching cabins: ", error.message);
-            throw new Error("An error occured, read cabin failed");
-        } else {
-            console.error("Unknown error in readCabins", error);
-            throw new Error("Unknown Error occured while reading cabins");
-        }
-    }
+    return {
+        cabins: parseCabinList(data),
+        cabinsLength: parseCabinCount(count),
+    };
 };
