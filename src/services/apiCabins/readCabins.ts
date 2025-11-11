@@ -16,8 +16,6 @@ export const readCabins = async (
     // indexes for getting specific cabins data
         const from = (page - 1) * DATA_PER_PAGE_SIZE;
         const to = from + DATA_PER_PAGE_SIZE - 1;
-        console.log(`from: ${from}`);
-        console.log(`to: ${to}`);
 
         // define re-assignable variablel 'query'
         let query = supabase
@@ -41,15 +39,12 @@ export const readCabins = async (
             console.log(filter.value);
             console.log("difilter....");
         }
-        console.log(`INI ISI FILTER: ${filter}`);
-        console.log(`INI ISI FIELD: ${filter?.field}`);
-        console.log(`INI ISI VALUE: ${filter?.value}`);
 
         const { data, error, count } = await query;
 
         // handle error
         if (error) {
-            throw new Error("Cabins data could not be loaded", error);
+        throw new Error(`Cabins data could not be loaded: ${error}`);
         }
 
         // return clean 'cabins' data
