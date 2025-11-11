@@ -5,6 +5,8 @@ import {
     CabinsDataType,
     CabinSortValue,
 } from "../../types/cabins.type";
+import { parseCabinList } from "../parser/parseCabinList";
+import { parseCabinCount } from "../parser/parseCabinCount";
 
 // define get all data from 'cabins' table database
 // read cabins function. used in useCabin query function
