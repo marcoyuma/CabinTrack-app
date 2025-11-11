@@ -2,9 +2,7 @@ import supabase from "../../supabase/supabase";
 import { DATA_PER_PAGE_SIZE } from "../../utils/constants";
 import {
     CabinFilterValue,
-    cabinReadSchema,
     CabinsDataType,
-    cabinsLengthSchema,
     CabinSortValue,
 } from "../../types/cabins.type";
 
@@ -53,11 +51,6 @@ export const readCabins = async (
         if (error) {
             throw new Error("Cabins data could not be loaded", error);
         }
-
-        // returned promise value
-        const cabins = data.map((val) => cabinReadSchema.parse(val));
-        const cabinsLength = cabinsLengthSchema.parse(count);
-        console.log(`cabins length: ${cabinsLength}`);
 
         // return clean 'cabins' data
         return { cabins, cabinsLength };
