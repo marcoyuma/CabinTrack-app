@@ -47,8 +47,6 @@ function BookingDetail() {
     // ! TEMPORARY,
     if (!bookingId) return <PageNotFound />;
 
-    if (isBookingLoading) return <Spinner />;
-
     return (
         <>
             <Row type="horizontal">
@@ -96,14 +94,25 @@ function BookingDetail() {
 
                 <Modal>
                     <Modal.Open opens="confirm-booking-deletion">
-                        <Button variation="danger">Delete booking</Button>
+                        {(open) => (
+                            <Button variation="danger" onClick={open}>
+                                Delete booking
+                            </Button>
+                        )}
                     </Modal.Open>
 
                     <Modal.Window name="confirm-booking-deletion">
                         {(close) => (
                             <ConfirmDelete
                                 resourceName={"name"}
-                                onConfirm={() => deleteBooking(bookingId)}
+                                onConfirm={() =>
+                                    // passing an object with 'onSettled' callback to navigate previous page
+                                    deleteBooking(bookingId, {
+                                        onSettled: () => {
+                                            navigate(-1);
+                                        },
+                                    })
+                                }
                                 onCancel={close}
                                 disabled={isBookingDeleting}
                             />
