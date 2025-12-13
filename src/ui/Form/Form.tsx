@@ -9,9 +9,10 @@ type FormType = {
 // If the type is 'regular', it will have padding and a box style.
 // If the type is 'modal', it will have a specific width for modal forms.
 // The default type is 'regular'.
-const Form = styled.form<FormType>`
-    ${(props) =>
-        props.type === "regular" &&
+export const Form = styled.form<FormType>`
+    // defining default value in css level by 'regular' if undefined
+    ${({ type = "regular" }) =>
+        type === "regular" &&
         css`
             padding: 2.4rem 4rem;
 
@@ -21,17 +22,13 @@ const Form = styled.form<FormType>`
             border-radius: var(--border-radius-md);
         `}
 
-    ${(props) =>
-        props.type === "modal" &&
+    ${({ type }) =>
+        type === "modal" &&
         css`
             width: 80rem;
         `}
 
-    /* way to define default props logic  */
-    ${(props) => props.type || "regular"}
     
   overflow: hidden;
     font-size: 1.4rem;
 `;
-
-export default Form;
