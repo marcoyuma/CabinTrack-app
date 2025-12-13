@@ -16,6 +16,8 @@ import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
+import { Booking } from "./pages/Bookings/Booking";
+import { Checkin } from "./pages/Checkin/Checkin";
 
 export const App = () => {
     // define react-query instance
@@ -34,6 +36,8 @@ export const App = () => {
             children: [
                 { index: true, element: <Navigate replace to="dashboard" /> },
                 { path: "dashboard", element: <Dashboard /> },
+                { path: "bookings/:bookingId", element: <Booking /> },
+                { path: "checkin/:bookingId", element: <Checkin /> },
                 { path: "bookings", element: <Bookings /> },
                 { path: "cabins", element: <Cabins /> },
                 { path: "users", element: <Users /> },
