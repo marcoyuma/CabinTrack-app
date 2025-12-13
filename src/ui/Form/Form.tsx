@@ -27,8 +27,7 @@ export const Form = styled.form<FormType>`
         css`
             width: 80rem;
         `}
-
-    
-  overflow: hidden;
+        
+    overflow: hidden;
     font-size: 1.4rem;
 `;
