@@ -3,19 +3,21 @@ import {
     Navigate,
     RouterProvider,
 } from "react-router-dom";
-import GlobalStyles from "./styles/GlobalStyles";
-import { AppLayout } from "./ui/AppLayout/AppLayout";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import Bookings from "./pages/Bookings/Bookings";
-import Cabins from "./pages/Cabins/Cabins";
-import { Users } from "./pages/Users/Users";
-import Settings from "./pages/Settings/Settings";
-import Account from "./pages/Account/Account";
-import Login from "./pages/Login/Login";
-import PageNotFound from "./pages/PageNotFound/PageNotFound";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
+import GlobalStyles from "./styles/GlobalStyles";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import { AppLayout } from "./ui/AppLayout/AppLayout";
+import { Dashboard } from "./pages/Dashboard/Dashboard";
+import { Bookings } from "./pages/Bookings/Bookings";
+import { Cabins } from "./pages/Cabins/Cabins";
+import { Users } from "./pages/Users/Users";
+import { Settings } from "./pages/Settings/Settings";
+import { Account } from "./pages/Account/Account";
+import { Login } from "./pages/Login/Login";
+import { PageNotFound } from "./pages/PageNotFound/PageNotFound";
+
 import { Booking } from "./pages/Bookings/Booking";
 import { Checkin } from "./pages/Checkin/Checkin";
 
