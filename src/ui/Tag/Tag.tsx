@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 type TagProps = { type: string };
-const Tag = styled.span<TagProps>`
+export const Tag = styled.span<TagProps>`
     width: fit-content;
     text-transform: uppercase;
     font-size: 1.1rem;
@@ -13,5 +13,3 @@ const Tag = styled.span<TagProps>`
     color: var(--color-${(props) => props.type}-700);
     background-color: var(--color-${(props) => props.type}-100);
 `;
-
-export default Tag;
