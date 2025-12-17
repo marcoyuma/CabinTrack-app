@@ -38,11 +38,11 @@ const Error = styled.span`
 `;
 
 type HtmlFor =
-            | "name"
-            | "maxCapacity"
-            | "regularPrice"
-            | "discount"
-            | "description"
+    | "name"
+    | "maxCapacity"
+    | "regularPrice"
+    | "discount"
+    | "description"
     | "image"
     | "email";
 
