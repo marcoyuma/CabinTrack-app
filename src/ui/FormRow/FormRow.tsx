@@ -36,31 +36,32 @@ const Error = styled.span`
     font-size: 1.4rem;
     color: var(--color-red-700);
 `;
-export const FormRow = ({
-    label,
-    errors,
-    children,
-}: {
-    label?: {
-        htmlfor?:
+
+type HtmlFor =
             | "name"
             | "maxCapacity"
             | "regularPrice"
             | "discount"
             | "description"
-            | "image";
-        labelChild: string;
-    };
-    errors?: string | undefined;
+    | "image"
+    | "email";
+
+export const FormRow = ({
+    htmlFor,
+    label,
+    error,
+    children,
+}: {
+    htmlFor?: HtmlFor;
+    label?: string;
+    error?: string | undefined;
     children: ReactNode;
 }) => {
-    const htmlFor = label?.htmlfor || "";
-    const labelChild = label?.labelChild || "";
     return (
         <StyledFormRow>
-            <Label htmlFor={htmlFor}>{labelChild}</Label>
+            {label && <Label htmlFor={htmlFor}>{label}</Label>}
             {children}
-            {errors && <Error>{errors}</Error>}
+            {error && <Error>{error}</Error>}
         </StyledFormRow>
     );
 };
