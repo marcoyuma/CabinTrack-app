@@ -16,7 +16,7 @@ import { FileInput } from "../../../ui/FileInput/FileInput";
 
 interface UserMetadata {
     fullName?: string;
-    avatar?: string | FileList;
+    avatar?: FileList;
 }
 
 export const UpdateUserDataFormInner = ({ user }: { user: User }) => {
@@ -51,7 +51,8 @@ export const UpdateUserDataFormInner = ({ user }: { user: User }) => {
                 {
                     fullName,
                     email,
-                    avatar: typeof avatar === "string" ? avatar : avatar[0],
+                    // avatar: typeof avatar === "string" ? avatar : avatar[0],
+                    avatar: avatar[0],
                 },
                 {
                     onSuccess: () => {
