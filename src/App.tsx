@@ -20,6 +20,8 @@ import { PageNotFound } from "./pages/PageNotFound/PageNotFound";
 
 import { Booking } from "./pages/Bookings/Booking";
 import { Checkin } from "./pages/Checkin/Checkin";
+import { ProtectedRoute } from "./ui/ProtectedRoute/ProtectedRoute";
+import { DarkModeProvider } from "./context/DarkModeProvider";
 
 export const App = () => {
     // define react-query instance
@@ -33,8 +35,16 @@ export const App = () => {
     });
 
     const router = createBrowserRouter([
+        // public route
+        { path: "login", element: <Login /> },
+
+        // private routes
         {
-            element: <AppLayout />,
+            element: (
+                <ProtectedRoute>
+                    <AppLayout />
+                </ProtectedRoute>
+            ),
             children: [
                 { index: true, element: <Navigate replace to="dashboard" /> },
                 { path: "dashboard", element: <Dashboard /> },
@@ -45,7 +55,6 @@ export const App = () => {
                 { path: "users", element: <Users /> },
                 { path: "settings", element: <Settings /> },
                 { path: "account", element: <Account /> },
-                { path: "login", element: <Login /> },
             ],
         },
         { path: "login", element: <Login /> },
