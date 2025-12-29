@@ -2,7 +2,6 @@ import { JSX, ReactNode } from "react";
 import styled from "styled-components";
 import { TableContext } from "./context/TableContext";
 import { useTableContext } from "./context/useTableContext";
-import { Cabin } from "../../features/cabins/CabinRow/CabinRow";
 
 const StyledTable = styled.div`
     border: 1px solid var(--color-grey-200);
