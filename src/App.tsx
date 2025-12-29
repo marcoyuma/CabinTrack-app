@@ -57,34 +57,38 @@ export const App = () => {
                 { path: "account", element: <Account /> },
             ],
         },
-        { path: "login", element: <Login /> },
+
+        // fallback
         { path: "*", element: <PageNotFound /> },
         // path opened as soon as the app is open then directly navigate to 'dashboard' path
     ]);
     return (
-        // wrap up our provider with query client provider
-        <QueryClientProvider client={queryClient}>
-            <ReactQueryDevtools initialIsOpen={false} />
-            <GlobalStyles />
-            <RouterProvider router={router} />
-            <Toaster
-                position="top-center"
-                gutter={12}
-                containerStyle={{ margin: "8px" }}
-                toastOptions={{
-                    success: {
-                        duration: 3000,
-                    },
-                    error: { duration: 5000 },
-                    style: {
-                        fontSize: "16px",
-                        maxWidth: "500px",
-                        padding: "16px 24px",
-                        backgroundColor: "var(--color-grey-0)",
-                        color: "var(--color-grey-700)",
-                    },
-                }}
-            />
-        </QueryClientProvider>
+        // dark mode context provider
+        <DarkModeProvider>
+            {/* wrap up our provider with query client provider */}
+            <QueryClientProvider client={queryClient}>
+                <ReactQueryDevtools initialIsOpen={false} />
+                <GlobalStyles />
+                <RouterProvider router={router} />
+                <Toaster
+                    position="top-center"
+                    gutter={12}
+                    containerStyle={{ margin: "8px" }}
+                    toastOptions={{
+                        success: {
+                            duration: 3000,
+                        },
+                        error: { duration: 5000 },
+                        style: {
+                            fontSize: "16px",
+                            maxWidth: "500px",
+                            padding: "16px 24px",
+                            backgroundColor: "var(--color-grey-0)",
+                            color: "var(--color-grey-700)",
+                        },
+                    }}
+                />
+            </QueryClientProvider>
+        </DarkModeProvider>
     );
 };
