@@ -5,7 +5,7 @@ export const useTableContext = () => {
     const context = useContext(TableContext);
     if (context === null) {
         throw new Error(
-            "table context cannot be applied ouside child component"
+            "table context cannot be applied outside child component"
         );
     }
     return context;
