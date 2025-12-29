@@ -145,7 +145,7 @@ interface BodyProps<T> {
  *
  * @returns - A styled body component with the data passed to it
  */
-const Body = ({ data, render }: BodyProps<Cabin>) => {
+const Body = <T,>({ data, render }: BodyProps<T>) => {
     // validation to check if data is empty
     if (!data.length) return <Empty>No data to show at the moment</Empty>;
 
