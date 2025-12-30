@@ -1,5 +1,3 @@
-// Email regex: /\S+@\S+\.\S+/
-
 import { FieldErrors, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../../../ui/Button/Button";
 import { Form } from "../../../ui/Form/Form";
