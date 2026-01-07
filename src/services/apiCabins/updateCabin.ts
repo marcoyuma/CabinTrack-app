@@ -1,18 +1,17 @@
 import supabase from "../../supabase/supabase";
-import { cabinUpdateSchema, NewCabin } from "../../types/cabins.type";
-import { formatImagePath } from "../../utils/formatImagePath";
+import { formatImagePath } from "../../features/cabins/services/formatImagePath";
+import { parseCabinList } from "../parser/parseCabinList";
+import { UpdateCabinInput } from "../../features/cabins/types/cabin.api.types";
+import { updateCabinSchema } from "../../features/cabins/types/cabin.schema";
 
 // update cabins function based on cabin id. used in useUpdateCabin query mutation function
-export const updateCabin = async (newCabin: NewCabin, id: number) => {
-    try {
-        console.log(newCabin);
-        console.log(id);
-
+export const updateCabin = async (newCabin: UpdateCabinInput, id: number) => {
         // zod parsed cabin based on minimal required value
-        const parsedCabin = cabinUpdateSchema.parse(newCabin);
+    const parsedCabin = updateCabinSchema.parse(newCabin);
 
         const { isNewImage, imageName, imagePath } = formatImagePath(
-            parsedCabin.image
+        parsedCabin.image,
+        "cabin-images"
         );
 
         // 1. update cabin data into 'cabins' table
@@ -29,7 +28,7 @@ export const updateCabin = async (newCabin: NewCabin, id: number) => {
 
         if (error) {
             console.error(error);
-            throw new Error("cabin could not updated");
+        throw new Error(`server error, cabin could not updated`);
         }
 
         // 2. upload image to storage if there's image file from input file
@@ -44,19 +43,10 @@ export const updateCabin = async (newCabin: NewCabin, id: number) => {
             if (storageError) {
                 console.error(storageError);
                 throw new Error(
-                    "image could not uploaded and cabin was not updated"
+                `image could not uploaded and cabin was not updated: ${storageError.message}`
                 );
             }
         }
 
-        return data;
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error("Error in updateCabin: ", error.message);
-            throw new Error("An error occured, update cabin failed");
-        } else {
-            console.error("Unknown error in updateCabin: ", error);
-            throw new Error("Unknown error occured while updating the cabin");
-        }
-    }
+    return parseCabinList(data);
 };
