@@ -1,12 +1,12 @@
 import supabase from "../../supabase/supabase";
-import { DATA_PER_PAGE_SIZE } from "../../utils/constants";
-import {
-    CabinFilterValue,
-    CabinsDataType,
-    CabinSortValue,
-} from "../../types/cabins.type";
+import { DATA_PER_PAGE_SIZE } from "../../shared/utils/constants";
 import { parseCabinList } from "../parser/parseCabinList";
 import { parseCabinCount } from "../parser/parseCabinCount";
+import {
+    CabinFilterValue,
+    CabinSortValue,
+} from "../../features/cabins/types/cabin.ui.types";
+import { CabinsDataType } from "../../features/cabins/types/cabin.schema";
 
 // define get all data from 'cabins' table database
 // read cabins function. used in useCabin query function
@@ -46,7 +46,8 @@ export const readCabins = async (
 
     // handle error
     if (error) {
-        throw new Error(`Cabins data could not be loaded: ${error}`);
+        console.error(error);
+        throw new Error(`server error, cabins data could not be loaded`);
     }
 
     // return clean 'cabins' data
