@@ -1,7 +1,7 @@
 import { subDays } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import { useBatchSearchParams } from "../../../hooks/useBatchSearchParams";
 import { getStaysAfterDate } from "../../../services/apiBookings";
-import { useQuery } from "@tanstack/react-query";
 
 // query hook for get stays data values based on 'last' day params
 export function useRecentStays() {
