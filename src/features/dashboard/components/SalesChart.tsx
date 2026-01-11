@@ -11,8 +11,8 @@ import {
 import styled from "styled-components";
 import DashboardBox from "./DashboardBox";
 import { useDarkModeContext } from "../../../context/useDarkModeContext";
-import { DetailedBookingDataType } from "../../../types/bookings.type";
 import { Heading } from "../../../ui/Heading/Heading";
+import { RecentBookings } from "../types/dashboard.schema";
 
 const StyledSalesChart = styled(DashboardBox)`
     grid-column: 1 / -1;
@@ -24,6 +24,7 @@ const StyledSalesChart = styled(DashboardBox)`
     > :first-child {
         align-self: flex-start;
         padding-left: 55px;
+        padding-top: 20px;
     }
 
     /* Hack to change grid line colors */
@@ -33,8 +34,12 @@ const StyledSalesChart = styled(DashboardBox)`
     }
 `;
 
-type SalesChartProps = { bookings: DetailedBookingDataType[]; numDays: number };
-export function SalesChart({ bookings, numDays }: SalesChartProps) {
+type SalesChartProps = {
+    recentBookings: RecentBookings | undefined;
+    numDays: number;
+};
+
+export function SalesChart({ recentBookings, numDays }: SalesChartProps) {
     // In the chart we need to set colors, but we can't do it based on CSS variables, because we have no access to them here. So let's set them manually
     const { isDarkMode } = useDarkModeContext();
 
@@ -47,20 +52,32 @@ export function SalesChart({ bookings, numDays }: SalesChartProps) {
     console.log("alldates: " + allDates);
     allDates.forEach(console.log);
 
-    // Build daily sales data by iterating over each date, selecting bookings made on that day, and summing total and extras revenue
+    // Build daily sales data by iterating over each date, selecting recentBookings made on that day, and summing total and extras revenue
     const data = allDates.map((date) => {
+        // define a formatted date into a short, human-readable label (e.g., "Jan 05") for display
+        const label = format(date, "MMM dd");
+
+        if (!recentBookings) return { label, totalSales: 0, extrasSales: 0 };
+
+        // Filter bookings to include only those created on the same calendar day as the given date
+        const bookingsOnDate = recentBookings.filter((recentBooking) =>
+            isSameDay(date, new Date(recentBooking.created_at))
+        );
+
+        // Accumulate total and extras sales by summing prices from all bookings on the selected date
+        const { totalSales, extrasSales } = bookingsOnDate.reduce(
+            (acc, curr) => {
+                acc.totalSales += curr.totalPrice;
+                acc.extrasSales += curr.extrasPrice;
+                return acc;
+            },
+            { totalSales: 0, extrasSales: 0 }
+        );
+
         return {
-            label: format(date, "MMM dd"),
-            totalSales: bookings
-                .filter((booking) =>
-                    isSameDay(date, new Date(booking.created_at))
-                )
-                .reduce((acc, cur) => acc + cur.totalPrice, 0),
-            extrasSales: bookings
-                .filter((booking) =>
-                    isSameDay(date, new Date(booking.created_at))
-                )
-                .reduce((acc, cur) => acc + cur.extrasPrice, 0),
+            label,
+            totalSales,
+            extrasSales,
         };
     });
     console.log(data);
