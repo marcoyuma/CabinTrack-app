@@ -4,7 +4,8 @@ import { useRecentBookings } from "../hooks/useRecentBookings";
 import { useRecentStays } from "../hooks/useRecentStays";
 import Stats from "./Stats";
 import { useCabins } from "../../cabins/hooks/useCabins";
-import { useSearchParams } from "react-router-dom";
+import { SalesChart } from "./SalesChart";
+import { DurationChart } from "./DurationChart";
 
 // import DurationChart from 'features/dashboard/DurationChart';
 // import SalesChart from 'features/dashboard/SalesChart';
@@ -29,15 +30,14 @@ We need to distinguish between two types of data here:
 */
 function DashboardLayout() {
     const { recentBookings, isRecentBookingLoading } = useRecentBookings();
-    const { isRecentStayLoading, confirmedStays } = useRecentStays();
+    const { isRecentStayLoading, confirmedStays, numDays } = useRecentStays();
     const { isPending: isCabinLoading, cabinsLength } = useCabins();
 
-    const [params] = useSearchParams();
-    const numDays = !params.get("last") ? 7 : Number(params.get("last"));
-
     // if (isLoading1 || isLoading2 || isLoading3) return <Spinner />;
-    if (isRecentBookingLoading || isRecentStayLoading || isCabinLoading)
+    if (isRecentBookingLoading || isRecentStayLoading || isCabinLoading) {
         return <Spinner />;
+    }
+
     console.log("recentBookings");
     console.log(recentBookings);
     console.log("confirmedStays");
@@ -52,8 +52,8 @@ function DashboardLayout() {
                 numDays={numDays}
             />
             <div>Today's activity</div>
-            <div>Chart stay durations</div>
-            <div>Chart sales</div>
+            <DurationChart confirmedStays={confirmedStays} />
+            <SalesChart recentBookings={recentBookings} numDays={numDays} />
         </StyledDashboardLayout>
     );
 }
