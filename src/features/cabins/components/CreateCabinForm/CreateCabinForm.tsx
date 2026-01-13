@@ -24,7 +24,7 @@ export interface CreateCabinFormProps {
         description: string;
         discount: number;
         id: number;
-        image: FileList | string;
+        image: FileList | null;
         maxCapacity: number;
         name: string;
         regularPrice: number;
@@ -44,7 +44,7 @@ export const CreateCabinForm = ({
         name: "",
         description: "",
         discount: 0,
-        image: "",
+        image: null,
         maxCapacity: 0,
         regularPrice: 0,
     };
@@ -76,7 +76,6 @@ export const CreateCabinForm = ({
                       name: editedCabinData?.name,
                       description: editedCabinData?.description,
                       discount: Number(editedCabinData?.discount),
-                      image: editedCabinData?.image,
                       maxCapacity: Number(editedCabinData?.maxCapacity),
                       regularPrice: Number(editedCabinData?.regularPrice),
                   }
@@ -103,7 +102,10 @@ export const CreateCabinForm = ({
             name: data.name,
             description: data.description,
             discount: Number(data.discount),
-            image: typeof data.image === "string" ? data.image : data.image[0],
+            image:
+                data.image instanceof FileList && data.image.length > 0
+                    ? data.image[0]
+                    : null,
             maxCapacity: Number(data.maxCapacity),
             regularPrice: Number(data.regularPrice),
         };
@@ -155,6 +157,8 @@ export const CreateCabinForm = ({
             // if onCloseModal is provided, then the form is used as a modal
             // otherwise, it is a regular form
             type={onCloseModal ? "modal" : "regular"}
+            id="createCabin"
+            name="createCabin"
         >
             <FormRow
                 label="Cabin name"
