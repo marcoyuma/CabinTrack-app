@@ -7,7 +7,7 @@ import {
     BookingSortFieldProperty,
     FilterValueType,
 } from "../../../types/bookings.type";
-import { DATA_PER_PAGE_SIZE } from "../../../utils/constants";
+import { DATA_PER_PAGE_SIZE } from "../../../shared/utils/constants";
 import { useBatchSearchParams } from "../../../hooks/useBatchSearchParams";
 
 // hooks for bookings query
@@ -38,13 +38,15 @@ export const useBookings = () => {
         BookingSortFieldProperty,
         BookingSortDirectionProperty
     ];
+
+    // Combine sorting field and direction into a single configuration object
     const sortBy = { field, direction };
 
     // pagination
     const page = !pageParam ? 1 : Number(pageParam);
 
     // useQuery from fetch data from 'getBookings' including another dependency in the array so data will refetched when the anything inside is changes
-    const { isPending, data } = useQuery({
+    const { isPending: isBookingsLoading, data } = useQuery({
         queryKey: ["bookings", filter, sortBy, page],
         queryFn: () => readBookings(filter, sortBy, page),
     });
@@ -73,5 +75,5 @@ export const useBookings = () => {
         });
     }
 
-    return { isPending, bookings, bookingsLength };
+    return { isBookingsLoading, bookings, bookingsLength };
 };
