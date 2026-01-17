@@ -9,18 +9,17 @@ import { supabaseUrl } from "../../../supabase/supabase";
  *
  */
 export const formatImagePath = (
-    image: string | File | undefined,
+    image: File | null,
     bucketName: "cabin-images" | "avatars"
 ) => {
     // ! DEVELOPMENT PURPOSE
-    if (!image) return null;
 
     const isNewImage = image instanceof File;
 
     // define dynamic value of image name based on type of image wether it's File or string
     const imageName = isNewImage
-        ? `${uuidv4()}-${(image as File).name}`.replaceAll("/", "")
-        : (image as string);
+        ? `${uuidv4()}-${image.name}`.replaceAll("/", "")
+        : image;
 
     // define variable to make a new image name path
     const imagePath = isNewImage
