@@ -13,7 +13,7 @@ type CreateCabinInput = {
     regularPrice: number;
     discount: number;
     description: string;
-    image: File | null;
+    image: File | string | null;
 };
 
 // create new cabins function. used in useCreateCabin query mutation function
