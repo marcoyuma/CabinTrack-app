@@ -47,7 +47,7 @@ function SignupForm() {
     };
 
     return (
-        <Form onSubmit={handleSubmit(onSubmit, onError)}>
+        <Form onSubmit={handleSubmit(onSubmit, onError)} id="signup">
             <FormRow label="Full name" error={errors.fullName?.message}>
                 <Input
                     disabled={isSigningUp}

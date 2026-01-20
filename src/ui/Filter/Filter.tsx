@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { useURL } from "../../hooks/useURL";
+import { useBatchSearchParams } from "../../hooks/useBatchSearchParams";
 
 const StyledFilter = styled.div`
     border: 1px solid var(--color-grey-100);
@@ -19,6 +19,7 @@ const FilterButton = styled.button<FilterButtonType>`
     background-color: var(--color-grey-0);
     border: none;
 
+    /* why not use props.active? because 'active' is a reserved word in HTML attribute. So we use $active instead. */
     ${({ $active }) =>
         $active &&
         css`
@@ -42,29 +43,44 @@ const FilterButton = styled.button<FilterButtonType>`
 interface FilterPropsType {
     filterField: string;
     options: { value: string; label: string }[];
+    paramToReset?: Record<string, string>;
 }
-export const Filter = ({ filterField, options }: FilterPropsType) => {
-    // custom hooks for storing relevan value into url based on using useSearchParams hook
-    const { valueFromParams, setParams } = useURL(filterField);
+export const Filter = ({
+    filterField,
+    options,
+    paramToReset,
+}: FilterPropsType) => {
+    // custom hook for get and set value to url
+    const [params, setParams] = useBatchSearchParams();
 
-    const currentFilter = valueFromParams || options.at(0)?.value;
-    console.log(currentFilter);
+    // const currentFilter = valueFromParams || options.at(0)?.value;
+    const currentFilter = params.get(filterField) || options.at(0)?.value;
 
     // handle onClick event
     const handleClick = (value: string) => {
-        // set url query key as 'discount' = 'value' into url
-        setParams(value);
+        if (!value) return;
+
+        // set the filterField to value, and reset other search params to default value
+        if (paramToReset) {
+            setParams({ [filterField]: value }, paramToReset);
+        }
+
+        // or just update the params
+        else {
+            setParams({ [filterField]: value });
+        }
+        console.log(value);
     };
     return (
         <StyledFilter>
-            {options.map((value) => (
+            {options.map((option) => (
                 <FilterButton
-                    onClick={() => handleClick(value.value)}
-                    key={value.value}
-                    $active={currentFilter === value.value}
-                    disabled={currentFilter === value.value}
+                    onClick={() => handleClick(option.value)}
+                    key={option.value}
+                    $active={currentFilter === option.value}
+                    disabled={currentFilter === option.value}
                 >
-                    {value.label}
+                    {option.label}
                 </FilterButton>
             ))}
         </StyledFilter>

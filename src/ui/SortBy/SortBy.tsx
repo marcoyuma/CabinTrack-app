@@ -1,6 +1,7 @@
 import { Select } from "../Select/Select";
 import { ChangeEvent } from "react";
-import { useURL } from "../../hooks/useURL";
+
+import { useBatchSearchParams } from "../../hooks/useBatchSearchParams";
 
 // type for SortBy Component props
 interface SortByPropsType {
@@ -12,19 +13,19 @@ interface SortByPropsType {
 
 // component for sorting data by specified options
 export const SortBy = ({ options }: SortByPropsType) => {
-    // destructured custom hook that using 'useSearchParams'
-    const { setParams, valueFromParams } = useURL("sortBy");
+    // custom hook for get and set value to url
+    const [params, setParams] = useBatchSearchParams();
 
-    const sortBy = valueFromParams || "";
+    const sortByParam = params.get("sortBy") || "";
 
     const handleClick = (e: ChangeEvent<HTMLSelectElement>) => {
-        setParams(e.target.value);
-        console.log(valueFromParams);
+        setParams({ sortBy: e.target.value });
+        console.log(sortByParam);
     };
     return (
         <Select
             options={options}
-            value={sortBy}
+            value={sortByParam}
             type="white"
             onChange={handleClick}
         />

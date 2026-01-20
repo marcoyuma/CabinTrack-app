@@ -3,47 +3,56 @@ import { formatImagePath } from "../../cabins/services/formatImagePath";
 import { deleteUserAvatar } from "./deleteUserAvatar";
 import { uploadImage } from "./uploadImage";
 
+/**
+ * api function for updating user properties
+ *
+ * @param param0 opsional user properties
+ * @returns User | null
+ */
 export async function updateUser({
     fullName,
-    email,
     password,
     avatar,
 }: {
     fullName?: string;
-    email?: string;
     password?: string;
-    avatar?: File | string;
+    avatar?: File;
 }) {
     // new user data payload
     const payload: Parameters<typeof supabase.auth.updateUser>[0] = {};
 
-    // image properties that will be uploaded
-    const {
-        isNewImage: isNewAvatar,
-        imageName: avatarName,
-        imagePath: avatarPath,
-    } = formatImagePath(avatar, "avatars") ?? {};
-
-    // new avatar indicator
-    const isAvatar = isNewAvatar && avatarName && avatarPath;
-
     // if there's new avatar included
-    if (isAvatar) {
-        // delete previous avatar from bucket storage
-        await deleteUserAvatar();
+    if (avatar) {
+        // image properties that will be uploaded
+        const {
+            isNewImage: isNewAvatar,
+            imageName: avatarName,
+            imagePath: avatarPath,
+        } = formatImagePath(avatar, "avatars");
 
-        // upload new avatar to bucket storage
-        const storageError = await uploadImage({ avatar, avatarName });
-        console.log("avatar uploaded...");
+        // new avatar indicator
+        const isAvatar = isNewAvatar && avatarName && avatarPath;
 
-        // failed upload avatar to storage condition
-        if (!storageError) {
-            // redefining payload for conditional updating
-            payload.data = { ...payload.data, avatar: avatarPath };
+        if (isAvatar) {
+            // delete previous avatar from bucket storage
+            await deleteUserAvatar();
+
+            // upload new avatar to bucket storage
+            const storageError = await uploadImage({
+                image: avatar,
+                imageName: avatarName,
+                bucketName: "avatars",
+            });
+            console.log("avatar uploaded...");
+
+            // failed upload avatar to storage condition
+            if (!storageError) {
+                // redefining payload for conditional updating
+                payload.data = { ...payload.data, avatar: avatarPath };
+            }
         }
     }
 
-    // ! pola pertama
     // 1. update fullName (conditional)
     if (fullName) {
         payload.data = {
@@ -66,9 +75,7 @@ export async function updateUser({
 
     if (error) {
         console.error(error);
-        throw new Error(
-            "An error occured while updating user data, try again later"
-        );
+        throw new Error(error.message);
     }
 
     return user;

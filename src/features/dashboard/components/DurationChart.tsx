@@ -143,12 +143,10 @@ function prepareData(startData, stays) {
 }
 
 interface DurationChartProps {
-    confirmedStays:
-        | {
-              numNights: number;
-              status: "checked-in" | "checked-out" | "unconfirmed";
-          }[]
-        | undefined;
+    confirmedStays: {
+        numNights: number;
+        status: "checked-in" | "checked-out" | "unconfirmed";
+    }[];
 }
 export function DurationChart({ confirmedStays }: DurationChartProps) {
     const { isDarkMode } = useDarkModeContext();

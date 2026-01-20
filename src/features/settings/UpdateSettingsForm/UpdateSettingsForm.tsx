@@ -1,11 +1,8 @@
-import Form from "../../../ui/Form/Form";
+import { Form } from "../../../ui/Form/Form";
 import { FormRow } from "../../../ui/FormRow/FormRow";
-import Input from "../../../ui/Input/Input";
-import Spinner from "../../../ui/Spinner/Spinner";
-import {
-    SanitizedSettingsData,
-    sanitizeSettings,
-} from "../../../utils/sanitizeSettings";
+import { Input } from "../../../ui/Input/Input";
+import { Spinner } from "../../../ui/Spinner/Spinner";
+import { SanitizedSettingsData } from "../../../shared/utils/sanitizeSettings";
 import { useSettings } from "../hooks/useSettings";
 import { useUpdateSettings } from "../hooks/useUpdateSettings";
 import { FocusEvent } from "react";
@@ -15,10 +12,10 @@ export type UpdateSettingsKeys = keyof SanitizedSettingsData;
 
 function UpdateSettingsForm() {
     const {
-        isPending,
+        isSettingLoading,
 
         // never destructuring an undefined or null possible nested value
-        dataSettings,
+        setting,
     } = useSettings();
 
     // non nullable value and type safe from 'sanitizeSettings'
@@ -27,7 +24,7 @@ function UpdateSettingsForm() {
         maxNumberGuestsPerBooking,
         minBookingLength,
         breakfastPrice,
-    } = sanitizeSettings(dataSettings);
+    } = setting;
 
     // destructuring isUpdating and updateSettings from useUpdateSettings hook
     // this will be used to update the settings when the form is submitted
@@ -45,10 +42,10 @@ function UpdateSettingsForm() {
     };
 
     // if no data is available, show a spinner
-    if (isPending) return <Spinner />;
+    if (isSettingLoading) return <Spinner />;
     return (
-        <Form>
-            <FormRow label={{ labelChild: "Minimum nights/booking" }}>
+        <Form id="updateSettings" name="updateSettings">
+            <FormRow label="Minimum nights/booking">
                 <Input
                     type="number"
                     id="min-nights"
@@ -59,7 +56,7 @@ function UpdateSettingsForm() {
                     }}
                 />
             </FormRow>
-            <FormRow label={{ labelChild: "Maximum nights/booking" }}>
+            <FormRow label="Maximum nights/booking">
                 <Input
                     type="number"
                     id="max-nights"
@@ -70,7 +67,7 @@ function UpdateSettingsForm() {
                     }}
                 />
             </FormRow>
-            <FormRow label={{ labelChild: "Maximum guests/booking" }}>
+            <FormRow label="Maximum guests/booking">
                 <Input
                     type="number"
                     id="max-guests"
@@ -79,7 +76,7 @@ function UpdateSettingsForm() {
                     onBlur={(e) => handleUpdate(e, "maxNumberGuestsPerBooking")}
                 />
             </FormRow>
-            <FormRow label={{ labelChild: "Breakfast price" }}>
+            <FormRow label="Breakfast price">
                 <Input
                     type="number"
                     id="breakfast-price"

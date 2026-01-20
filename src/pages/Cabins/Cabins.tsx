@@ -1,10 +1,10 @@
-import Heading from "../../ui/Heading/Heading";
+import { Heading } from "../../ui/Heading/Heading";
 import { Row } from "../../ui/Row/Row";
-import { CabinTable } from "../../features/cabins/CabinTable/CabinTable";
-import { AddCabin } from "../../features/cabins/AddCabin/AddCabin";
-import { CabinTableOperations } from "../../features/cabins/CabinTableOperations/CabinTableOperations";
+import { CabinTable } from "../../features/cabins/components/CabinTable/CabinTable";
+import { AddCabin } from "../../features/cabins/components/AddCabin/AddCabin";
+import { CabinTableOperations } from "../../features/cabins/components/CabinTableOperations/CabinTableOperations";
 
-function Cabins() {
+export const Cabins = () => {
     return (
         <>
             <Row type="horizontal">
@@ -17,6 +17,4 @@ function Cabins() {
             </Row>
         </>
     );
-}
-
-export default Cabins;
+};

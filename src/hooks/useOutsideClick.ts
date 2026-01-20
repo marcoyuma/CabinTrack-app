@@ -44,5 +44,5 @@ export const useOutsideClick = <T extends HTMLElement>(
 
     // Return the ref that can be attached to the modal element.
     // This ref will be used to check if the clicked element is outside of the modal.
-    return { ref };
+    return ref;
 };

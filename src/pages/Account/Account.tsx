@@ -1,3 +1,5 @@
+import { UpdateUserPasswordForm } from "../../features/authentication/components/UpdateUserPasswordForm";
+import { UpdateUserDataForm } from "../../features/authentication/components/UpdateUserDataForm";
 import { Heading } from "../../ui/Heading/Heading";
 import { Row } from "../../ui/Row/Row";
 
@@ -8,12 +10,12 @@ export const Account = () => {
 
             <Row>
                 <Heading as="h3">Update user data</Heading>
-                <p>Update user data form</p>
+                <UpdateUserDataForm />
             </Row>
 
             <Row>
                 <Heading as="h3">Update password</Heading>
-                <p>Update user password form</p>
+                <UpdateUserPasswordForm />
             </Row>
         </>
     );

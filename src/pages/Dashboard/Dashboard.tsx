@@ -1,13 +1,17 @@
-import Heading from "../../ui/Heading/Heading";
+import DashboardFilter from "../../features/dashboard/components/DashboardFilter";
+import DashboardLayout from "../../features/dashboard/components/DashboardLayout";
+import { Heading } from "../../ui/Heading/Heading";
 import { Row } from "../../ui/Row/Row";
 
-function Dashboard() {
+export const Dashboard = () => {
     return (
-        <Row type="horizontal">
-            <Heading as="h1">Dashboard</Heading>
-            <p>TEST</p>
-        </Row>
-    );
-}
+        <>
+            <Row type="horizontal">
+                <Heading as="h1">Dashboard</Heading>
+                <DashboardFilter />
+            </Row>
 
-export default Dashboard;
+            <DashboardLayout />
+        </>
+    );
+};

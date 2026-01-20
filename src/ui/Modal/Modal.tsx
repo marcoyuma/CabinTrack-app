@@ -143,7 +143,7 @@ export const Window = ({ children, name }: WindowProps) => {
 
     // This hook is used to handle outside click events. It provides a ref that can be attached to the modal element.
     // When a click occurs outside of the modal, it calls the 'handleClose' function to close the modal. The 'listenCapturing' parameter is set to true to ensure that the click event is captured before it bubbles up.
-    const { ref } = useOutsideClick<HTMLDivElement>(handleClose);
+    const ref = useOutsideClick<HTMLDivElement>(handleClose);
 
     // If the current open name does not match the provided name, return null to avoid rendering the modal.
     if (openName !== name) return null;

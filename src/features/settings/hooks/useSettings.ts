@@ -1,14 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSettings } from "../../../services/apiSettings";
+import { readSetting } from "../../../services/apiSettings";
+import { Setting } from "../../../types/settings.type";
 
 export const useSettings = () => {
     const {
-        isPending,
+        isPending: isSettingLoading,
         error,
-        data: dataSettings,
+        data,
     } = useQuery({
         queryKey: ["settings"],
-        queryFn: getSettings,
+        queryFn: readSetting,
     });
-    return { isPending, error, dataSettings };
+
+    const setting = (data as Setting) ?? {
+        id: 0,
+        breakfastPrice: 0,
+        maxBookingLength: 0,
+        maxNumberGuestsPerBooking: 0,
+        minBookingLength: 0,
+    };
+
+    console.log(setting);
+
+    return { isSettingLoading, error, setting };
 };

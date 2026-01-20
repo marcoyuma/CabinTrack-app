@@ -12,7 +12,7 @@ import styled from "styled-components";
 import DashboardBox from "./DashboardBox";
 import { useDarkModeContext } from "../../../context/useDarkModeContext";
 import { Heading } from "../../../ui/Heading/Heading";
-import { RecentBookings } from "../types/dashboard.schema";
+import { RecentBooking } from "../types/dashboard.schema";
 
 const StyledSalesChart = styled(DashboardBox)`
     grid-column: 1 / -1;
@@ -35,7 +35,7 @@ const StyledSalesChart = styled(DashboardBox)`
 `;
 
 type SalesChartProps = {
-    recentBookings: RecentBookings | undefined;
+    recentBookings: RecentBooking[] | undefined;
     numDays: number;
 };
 

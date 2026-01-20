@@ -1,9 +1,9 @@
+import { SupabaseCabinRow } from "../../features/cabins/types/cabin.db.types";
 import {
     Cabin,
-    cabinReadSchema,
-    SupabaseCabinType,
-} from "../../types/cabins.type";
+    readCabinSchema,
+} from "../../features/cabins/types/cabin.schema";
 
-export const parseCabinList = (cabins: SupabaseCabinType[]): Cabin[] => {
-    return cabins.map((cabin) => cabinReadSchema.parse(cabin));
+export const parseCabinList = (cabins: SupabaseCabinRow[]): Cabin[] => {
+    return cabins.map((cabin) => readCabinSchema.parse(cabin));
 };

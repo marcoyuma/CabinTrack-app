@@ -104,9 +104,10 @@ const Toggle = ({ id }: { id: string }) => {
     const { openId, open, close, setPosition } = useMenusContext();
 
     const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-        // rect is used to get the position of the button and set the position of the menu list
-        // This is useful for positioning the menu list relative to the button.
-        // It uses the closest button to get the bounding rectangle using 'e.target', 'closest' and 'getBoundingClientRect' method.
+        // Prevent the click event from bubbling up and accidentally closing the menu
+        e.stopPropagation();
+
+        // Calculate the clicked button's position to align the menu below it
         const rect = (e.target as HTMLElement)
             .closest("button")
             ?.getBoundingClientRect();
@@ -114,11 +115,9 @@ const Toggle = ({ id }: { id: string }) => {
             x: window.innerWidth - (rect?.width ?? 0) - (rect?.x ?? 0),
             y: (rect?.y ?? 0) + (rect?.height ?? 0) + 8,
         });
-        console.log(rect);
 
         // conditional logic to open or close the menu
-        // if the openId is empty or not equal to the current id, open the menu
-        // otherwise close the menu
+        // if the openId is empty or not equal to the current id, open the menu, otherwise close the menu
         if (openId === "" || openId !== id) {
             open(id);
         } else {
@@ -134,8 +133,11 @@ const Toggle = ({ id }: { id: string }) => {
 
 // parent component component for grouping relevan button inside
 const List = ({ id, children }: { id: string; children: ReactNode }) => {
+    // get useMenusContext object value
     const { openId, position, close } = useMenusContext();
-    const { ref } = useOutsideClick<HTMLUListElement>(close);
+
+    // assign ref
+    const ref = useOutsideClick<HTMLUListElement>(close, false);
     if (openId !== id) return null;
     // it float on top of the ui, use 'createPortal'
     return createPortal(

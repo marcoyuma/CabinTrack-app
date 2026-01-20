@@ -6,6 +6,7 @@ import Stats from "./Stats";
 import { useCabins } from "../../cabins/hooks/useCabins";
 import { SalesChart } from "./SalesChart";
 import { DurationChart } from "./DurationChart";
+import { TodayActivity } from "../../check-in-out/components/TodayActivity";
 
 // import DurationChart from 'features/dashboard/DurationChart';
 // import SalesChart from 'features/dashboard/SalesChart';
@@ -51,7 +52,7 @@ function DashboardLayout() {
                 cabinCount={cabinsLength}
                 numDays={numDays}
             />
-            <div>Today's activity</div>
+            <TodayActivity />
             <DurationChart confirmedStays={confirmedStays} />
             <SalesChart recentBookings={recentBookings} numDays={numDays} />
         </StyledDashboardLayout>

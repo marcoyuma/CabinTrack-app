@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 import { Logo } from "../../ui/Logo/Logo";
 import { Heading } from "../../ui/Heading/Heading";
-import { LoginForm } from "../../features/authentication/LoginForm";
+import { LoginForm } from "../../features/authentication/components/LoginForm";
 
 const LoginLayout = styled.main`
     min-height: 100vh;
