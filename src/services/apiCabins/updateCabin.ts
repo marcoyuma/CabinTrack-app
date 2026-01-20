@@ -17,7 +17,7 @@ export const updateCabin = async (newCabin: UpdateCabinInput, id: number) => {
     // zod parsed cabin based on minimal required value
     const parsedCabin = updateCabinSchema.parse(newCabin);
 
-    payload = { ...payload, ...parsedCabin };
+    payload = { ...parsedCabin };
 
     // Normalize cabin image input by determining whether it’s a new file and generating its storage-safe name and public path
     const { isNewImage, imageName, imagePath } = formatImagePath(
