@@ -2,24 +2,34 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCabin as deleteCabinApi } from "../../../services/apiCabins/deleteCabin";
 import toast from "react-hot-toast";
 
+/**
+ * Custom React Query hook to delete a cabin, manage mutation state,
+ * invalidate cached cabin data, and show user feedback notifications
+ */
 export const useDeleteCabin = () => {
     // define query client for invalidate logic
     const queryClient = useQueryClient();
-    // this is the way we do mutate on react-query
+
     const {
-        // status information returned while mutating or end mutating. named as 'isDeleting'
+        // status information returned while mutating or end mutating
         isPending: isDeleting,
-        // function returned to trigger the mutation and call the callback function 'deleteCabin'
+        // function to trigger the delete mutation
         mutate: deleteCabin,
     } = useMutation({
-        // mutationFn: (id: number) => deleteCabin(id),
         mutationFn: deleteCabinApi,
-        // when mutation is success then invalidate the query and force it to be stale, this will automatically re-fetch data from server so the UI will stay in sync with updated 'cabin' query data.
+
+        // re-fetch cabins data and notify user on success
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cabins"] });
             toast.success("cabin deleted successfully");
         },
-        onError: (err) => toast.error(err.message),
+
+        // show error notification on failure
+        onError: (err) => {
+            toast.error(err.message);
+            console.error(err);
+        },
     });
+
     return { isDeleting, deleteCabin };
 };
