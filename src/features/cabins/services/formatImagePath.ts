@@ -9,11 +9,10 @@ import { supabaseUrl } from "../../../supabase/supabase";
  *
  */
 export const formatImagePath = (
-    image: File | null,
+    image: File | string | null,
     bucketName: "cabin-images" | "avatars"
 ) => {
-    // ! DEVELOPMENT PURPOSE
-
+    // new file image indicator
     const isNewImage = image instanceof File;
 
     // define dynamic value of image name based on type of image wether it's File or string
