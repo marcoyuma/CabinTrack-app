@@ -3,14 +3,18 @@ import { updateCabin as updateCabinApi } from "../../../services/apiCabins/updat
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CabinPayload } from "../types/cabin.schema";
 
+/**
+ * Custom React Query hook to update an existing cabin, handle mutation state,
+ * invalidate cached cabin data, and provide user feedback via toast notifications
+ */
 export const useUpdateCabin = () => {
     // define client for invalidate the new data
     const queryClient = useQueryClient();
 
     const {
-        // status information returned while mutating or end mutating. named as 'isCreating'
+        // status information returned while mutating or end mutating
         isPending: isUpdating,
-        // mutation function returned and renamed as 'createNewCabin' to trigger the actual mutation input data and call the callback function 'createCabin'
+        // mutation function to trigger the cabin update
         mutate: updateCabin,
     } = useMutation({
         // mutation function
@@ -18,26 +22,22 @@ export const useUpdateCabin = () => {
             newCabinData,
             id,
         }: {
-            // newCabinData: NewCabin;
             newCabinData: CabinPayload;
             id: number;
         }) => updateCabinApi(newCabinData, id),
-        // when mutation is success then invalidate the query and force it to be stale, this will automatically re-fetch data from server so the UI will stay in sync with updated 'cabin' query data.
-        onSuccess: (data) => {
-            // invalidate logic based on 'queryKey' defined on '../CabinTable/CabinTable.tsx'
-            queryClient.invalidateQueries({ queryKey: ["cabins"] }); // this will make react-query re-fetch and updatin ui
-            // notification when successfully created
+
+        // re-fetch cabins data and notify user on success
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["cabins"] });
             toast.success("cabin edited successfully");
-            // reset form value
-            // reset();
-            console.log(data);
         },
-        // when error logic
+
+        // show error notification on failure
         onError: (err) => {
             toast.error(err.message);
-            console.error(err.message);
-            throw new Error(`Error while updating cabin: ${err}`);
+            console.error(err);
         },
     });
+
     return { isUpdating, updateCabin };
 };
