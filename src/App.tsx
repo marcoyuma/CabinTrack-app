@@ -22,6 +22,7 @@ import { Booking } from "./pages/Bookings/Booking";
 import { Checkin } from "./pages/Checkin/Checkin";
 import { ProtectedRoute } from "./ui/ProtectedRoute/ProtectedRoute";
 import { DarkModeProvider } from "./context/DarkModeProvider";
+import { ErrorFallback } from "./ui/ErrorFallback/ErrorFallback";
 
 export const App = () => {
     // define react-query instance
@@ -35,9 +36,6 @@ export const App = () => {
     });
 
     const router = createBrowserRouter([
-        // public route
-        { path: "login", element: <Login /> },
-
         // private routes
         {
             element: (
@@ -45,6 +43,7 @@ export const App = () => {
                     <AppLayout />
                 </ProtectedRoute>
             ),
+            errorElement: <ErrorFallback />,
             children: [
                 { index: true, element: <Navigate replace to="dashboard" /> },
                 { path: "dashboard", element: <Dashboard /> },
@@ -57,7 +56,8 @@ export const App = () => {
                 { path: "account", element: <Account /> },
             ],
         },
-
+        // public route
+        { path: "login", element: <Login /> },
         // fallback
         { path: "*", element: <PageNotFound /> },
         // path opened as soon as the app is open then directly navigate to 'dashboard' path
