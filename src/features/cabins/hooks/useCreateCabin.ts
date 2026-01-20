@@ -2,6 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCabin as createCabinApi } from "../../../services/apiCabins/createCabin";
 import toast from "react-hot-toast";
 
+/**
+ * Custom React Query hook to handle cabin creation, including mutation state, cache invalidation, and user feedback
+ */
 export const useCreateCabin = () => {
     // define client for invalidate the new data
     const queryClient = useQueryClient();
@@ -13,19 +16,21 @@ export const useCreateCabin = () => {
         mutate: createCabin,
     } = useMutation({
         // mutation function defined in '../../../services/apiCabins.ts'
-        // mutationFn: (id: number) => deleteCabin(id),
         mutationFn: createCabinApi,
-        // when mutation is success then invalidate the query and force it to be stale, this will automatically re-fetch data from server so the UI will stay in sync with updated 'cabin' query data.
+
+        // re-fetch cabins data and notify user on success
         onSuccess: () => {
             // invalidate logic based on 'queryKey' defined on '../CabinTable/CabinTable.tsx'
             queryClient.invalidateQueries({ queryKey: ["cabins"] }); // this will make react-query re-fetch and updatin ui
             // notification when successfully created
             toast.success("new cabin created successfully");
-            // reset form value
-            // reset();
         },
-        // when error logic
-        onError: (err) => toast.error(err.message),
+
+        // show error notification on failure
+        onError: (err) => {
+            toast.error(err.message);
+            console.error(err);
+        },
     });
     return { isCreating, createCabin };
 };
