@@ -19,10 +19,13 @@ interface UserMetadata {
     avatar?: FileList;
 }
 
+/**
+ * Handles updating the current user's profile information and avatar
+ */
 export const UpdateUserDataFormInner = ({ user }: { user: User }) => {
     const email = user.email;
     const userMetaData: UserMetadata = user.user_metadata;
-    const { fullName: currentFullName, avatar } = userMetaData;
+    const { fullName: currentFullName } = userMetaData;
 
     const {
         register,
@@ -47,42 +50,26 @@ export const UpdateUserDataFormInner = ({ user }: { user: User }) => {
         if (avatar) {
             // imageFile =
             console.log(avatar[0]);
-            updateUser(
-                {
-                    fullName,
-                    email,
-                    // avatar: typeof avatar === "string" ? avatar : avatar[0],
-                    avatar: avatar[0],
-                },
-                {
-                    onSuccess: () => {
-                        // setAvatar(null);
-                        // Resetting form using .reset() that's available on all HTML form elements, otherwise the old filename will stay displayed in the UI
-                        // e.target.reset();
-                        // resetField("fullName");
-                        // resetField("avatar");
-                    },
-                }
-            );
+            updateUser({
+                fullName,
+                email,
+                avatar: avatar[0],
+            });
         } else {
-            updateUser(
-                { fullName, email },
-                {
-                    onSuccess: () => {
-                        // resetField("fullName");
-                    },
-                }
-            );
+            updateUser({ fullName, email });
         }
     };
 
     const handleCancel = () => {
         resetField("fullName", { defaultValue: "" });
-        resetField("avatar");
     };
 
     return (
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form
+            onSubmit={handleSubmit(onSubmit)}
+            id="updateUserData"
+            name="updateUserData"
+        >
             <FormRow error={errors.email?.message} label="Email address">
                 <Input
                     {...register("email")}
@@ -118,11 +105,7 @@ export const UpdateUserDataFormInner = ({ user }: { user: User }) => {
                 >
                     Cancel
                 </Button>
-                <Button
-                // disabled={isUpdating}
-                >
-                    Update account
-                </Button>
+                <Button disabled={isUpdatingNewUser}>Update account</Button>
             </FormRow>
         </Form>
     );
