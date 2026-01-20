@@ -1,18 +1,22 @@
 import styled from "styled-components";
 import { MainNav } from "../MainNav/MainNav";
-import Logo from "../Logo/Logo";
+import { Logo } from "../Logo/Logo";
 
 const StyledSidebar = styled.aside`
     background-color: var(--color-grey-0);
     padding: 3.2rem 2.4rem;
     border-right: 1px solid var(--color-grey-100);
 
-    grid-row: 1/-1;
+    grid-row: 1 / -1;
 
     display: flex;
     flex-direction: column;
     gap: 3.2rem;
 `;
+
+/**
+ * Sidebar layout component that displays the application logo and main navigation
+ */
 export const Sidebar = () => {
     return (
         <StyledSidebar>
