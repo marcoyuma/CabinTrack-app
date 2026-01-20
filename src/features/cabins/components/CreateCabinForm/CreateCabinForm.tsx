@@ -24,7 +24,7 @@ export interface CreateCabinFormProps {
         description: string;
         discount: number;
         id: number;
-        image: FileList | null;
+        image: string | null;
         maxCapacity: number;
         name: string;
         regularPrice: number;
@@ -40,22 +40,20 @@ export const CreateCabinForm = ({
 }: CreateCabinFormProps) => {
     // destructure editedCabinData if available for default values
     let editId: undefined | number;
-    const createValues: CabinFormSchemaType = {
+    const createValues: Omit<CabinFormSchemaType, "image"> = {
         name: "",
         description: "",
         discount: 0,
-        image: null,
         maxCapacity: 0,
         regularPrice: 0,
     };
 
-    let editValues: CabinFormSchemaType;
+    let editValues: Omit<CabinFormSchemaType, "image">;
 
     if (editedCabinData) {
         ({ id: editId, ...editValues } = editedCabinData);
         console.log(`editId: ${editId}`);
         console.log(`editValues: ${editValues}`);
-        console.log(`editValues.image: ${editValues.image}`);
     }
 
     // on edit indicator
@@ -80,7 +78,7 @@ export const CreateCabinForm = ({
                       regularPrice: Number(editedCabinData?.regularPrice),
                   }
                 : createValues,
-        }); // dont forget to give the hook generic type
+        });
 
     const { errors } = formState;
 
@@ -90,7 +88,7 @@ export const CreateCabinForm = ({
     // custom hook for updating cabin
     const { isUpdating, updateCabin } = useUpdateCabin();
 
-    // combine both
+    // loading indicator
     const isWorking = isCreating || isUpdating;
 
     // submit handler
