@@ -2,12 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { updateBooking } from "../../../services/apiBookings";
 
-// custom hook for checking in and update booking property
+/**
+ * Custom React Query hook to handle booking check-in by updating booking status,
+ * refreshing active queries, and providing user feedback
+ */
 export const useCheckin = () => {
     const queryClient = useQueryClient();
 
     const { mutate: checkin, isPending: isCheckingIn } = useMutation({
-        // mutationFn calling 'updateBooking' when 'checkin' triggered and update status
+        // update booking status to checked-in and mark as paid (including breakfast data if provided)
         mutationFn: ({
             bookingId,
             breakfast,
@@ -19,18 +22,19 @@ export const useCheckin = () => {
                 totalPrice: number;
             };
         }) =>
-            // updateBooking(bookingId, { status: "check-in", isPaid: true }),
             updateBooking(bookingId, {
                 status: "checked-in",
                 isPaid: true,
                 ...breakfast,
             }),
-        // onSuccess is receive some data that we can use in this case in toast notification
+
+        // refresh active queries and notify user on success
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["bookings"] });
-            queryClient.invalidateQueries({ queryKey: ["today-activity"] });
+            queryClient.refetchQueries({ type: "active" });
             toast.success(`booking #${data.cabinId} successfully check in`);
         },
+
+        // show error notification on failure
         onError: (err) => {
             toast.error(err.message);
         },
