@@ -14,7 +14,7 @@ import { useEffect, useRef } from "react";
  */
 export const useOutsideClick = <T extends HTMLElement>(
     onOutsideClick: () => void,
-    listenCapturing: boolean = true
+    listenCapturing: boolean = true,
 ) => {
     // This ref is used to attach the click event listener to the document in target element.
     // It will be used to check if the clicked element is outside of the modal.
@@ -24,6 +24,9 @@ export const useOutsideClick = <T extends HTMLElement>(
     // It checks if the clicked element is outside the modal.
     useEffect(() => {
         const handleClick = (e: MouseEvent) => {
+            // Ignore clicks inside rsuite picker popup
+            if ((e.target as HTMLElement).closest(".rs-picker-popup")) return;
+
             // validate if the 'ref' is set and if the clicked element is not inside the 'ref' with 'e.target'
             if (ref.current && !ref.current.contains(e.target as Node)) {
                 onOutsideClick();
@@ -37,7 +40,7 @@ export const useOutsideClick = <T extends HTMLElement>(
         // true = listen during the capture phase (before bubbling), ensures outside clicks are detected
         document.addEventListener("click", handleClick, listenCapturing);
 
-        // The event listener is removed when the component unmounts to prevent memory leaks.
+        // The event listener is removed when the component unmounts to prevent memory leaks. v
         return () =>
             document.removeEventListener("click", handleClick, listenCapturing);
     }, [ref, onOutsideClick, listenCapturing]);
