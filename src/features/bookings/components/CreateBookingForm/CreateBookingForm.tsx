@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { Range } from "react-date-range";
 import { Form } from "../../../../ui/Form/Form";
 import { Input } from "../../../../ui/Input/Input";
@@ -10,6 +10,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../../../../ui/Button/Button";
 import {
     BookingFormDataType,
+    BookingFormInputType,
     bookingFormSchema,
 } from "../../../../types/bookings.type";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,11 +24,21 @@ import { useCreateBooking } from "../../hooks/useCreateBooking";
 interface CreateBookingFormProps {
     onCloseModal: () => void;
 }
+
+/**
+ * CreateBookingForm collects guest + booking details in a single UI flow.
+ *
+ * On submit it creates the guest first (to obtain `guestId`), then creates the booking
+ * using the selected cabin, date range, and optional breakfast pricing.
+ */
 export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
-    const { register, handleSubmit, formState, watch } =
-        useForm<BookingFormDataType>({
-            resolver: zodResolver(bookingFormSchema),
-        });
+    const { register, handleSubmit, formState, watch } = useForm<
+        BookingFormInputType,
+        unknown,
+        BookingFormDataType
+    >({
+        resolver: zodResolver(bookingFormSchema),
+    });
 
     const { cabins } = useCabins();
     const [cabinId, setCabinId] = useState<number>();
@@ -46,6 +57,10 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
     });
 
     const [hasBreakfast, setHasBreakfast] = useState(false);
+    const [customErrors, setCustomErrors] = useState<{
+        dateRange?: string;
+        cabinId?: string;
+    }>({});
 
     let numNights: number | null = null;
     if (range.startDate && range.endDate) {
@@ -70,7 +85,55 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
 
     console.log(formState);
 
+    const validateCustomFields = () => {
+        let isValid = true;
+        const nextErrors: { dateRange?: string; cabinId?: string } = {};
+
+        if (!range.startDate || !range.endDate) {
+            nextErrors.dateRange = "Please select a date range";
+            isValid = false;
+        } else if (range.endDate <= range.startDate) {
+            nextErrors.dateRange = "End date must be after start date";
+            isValid = false;
+        }
+
+        if (!cabinId || !cabin) {
+            nextErrors.cabinId = "Please select a cabin";
+            isValid = false;
+        }
+
+        setCustomErrors(nextErrors);
+        return isValid;
+    };
+
+    const handleRangeChange = (value: SetStateAction<Range>) => {
+        const nextRange = typeof value === "function" ? value(range) : value;
+        setRange(nextRange);
+
+        if (
+            nextRange.startDate &&
+            nextRange.endDate &&
+            nextRange.endDate > nextRange.startDate
+        ) {
+            setCustomErrors((prev) => ({ ...prev, dateRange: undefined }));
+        }
+    };
+
+    const handleCabinChange = (value: SetStateAction<number | undefined>) => {
+        const nextCabinId =
+            typeof value === "function" ? value(cabinId) : value;
+        setCabinId(nextCabinId);
+
+        const nextCabin = cabins.find((val) => val.id === nextCabinId);
+        if (nextCabinId && nextCabin) {
+            setCustomErrors((prev) => ({ ...prev, cabinId: undefined }));
+        }
+    };
+
     const onSubmit: SubmitHandler<BookingFormDataType> = (data) => {
+        const isValid = validateCustomFields();
+        if (!isValid) return;
+
         if (!range.startDate || !range.endDate) {
             console.error("Please select date range");
             return;
@@ -81,44 +144,8 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             return;
         }
 
-        // ! DATA BOOKINGS
-        //   "startDate" timestamp without time zone null,
-        //   "endDate" timestamp without time zone null,
-        //   "numNights" smallint null,
-        //   "numGuests" smallint null,
-        //   "cabinPrice" real null,
-        //   "extrasPrice" real null,
-        //   "totalPrice" integer null,
-        //   status text null,
-        //   "hasBreakfast" boolean null,
-        //   "isPaid" boolean null,
-        //   observations text null,
-        //   "cabinId" bigint null,
-        //   "guestId" bigint null,
-        //   constraint bookings_pkey primary key (id),
-        //   constraint bookings_cabinId_fkey foreign KEY ("cabinId") references cabins (id),
-        //   constraint bookings_guestId_fkey foreign KEY ("guestId") references guests (id)
-
         // * ALUR MEMBUAT BOOKINGS -> DALAM SATU SYNCHRONOUS OPERATION
-        // 1. insert guest
 
-        // 2. ambil guestId yang berhasil diinsert
-
-        // 3. insert booking
-
-        // type BookingFormDataType = {
-        //     fullName: string;
-        //     email: string;
-        //     nationalID: string;
-        //     nationality: string;
-        //     countryFlag: string;
-        //     numGuests: number;
-        //     cabinId: number;
-        //     hasBreakfast: boolean;
-        //     isPaid: boolean;
-        //     status: "unconfirmed" | "checked-in" | "checked-out";
-        //     observations: string | null;
-        // };
         const guestPayload: {
             fullName: string | null;
             email: string | null;
@@ -132,12 +159,6 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             nationalID: null,
             countryFlag: null,
         };
-
-        createGuest(guestPayload, {
-            onSuccess: (data) => {
-                console.log(data);
-            },
-        });
 
         if (isCreatingGuest) {
             console.log("lagi loading");
@@ -174,9 +195,21 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             cabinId,
         };
 
-        createBooking(payload, {
+        // 1. insert guest
+        createGuest(guestPayload, {
             onSuccess: (data) => {
                 console.log(data);
+
+                // 2. ambil guestId yang berhasil diinsert
+                // 3. insert booking dengan guestId
+                createBooking(
+                    { ...payload, guestId: data[0].id },
+                    {
+                        onSuccess: (data) => {
+                            console.log(data);
+                        },
+                    },
+                );
             },
         });
 
@@ -220,7 +253,11 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
                 htmlFor="numGuests"
                 error={errors.numGuests?.message}
             >
-                <Input type="text" id="numGuests" {...register("numGuests")} />
+                <Input
+                    type="number"
+                    id="numGuests"
+                    {...register("numGuests")}
+                />
             </FormRow>
             <FormRow
                 label="Observations"
@@ -229,23 +266,26 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             >
                 <Textarea id="observations" {...register("observations")} />
             </FormRow>
-            <FormRow label="Check-in & Check-out Dates" htmlFor="dateRange">
-                {/* <DateRangePicker size="lg" placeholder="Select stay date" /> */}
-                <BookingDateRangePicker range={range} setRange={setRange} />
+            <FormRow
+                label="Check-in & Check-out Dates"
+                htmlFor="dateRange"
+                error={customErrors.dateRange}
+            >
+                <BookingDateRangePicker
+                    range={range}
+                    setRange={handleRangeChange}
+                />
             </FormRow>
             <FormRow
                 label="Select cabin"
                 htmlFor="cabin"
-                // error={errors.cabinId?.message}
+                error={customErrors.cabinId}
             >
-                {/* <Input type="" id="cabin"  
-                // {...register("")}
-                 /> */}
                 <BookingCabinSelect
                     // {...register("cabinId")}
                     cabins={cabins}
                     cabinId={cabinId}
-                    setCabinId={setCabinId}
+                    setCabinId={handleCabinChange}
                 />
             </FormRow>
             <FormRow label="Optional breakfast">
