@@ -20,6 +20,7 @@ import { useSettings } from "../../../settings/hooks/useSettings";
 import { Textarea } from "../../../../ui/Textarea/Textarea";
 import { useCreateGuest } from "../../../guests/hooks/useCreateGuest";
 import { useCreateBooking } from "../../hooks/useCreateBooking";
+import { format } from "date-fns";
 
 interface CreateBookingFormProps {
     onCloseModal: () => void;
@@ -56,6 +57,9 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
         key: "selection",
     });
 
+    console.log(format(range.startDate, "yyyy-MM-dd"));
+    console.log(format(range.endDate, "yyyy-MM-dd"));
+
     const [hasBreakfast, setHasBreakfast] = useState(false);
     const [customErrors, setCustomErrors] = useState<{
         dateRange?: string;
@@ -67,6 +71,7 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
         const diffTime = range.endDate.getTime() - range.startDate.getTime();
         console.log(diffTime);
         numNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        console.log(numNights);
     }
 
     const numGuests = Number(watch("numGuests") ?? 0);
@@ -108,6 +113,8 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
 
     const handleRangeChange = (value: SetStateAction<Range>) => {
         const nextRange = typeof value === "function" ? value(range) : value;
+        console.log(nextRange);
+
         setRange(nextRange);
 
         if (
@@ -179,8 +186,8 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             status?: string | null;
             totalPrice?: number | null;
         } = {
-            startDate: range.startDate.toISOString(),
-            endDate: range.endDate.toISOString(),
+            startDate: format(range.startDate, "yyyy-MM-dd"),
+            endDate: format(range.endDate, "yyyy-MM-dd"),
             // fullName: data.fullName,
             // nationality: data.nationality,
             numNights,
