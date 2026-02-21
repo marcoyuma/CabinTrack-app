@@ -1,4 +1,4 @@
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Range } from "react-date-range";
 import { Form } from "../../../../ui/Form/Form";
 import { Input } from "../../../../ui/Input/Input";
@@ -21,6 +21,9 @@ import { Textarea } from "../../../../ui/Textarea/Textarea";
 import { useCreateGuest } from "../../../guests/hooks/useCreateGuest";
 import { useCreateBooking } from "../../hooks/useCreateBooking";
 import { format } from "date-fns";
+import { generateUniqueNumber } from "../../../../shared/utils/uniqueNumber";
+import { NationalitySelect } from "../NationalitySelect/NationalitySelect";
+import { useFlags } from "./useFlags";
 
 interface CreateBookingFormProps {
     onCloseModal: () => void;
@@ -33,17 +36,37 @@ interface CreateBookingFormProps {
  * using the selected cabin, date range, and optional breakfast pricing.
  */
 export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
-    const { register, handleSubmit, formState, watch } = useForm<
+    const flags = useFlags();
+    const [countryCode, setCountryCode] = useState("");
+    console.log(countryCode);
+    const options = Object.entries(flags ?? {})
+        .map(([countryCode, countryName]) => ({
+            value: countryCode,
+            label: countryName,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+    console.log(options);
+
+    const nationalID = generateUniqueNumber();
+    console.log(nationalID);
+
+    const { register, handleSubmit, formState, watch, setValue } = useForm<
         BookingFormInputType,
         unknown,
         BookingFormDataType
     >({
         resolver: zodResolver(bookingFormSchema),
+        defaultValues: { nationality: "" },
     });
 
+    useEffect(() => {
+        register("nationality");
+    }, [register]);
+
     const { cabins } = useCabins();
-    const [cabinId, setCabinId] = useState<number>();
-    const cabin = cabins.find((val) => val.id === cabinId);
+    const [cabinId, setCabinId] = useState<string>("");
+    const cabin = cabins.find((val) => val.id === +cabinId);
     console.log(cabin);
 
     const { isSettingLoading, errorSetting, setting } = useSettings();
@@ -162,9 +185,9 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
         } = {
             fullName: data.fullName,
             email: data.email,
-            nationality: data.nationality,
-            nationalID: null,
-            countryFlag: null,
+            nationality: flags[data.nationality],
+            nationalID: nationalID,
+            countryFlag: `https://flagcdn.com/${data.nationality}.svg`,
         };
 
         if (isCreatingGuest) {
@@ -188,8 +211,6 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
         } = {
             startDate: format(range.startDate, "yyyy-MM-dd"),
             endDate: format(range.endDate, "yyyy-MM-dd"),
-            // fullName: data.fullName,
-            // nationality: data.nationality,
             numNights,
             numGuests,
             cabinPrice: cabin.regularPrice,
@@ -214,6 +235,7 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
                     {
                         onSuccess: (data) => {
                             console.log(data);
+                            onCloseModal();
                         },
                     },
                 );
@@ -249,10 +271,20 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
                 htmlFor="nationality"
                 error={errors.nationality?.message}
             >
-                <Input
-                    type="text"
-                    id="nationality"
-                    {...register("nationality")}
+                <NationalitySelect
+                    flags={flags}
+                    value={countryCode}
+                    options={options}
+                    onChange={(e) => {
+                        const nextCountryCode = e.target.value;
+                        console.log(nextCountryCode);
+                        // setNationality(flags[nextCountryCode]);
+                        setCountryCode(nextCountryCode);
+                        setValue("nationality", nextCountryCode, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                        });
+                    }}
                 />
             </FormRow>
             <FormRow
