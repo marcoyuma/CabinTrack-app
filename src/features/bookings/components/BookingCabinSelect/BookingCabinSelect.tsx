@@ -4,7 +4,7 @@ import { Cabin } from "../../../cabins/types/cabin.schema";
 
 interface BookingCabinSelectProps {
     cabins: Cabin[];
-    cabinId: number | undefined;
+    cabinId: number;
     setCabinId: React.Dispatch<SetStateAction<number | undefined>>;
 }
 export function BookingCabinSelect({
@@ -12,9 +12,8 @@ export function BookingCabinSelect({
     cabinId,
     setCabinId,
 }: BookingCabinSelectProps) {
-    const handleClick = () => {
-        // setCabinId()
-    };
+    console.log(cabins);
+
     return (
         <Select
             options={cabins.map((cabin) => ({
@@ -22,6 +21,7 @@ export function BookingCabinSelect({
                 label: cabin.name,
             }))}
             value={cabinId}
+            defaultPlaceholder="Select cabin"
             type="white"
             onChange={(e) => setCabinId(+e.target.value)}
         />
