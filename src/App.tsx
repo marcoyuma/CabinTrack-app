@@ -18,13 +18,13 @@ import { Account } from "./pages/Account/Account";
 import { Login } from "./pages/Login/Login";
 import { PageNotFound } from "./pages/PageNotFound/PageNotFound";
 
-import { Booking } from "./pages/Bookings/Booking";
+import { Booking } from "./pages/Booking/Booking";
 import { Checkin } from "./pages/Checkin/Checkin";
 import { ProtectedRoute } from "./ui/ProtectedRoute/ProtectedRoute";
 import { DarkModeProvider } from "./context/DarkModeProvider";
 import { ErrorFallback } from "./ui/ErrorFallback/ErrorFallback";
 
-export const App = () => {
+export function App() {
     // define react-query instance
     const queryClient = new QueryClient({
         defaultOptions: {
@@ -91,4 +91,4 @@ export const App = () => {
             </QueryClientProvider>
         </DarkModeProvider>
     );
-};
+}
