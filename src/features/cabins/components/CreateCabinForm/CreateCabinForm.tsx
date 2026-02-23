@@ -227,7 +227,7 @@ export function CreateCabinForm({
                     defaultValue=""
                     disabled={isWorking}
                     {...register(
-                        "description"
+                        "description",
                         // {
                         // required: "this field is required",}
                     )}
