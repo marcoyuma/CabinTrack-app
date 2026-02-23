@@ -23,7 +23,7 @@ import { useCreateBooking } from "../../hooks/useCreateBooking";
 import { format } from "date-fns";
 import { generateUniqueNumber } from "../../../../shared/utils/uniqueNumber";
 import { NationalitySelect } from "../NationalitySelect/NationalitySelect";
-import { useFlags } from "./useFlags";
+import { useFlags } from "../../hooks/useFlags";
 
 interface CreateBookingFormProps {
     onCloseModal: () => void;
@@ -36,17 +36,9 @@ interface CreateBookingFormProps {
  * using the selected cabin, date range, and optional breakfast pricing.
  */
 export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
-    const flags = useFlags();
+    const flagOptions = useFlags();
     const [countryCode, setCountryCode] = useState("");
     console.log(countryCode);
-    const options = Object.entries(flags ?? {})
-        .map(([countryCode, countryName]) => ({
-            value: countryCode,
-            label: countryName,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label));
-
-    console.log(options);
 
     const nationalID = generateUniqueNumber();
     console.log(nationalID);
@@ -272,9 +264,8 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
                 error={errors.nationality?.message}
             >
                 <NationalitySelect
-                    flags={flags}
                     value={countryCode}
-                    options={options}
+                    options={flagOptions}
                     onChange={(e) => {
                         const nextCountryCode = e.target.value;
                         console.log(nextCountryCode);
