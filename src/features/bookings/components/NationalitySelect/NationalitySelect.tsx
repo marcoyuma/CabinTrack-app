@@ -3,7 +3,6 @@ import { Select } from "../../../../ui/Select/Select";
 import { Flags } from "../CreateBookingForm/useFlags";
 
 interface NationalitySelectProps {
-    flags?: Flags;
     value: string;
     options: {
         value: string;
@@ -13,7 +12,6 @@ interface NationalitySelectProps {
 }
 
 export function NationalitySelect({
-    flags,
     value,
     options,
     onChange,
@@ -24,10 +22,9 @@ export function NationalitySelect({
         <Select
             options={options}
             value={value}
-            defaultPlaceholder={
-                flags ? "Select nationality" : "Loading countries..."
-            }
+            defaultPlaceholder="Select nationality"
             type="white"
+            $fullwidth={true}
             onChange={onChange}
         />
     );
