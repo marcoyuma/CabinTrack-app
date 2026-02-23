@@ -69,29 +69,42 @@ export type CabinsDataType = z.infer<typeof cabinsDataSchema>;
 // };
 
 // cabins form schema
-export const cabinFormSchema = z
+export const cabinFormSchema = (maximumGuest: number) =>
+    z
     .object({
         name: z.string().trim().min(2),
         description: z
             .string()
             .trim()
             .min(1, "description required")
-            .max(1000, "max value reached, 100 words"),
-        discount: z.coerce.number().max(100, "maximum value reached, 100%"),
+            discount: z.coerce
+                .number<number>()
+                .max(100, "maximum value reached, 100%"),
         image: z.instanceof(FileList).nullable(),
         maxCapacity: z.coerce
-            .number()
+                .number<number>()
             .min(1, "required atleast 1 person")
             .max(6, "maximum value reached, 6 person"),
-        regularPrice: z.coerce.number().min(10, "required atleast $10"),
+            regularPrice: z.coerce
+                .number<number>()
+                .min(10, "required atleast $10"),
     })
     // validate cross value and return the error with specified path
     .refine((data) => data.discount <= data.regularPrice, {
         error: "discount should be lower than the actual price",
         path: ["discount"],
+        })
+        .superRefine((val, ctx) => {
+            if (val.maxCapacity > maximumGuest) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["maxCapacity"],
+                    message: `guest per cabin cannot more than ${maximumGuest}`,
+                });
+            }
     });
-// type of cabinFormSchema
-export type CabinFormSchemaType = z.infer<typeof cabinFormSchema>;
+// type of returned cabinFormSchema
+export type CabinFormSchemaType = z.infer<ReturnType<typeof cabinFormSchema>>;
 
 // create / update cabin payload schema
 export const cabinPayloadSchema = z.object({
