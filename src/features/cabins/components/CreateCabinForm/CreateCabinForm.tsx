@@ -16,6 +16,7 @@ import {
     CabinFormSchemaType,
     CabinPayload,
 } from "../../types/cabin.schema";
+import { useSettings } from "../../../settings/hooks/useSettings";
 
 // props type for CreateCabinForm component
 export interface CreateCabinFormProps {
@@ -34,10 +35,10 @@ export interface CreateCabinFormProps {
 
 // component for creating cabin with react hook form
 // no manual hookstate
-export const CreateCabinForm = ({
+export function CreateCabinForm({
     editedCabinData,
     onCloseModal,
-}: CreateCabinFormProps) => {
+}: CreateCabinFormProps) {
     // destructure editedCabinData if available for default values
     let editId: undefined | number;
     const createValues: Omit<CabinFormSchemaType, "image"> = {
@@ -60,13 +61,17 @@ export const CreateCabinForm = ({
     const isEditSession = Boolean(editId);
     console.log(`isEditSession: ${isEditSession}`);
 
+    const { setting } = useSettings();
+    // schema with maximumGuest from settings
+    const schema = cabinFormSchema(setting.maxNumberGuestsPerBooking);
+
     // implementing useForm hook
     // Destructure 'register' and 'handleSubmit' from useForm to manage form inputs and submission
     const { register, handleSubmit, reset, formState } =
         // useForm<FormDataType>({
-        useForm({
+        useForm<CabinFormSchemaType>({
             // integrate zod schema with react hook form resolver via zod resolver for input validation
-            resolver: zodResolver(cabinFormSchema),
+            resolver: zodResolver(schema),
             // conditional logic for if on edit session then use 'editValues' as default value from cabins query in each input
             // defaultValues: isEditSession ? editValues : createValues,
             defaultValues: isEditSession
@@ -122,7 +127,7 @@ export const CreateCabinForm = ({
                         onCloseModal?.();
                         reset();
                     },
-                }
+                },
             );
 
             // base isn't provided and not in edit session, create
@@ -149,7 +154,7 @@ export const CreateCabinForm = ({
                 // success input will call this
                 onSubmit,
                 // error input will prevent submitting and call this
-                onError
+                onError,
             )}
             // type is used to determine the style of the form
             // if onCloseModal is provided, then the form is used as a modal
@@ -239,7 +244,7 @@ export const CreateCabinForm = ({
                     accept="image/*"
                     type="file"
                     {...register(
-                        "image"
+                        "image",
                         //      {
                         //     // validation either editin or creating. true condition wouldn't be required
                         //     required: isEditSession ? false : "image is required",
@@ -248,7 +253,7 @@ export const CreateCabinForm = ({
                 />
             </FormRow>
 
-            <FormRow>
+            <FormRow actions>
                 {/* type is an HTML attribute! */}
                 <Button
                     variation="secondary"
@@ -264,4 +269,4 @@ export const CreateCabinForm = ({
             </FormRow>
         </Form>
     );
-};
+}
