@@ -6,6 +6,7 @@ import { Cabin } from "../../../cabins/types/cabin.schema";
 interface BookingCabinSelectProps {
     cabins: Cabin[];
     cabinId: number;
+    disabled?: boolean;
     setCabinId: React.Dispatch<SetStateAction<number | undefined>>;
 }
 
@@ -19,6 +20,7 @@ interface BookingCabinSelectProps {
 export function BookingCabinSelect({
     cabins,
     cabinId,
+    disabled,
     setCabinId,
 }: BookingCabinSelectProps) {
     console.log(cabins);
@@ -30,8 +32,11 @@ export function BookingCabinSelect({
                 label: cabin.name,
             }))}
             value={cabinId}
-            defaultPlaceholder="Select cabin"
+            defaultPlaceholder={
+                disabled ? "Select date first..." : "Select cabin"
+            }
             type="white"
+            disabled={disabled}
             onChange={(e) => setCabinId(+e.target.value)}
         />
     );
