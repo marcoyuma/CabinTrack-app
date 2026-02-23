@@ -245,6 +245,16 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             onSubmit={handleSubmit(onSubmit)}
         >
             <FormRow
+                label="Check-in & Check-out Dates"
+                htmlFor="dateRange"
+                error={customErrors.dateRange}
+            >
+                <BookingDateRangePicker
+                    range={range}
+                    setRange={handleRangeChange}
+                />
+            </FormRow>
+            <FormRow
                 label="Full name"
                 htmlFor="fullName"
                 error={errors.fullName?.message}
@@ -296,16 +306,7 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             >
                 <Textarea id="observations" {...register("observations")} />
             </FormRow>
-            <FormRow
-                label="Check-in & Check-out Dates"
-                htmlFor="dateRange"
-                error={customErrors.dateRange}
-            >
-                <BookingDateRangePicker
-                    range={range}
-                    setRange={handleRangeChange}
-                />
-            </FormRow>
+
             <FormRow
                 label="Select cabin"
                 htmlFor="cabin"
