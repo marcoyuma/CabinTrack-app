@@ -55,6 +55,7 @@ export const Button = styled.button<ButtonType>`
     border: none;
     border-radius: var(--border-radius-sm);
     box-shadow: var(--shadow-sm);
+    z-index: 10;
 
     ${(props) => sizes[props.size || "medium"]}
     ${(props) => variations[props.variation || "primary"]}
