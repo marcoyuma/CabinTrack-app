@@ -1,6 +1,5 @@
 import { ChangeEvent } from "react";
 import { Select } from "../../../../ui/Select/Select";
-import { Flags } from "../CreateBookingForm/useFlags";
 
 interface NationalitySelectProps {
     value: string;
