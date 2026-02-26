@@ -317,6 +317,9 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             >
                 <BookingCabinSelect
                     // {...register("cabinId")}
+                    disabled={
+                        range.startDate?.getDate() === range.endDate?.getDate()
+                    }
                     cabins={cabins}
                     cabinId={cabinId}
                     setCabinId={handleCabinChange}
