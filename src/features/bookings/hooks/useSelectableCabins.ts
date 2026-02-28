@@ -1,10 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSelectableCabins, getSpecificBooking } from "./apiBookings";
+import { getSelectableCabins } from "./apiBookings";
 
-export function useSelectableCabins() {
+export function useSelectableCabins({
+    checkIn,
+    checkOut,
+}: {
+    checkIn: string;
+    checkOut: string;
+}) {
     const { data, isPending } = useQuery({
         queryKey: ["selectableCabins"],
-        queryFn: getSpecificBooking,
+        queryFn: () => getSelectableCabins({ checkIn, checkOut }),
     });
     console.log(data);
 
