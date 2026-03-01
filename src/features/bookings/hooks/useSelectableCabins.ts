@@ -9,9 +9,12 @@ export function useSelectableCabins({
     checkOut: string;
 }) {
     const { data, isPending } = useQuery({
-        queryKey: ["selectableCabins"],
+        queryKey: ["selectableCabins", checkIn, checkOut],
         queryFn: () => getSelectableCabins({ checkIn, checkOut }),
     });
+
+    console.log(checkIn);
+    console.log(checkOut);
     console.log(data);
 
     return { data, isPending };
