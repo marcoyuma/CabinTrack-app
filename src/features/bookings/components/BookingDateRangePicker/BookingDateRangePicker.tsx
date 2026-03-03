@@ -6,8 +6,9 @@ import "react-date-range/dist/theme/default.css";
 import { DateRange, Range } from "react-date-range";
 import { Dispatch, SetStateAction, useState } from "react";
 import { DateRangeInput } from "../DateRangeInput/DateRangeInput";
-import { Button } from "../../../../ui/Button/Button";
+
 import { format, addDays } from "date-fns";
+import { useSettings } from "../../../settings/hooks/useSettings";
 
 // Controlled props passed from the parent booking form.
 interface Props {
@@ -20,6 +21,11 @@ interface Props {
  * Selection is controlled via `range`/`setRange` and constrained to today..60 days ahead.
  */
 export function BookingDateRangePicker({ range, setRange }: Props) {
+    // settings data
+    const {
+        setting: { maxBookingLength },
+    } = useSettings();
+
     // Popover open/close state.
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -31,6 +37,13 @@ export function BookingDateRangePicker({ range, setRange }: Props) {
                   "dd MMM yyyy",
               )}`
             : "";
+    console.log(range);
+    console.log(range.startDate);
+    console.log(range.endDate);
+
+    // ! maximum nights validation first stage development (startDate + maxnight)
+    // logic maximum booking/nights: startDate + 30 hari
+    const [firstTouch, setFirstTouch] = useState(false);
 
     return (
         <>
@@ -57,13 +70,28 @@ export function BookingDateRangePicker({ range, setRange }: Props) {
                 >
                     <DateRange
                         ranges={[range]}
-                        onChange={(item) => setRange(item.selection)}
+                        onChange={(item) => {
+                            console.log("tezs");
+
+                            setRange(item.selection);
+                            setFirstTouch((val) => !val);
+
+                            if (firstTouch) {
+                                console.log("false");
+                                setIsOpen(false);
+                                setFirstTouch(false);
+                            }
+                        }}
+                        // set today as selectable range date input
                         minDate={new Date()}
-                        maxDate={addDays(new Date(), 60)}
+                        // set h+ startDate and  and as selectable range date input
+                        maxDate={addDays(
+                            range.startDate ?? new Date(),
+                            firstTouch ? maxBookingLength : 60,
+                        )}
                         months={2}
                         direction="horizontal"
                     />
-                    <Button onClick={() => setIsOpen(false)}>Done</Button>
                 </div>
             )}
         </>
