@@ -24,6 +24,7 @@ import { format } from "date-fns";
 import { generateUniqueNumber } from "../../../../shared/utils/uniqueNumber";
 import { NationalitySelect } from "../NationalitySelect/NationalitySelect";
 import { useFlags } from "../../hooks/useFlags";
+import { useSelectableCabins } from "../../hooks/useSelectableCabins";
 
 interface CreateBookingFormProps {
     onCloseModal: () => void;
@@ -56,8 +57,10 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
         register("nationality");
     }, [register]);
 
-    const { cabins } = useCabins();
+    // const { cabins } = useCabins();
+    const { data, isPending } = useSelectableCabins();
     const [cabinId, setCabinId] = useState<string>("");
+    const cabins = data ?? [];
     const cabin = cabins.find((val) => val.id === +cabinId);
     console.log(cabin);
 
@@ -314,6 +317,9 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             >
                 <BookingCabinSelect
                     // {...register("cabinId")}
+                    disabled={
+                        range.startDate?.getDate() === range.endDate?.getDate()
+                    }
                     cabins={cabins}
                     cabinId={cabinId}
                     setCabinId={handleCabinChange}

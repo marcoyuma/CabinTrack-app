@@ -32,10 +32,7 @@ interface CheckinBookingProps {
         minBookingLength: number;
     };
 }
-export const CheckinBookingInner = ({
-    booking,
-    setting,
-}: CheckinBookingProps) => {
+export function CheckinBookingInner({ booking, setting }: CheckinBookingProps) {
     const [confirmPaid, setConfirmPaid] = useState(false);
     const [addBreakfast, setAddBreakfast] = useState(false);
 
@@ -102,7 +99,7 @@ export const CheckinBookingInner = ({
                         setAddBreakfast((prev) => !prev);
                         setConfirmPaid(false);
                     }}
-                    id={bookingId}
+                    id={bookingId.toString()}
                 >
                     Add breakfast for {formatCurrency(optionalBreakfastPrice)}?
                 </Checkbox>
@@ -112,18 +109,18 @@ export const CheckinBookingInner = ({
                     checked={confirmPaid}
                     onChange={() => setConfirmPaid((prev) => !prev)}
                     disabled={confirmPaid || isCheckingIn}
-                    id={bookingId}
+                    id={bookingId.toString()}
                 >
                     I confirm that {guests?.fullName} has paid the total amount
                     of{" "}
                     {!addBreakfast
                         ? formatCurrency(totalPrice)
                         : `${formatCurrency(
-                              totalPrice + optionalBreakfastPrice
+                              totalPrice + optionalBreakfastPrice,
                           )} (${formatCurrency(
-                              totalPrice
+                              totalPrice,
                           )} cabin + ${formatCurrency(
-                              optionalBreakfastPrice
+                              optionalBreakfastPrice,
                           )} breakfast)`}
                 </Checkbox>
             </Box>
@@ -141,4 +138,4 @@ export const CheckinBookingInner = ({
             </ButtonGroup>
         </>
     );
-};
+}
