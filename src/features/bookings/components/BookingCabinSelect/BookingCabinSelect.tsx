@@ -23,8 +23,6 @@ export function BookingCabinSelect({
     disabled,
     setCabinId,
 }: BookingCabinSelectProps) {
-    console.log(cabins);
-
     return (
         <Select
             options={cabins.map((cabin) => ({
