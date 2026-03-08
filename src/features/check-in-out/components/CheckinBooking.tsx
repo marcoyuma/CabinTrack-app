@@ -11,11 +11,11 @@ import { CheckinBookingInner } from "./CheckinBookingInner";
  */
 export function CheckinBooking() {
     const { booking, isBookingLoading, errorBooking } = useBooking();
-    const { isSettingLoading, setting, error: errorSettings } = useSettings();
+    const { isSettingLoading, setting, errorSetting } = useSettings();
 
     // error handling
     if (!booking) return <Empty resourceName="booking" />;
-    if (errorBooking || errorSettings) return <PageNotFound />;
+    if (errorBooking || errorSetting) return <PageNotFound />;
     if (isBookingLoading || isSettingLoading) return <Spinner />;
 
     return <CheckinBookingInner booking={booking} setting={setting} />;
