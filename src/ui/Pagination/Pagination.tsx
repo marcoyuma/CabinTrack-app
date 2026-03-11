@@ -63,7 +63,6 @@ const PaginationButton = styled.button<PaginationButtonPropsType>`
 export function Pagination({ count }: { count: number }) {
     // custom hook for get and set value to url
     const [params, setParams] = useBatchSearchParams();
-    console.log(count);
 
     // get 'page' params value
     const pageParam = params.get("page");
@@ -73,8 +72,6 @@ export function Pagination({ count }: { count: number }) {
 
     // total pagination indicator based on data length divided by 10 (maximum data displayed in the ui). numbers rounded up (2,1 = 3)
     const totalPagination = Math.ceil(count / DATA_PER_PAGE_SIZE);
-    console.log(currentPage);
-    console.log(totalPagination);
 
     // set new value every next button clicked for 'page' key params
     const nextPageHandler = () => {
