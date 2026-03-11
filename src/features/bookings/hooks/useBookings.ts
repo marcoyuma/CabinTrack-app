@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { readBookings } from "../../../services/apiBookings";
+import { readBookings } from "./apiBookings";
 import {
     BookingFilterValue,
     BookingsDataType,
@@ -9,21 +9,33 @@ import {
 } from "../../../types/bookings.type";
 import { DATA_PER_PAGE_SIZE } from "../../../shared/utils/constants";
 import { useBatchSearchParams } from "../../../hooks/useBatchSearchParams";
+import { useEnsureValidPage } from "../../../hooks/useEnsureValidPage";
 
-// hooks for bookings query
+/**
+ * Reads booking data for the bookings table based on URL query params.
+ *
+ * This hook centralizes list behavior for bookings:
+ * - builds filter/sort/page from `status`, `sortBy`, and `page` query params
+ * - fetches paginated rows with React Query
+ * - keeps `page` valid when total rows change
+ * - prefetches previous/next pages for faster navigation
+ *
+ * Returned values:
+ * - `isBookingsLoading`: loading state for current bookings query
+ * - `bookings`: current page rows
+ * - `bookingsLength`: total rows matching active filter (for pagination)
+ */
 export const useBookings = () => {
-    // query client instance
+    // React Query client for manual prefetch calls.
     const queryClient = useQueryClient();
 
-    // get value from url based on specified key
-    const [params] = useBatchSearchParams();
+    // Read current table state from URL.
+    const [params, setParams] = useBatchSearchParams();
     const statusParam = params.get("status");
     const sortByParam = params.get("sortBy");
     const pageParam = params.get("page");
 
-    // filter value by 'status'
-    // if 'statusParam' is 'null' or 'all', set 'filter' to null so that all 'bookings' are fetched
-
+    // `status=all` (or missing) means no status filter.
     const filter: FilterValueType =
         !statusParam || statusParam === "all"
             ? null
@@ -32,34 +44,40 @@ export const useBookings = () => {
                   value: statusParam as BookingFilterValue,
               };
 
-    // sort value based on url key 'sortedValue' value
-    const sortedValue = sortByParam || "startDate-desc";
+    // Default sort keeps ordering deterministic when URL has no value.
+    const sortedValue = sortByParam || "startDate-asc";
     const [field, direction] = sortedValue.split("-") as [
         BookingSortFieldProperty,
-        BookingSortDirectionProperty
+        BookingSortDirectionProperty,
     ];
 
-    // Combine sorting field and direction into a single configuration object
+    // React Query key and API both use this normalized sort object.
     const sortBy = { field, direction };
+    console.log(field);
+    console.log(direction);
 
-    // pagination
+    // URL is source of truth for current page.
     const page = !pageParam ? 1 : Number(pageParam);
 
-    // useQuery from fetch data from 'getBookings' including another dependency in the array so data will refetched when the anything inside is changes
+    // Fetch bookings for current query state.
     const { isPending: isBookingsLoading, data } = useQuery({
         queryKey: ["bookings", filter, sortBy, page],
         queryFn: () => readBookings(filter, sortBy, page),
     });
 
-    // destructuring and validate 'data' properties from possible undefined
+    // Keep return value stable before first successful fetch.
     const { bookings, bookingsLength } = (data as BookingsDataType) ?? {
         bookings: [],
         bookingsLength: 0,
     };
 
-    // prefetching next page while on the current page
-    const totalPagination = Math.ceil(bookingsLength / DATA_PER_PAGE_SIZE); // total page provided
-    // only executed when current page is less than total page preventing prefetching unexisting data
+    // Number of pages based on total rows returned by backend count.
+    const totalPagination = Math.ceil(bookingsLength / DATA_PER_PAGE_SIZE);
+
+    // Clamp invalid/out-of-range page values in URL.
+    useEnsureValidPage(bookingsLength, page, totalPagination, setParams);
+
+    // Warm next page cache when it exists.
     if (page < totalPagination) {
         queryClient.prefetchQuery({
             queryKey: ["bookings", filter, sortBy, page + 1],
@@ -67,13 +85,15 @@ export const useBookings = () => {
         });
     }
 
-    // prefetch previous page except on the first page
+    // Warm previous page cache except on first page.
     if (page > 1) {
         queryClient.prefetchQuery({
             queryKey: ["bookings", filter, sortBy, page - 1],
             queryFn: () => readBookings(filter, sortBy, page - 1),
         });
     }
+
+    console.log(bookingsLength);
 
     return { isBookingsLoading, bookings, bookingsLength };
 };

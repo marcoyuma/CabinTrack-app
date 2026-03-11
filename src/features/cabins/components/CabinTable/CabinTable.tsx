@@ -15,7 +15,7 @@ import { useCabins } from "../../hooks/useCabins";
  *
  * @returns - A styled table component with the cabins data passed to it
  */
-export const CabinTable = () => {
+export function CabinTable() {
     // destructuring the cabins data from custom hooks that calls 'getCabins' api
     const { isPending, cabins, cabinsLength } = useCabins();
 
@@ -54,4 +54,4 @@ export const CabinTable = () => {
             </Table.Footer>
         </Table>
     );
-};
+}

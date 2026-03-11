@@ -24,7 +24,7 @@ const Buttons = styled.div`
     gap: 0.6rem;
 `;
 
-type PaginationButtonPropsType = { active: boolean };
+type PaginationButtonPropsType = { active?: boolean };
 const PaginationButton = styled.button<PaginationButtonPropsType>`
     background-color: ${(props) =>
         props.active ? " var(--color-brand-600)" : "var(--color-grey-50)"};
@@ -60,7 +60,7 @@ const PaginationButton = styled.button<PaginationButtonPropsType>`
     }
 `;
 
-export const Pagination = ({ count }: { count: number }) => {
+export function Pagination({ count }: { count: number }) {
     // custom hook for get and set value to url
     const [params, setParams] = useBatchSearchParams();
 
@@ -69,24 +69,16 @@ export const Pagination = ({ count }: { count: number }) => {
 
     // current page from url, if no page on url, default to 1
     const currentPage = pageParam ? Number(pageParam) : 1;
-    console.log(`current page: ${currentPage}`);
 
     // total pagination indicator based on data length divided by 10 (maximum data displayed in the ui). numbers rounded up (2,1 = 3)
     const totalPagination = Math.ceil(count / DATA_PER_PAGE_SIZE);
-    console.log(
-        `total page: ${totalPagination} dan hasil raw sebelum diolah: ${
-            count / DATA_PER_PAGE_SIZE
-        }`
-    );
-    console.log(`jumlah data: ${count}`);
 
     // set new value every next button clicked for 'page' key params
     const nextPageHandler = () => {
         const next = (
             currentPage === totalPagination ? currentPage : currentPage + 1
         ).toString();
-        console.log("page setelah next: ", next);
-        // setParams(next);
+
         // set 'next' as new value for its params key
         setParams({ page: next });
     };
@@ -96,9 +88,6 @@ export const Pagination = ({ count }: { count: number }) => {
         const previous = (
             currentPage === 1 ? currentPage : currentPage - 1
         ).toString();
-        console.log("page setelah previous: ", previous);
-        // setParams(previous);
-
         setParams({ page: previous });
     };
 
@@ -136,4 +125,4 @@ export const Pagination = ({ count }: { count: number }) => {
             </Buttons>
         </StyledPagination>
     );
-};
+}
