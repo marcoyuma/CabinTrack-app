@@ -1,17 +1,18 @@
-import { SetStateAction, useEffect, useState } from "react";
-import { Range } from "react-date-range";
+import { useEffect, useState } from "react";
+
 import { Form } from "../../../../ui/Form/Form";
 import { Input } from "../../../../ui/Input/Input";
 import { FormRow } from "../../../../ui/FormRow/FormRow";
-import { useCabins } from "../../../cabins/hooks/useCabins";
 import { BookingCabinSelect } from "../BookingCabinSelect/BookingCabinSelect";
 import { BookingDateRangePicker } from "../BookingDateRangePicker/BookingDateRangePicker";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../../../../ui/Button/Button";
 import {
     BookingFormDataType,
     BookingFormInputType,
     bookingFormSchema,
+    createBookingPayloadSchema,
+    CreateBookingPayloadType,
 } from "../../../../types/bookings.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "../../../../ui/Checkbox/Checkbox";
@@ -25,6 +26,7 @@ import { generateUniqueNumber } from "../../../../shared/utils/uniqueNumber";
 import { NationalitySelect } from "../NationalitySelect/NationalitySelect";
 import { useFlags } from "../../hooks/useFlags";
 import { useSelectableCabins } from "../../hooks/useSelectableCabins";
+import { Guest } from "../../../../types/guests.type";
 
 interface CreateBookingFormProps {
     onCloseModal: () => void;
@@ -39,206 +41,144 @@ interface CreateBookingFormProps {
 export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
     const flagOptions = useFlags();
     const [countryCode, setCountryCode] = useState("");
-    console.log(countryCode);
+    const flags = flagOptions.find((val) => val.value === countryCode.trim());
 
     const nationalID = generateUniqueNumber();
-    console.log(nationalID);
 
-    const { register, handleSubmit, formState, watch, setValue } = useForm<
-        BookingFormInputType,
-        unknown,
-        BookingFormDataType
-    >({
-        resolver: zodResolver(bookingFormSchema),
-        defaultValues: { nationality: "" },
-    });
+    const { register, handleSubmit, formState, watch, setValue, control } =
+        useForm<BookingFormInputType, unknown, BookingFormDataType>({
+            resolver: zodResolver(bookingFormSchema),
+            defaultValues: {
+                dateRange: {
+                    startDate: new Date(),
+                    endDate: new Date(),
+                    key: "selection",
+                },
+                cabinId: 0,
+                nationality: "",
+                hasBreakfast: false,
+            },
+        });
 
     useEffect(() => {
         register("nationality");
     }, [register]);
 
-    // const { cabins } = useCabins();
-    const { data, isPending } = useSelectableCabins();
-    const [cabinId, setCabinId] = useState<string>("");
-    const cabins = data ?? [];
-    const cabin = cabins.find((val) => val.id === +cabinId);
-    console.log(cabin);
-
-    const { isSettingLoading, errorSetting, setting } = useSettings();
-
+    const { isSettingLoading, setting } = useSettings();
     const { createGuest, isCreatingGuest } = useCreateGuest();
     const { createBooking, isCreatingBooking } = useCreateBooking();
 
-    const [range, setRange] = useState<Range>({
-        startDate: new Date(),
-        endDate: new Date(),
-        key: "selection",
+    const cabinId = watch("cabinId");
+    const hasBreakfast = Boolean(watch("hasBreakfast"));
+    const numGuests = Number(watch("numGuests") ?? 0);
+    const startDate = watch("dateRange.startDate");
+    const endDate = watch("dateRange.endDate");
+
+    const { selectableCabins, isSelectingCabins } = useSelectableCabins({
+        checkIn: startDate ? `${format(startDate, "yyyy-MM-dd")}` : "",
+        checkOut: endDate ? `${format(endDate, "yyyy-MM-dd")}` : "",
+        guests: Number(watch("numGuests")),
     });
 
-    console.log(format(range.startDate, "yyyy-MM-dd"));
-    console.log(format(range.endDate, "yyyy-MM-dd"));
-
-    const [hasBreakfast, setHasBreakfast] = useState(false);
-    const [customErrors, setCustomErrors] = useState<{
-        dateRange?: string;
-        cabinId?: string;
-    }>({});
+    const cabins = selectableCabins ?? [];
+    const cabin = cabins.find((val) => val.id === cabinId);
 
     let numNights: number | null = null;
-    if (range.startDate && range.endDate) {
-        const diffTime = range.endDate.getTime() - range.startDate.getTime();
-        console.log(diffTime);
+    if (startDate && endDate) {
+        const diffTime = endDate.getTime() - startDate.getTime();
         numNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        console.log(numNights);
     }
 
-    const numGuests = Number(watch("numGuests") ?? 0);
     const optionalBreakfastPrice =
         numNights && setting
             ? setting.breakfastPrice * numNights * numGuests
             : 0;
-    console.log(numNights);
-    console.log(numGuests);
-    console.log(optionalBreakfastPrice);
-
-    console.log(`dateng: ${range.startDate}`);
-    console.log(`pulang: ${range.endDate}`);
 
     const { errors } = formState;
 
-    console.log(formState);
-
-    const validateCustomFields = () => {
-        let isValid = true;
-        const nextErrors: { dateRange?: string; cabinId?: string } = {};
-
-        if (!range.startDate || !range.endDate) {
-            nextErrors.dateRange = "Please select a date range";
-            isValid = false;
-        } else if (range.endDate <= range.startDate) {
-            nextErrors.dateRange = "End date must be after start date";
-            isValid = false;
-        }
-
-        if (!cabinId || !cabin) {
-            nextErrors.cabinId = "Please select a cabin";
-            isValid = false;
-        }
-
-        setCustomErrors(nextErrors);
-        return isValid;
-    };
-
-    const handleRangeChange = (value: SetStateAction<Range>) => {
-        const nextRange = typeof value === "function" ? value(range) : value;
-        console.log(nextRange);
-
-        setRange(nextRange);
-
-        if (
-            nextRange.startDate &&
-            nextRange.endDate &&
-            nextRange.endDate > nextRange.startDate
-        ) {
-            setCustomErrors((prev) => ({ ...prev, dateRange: undefined }));
-        }
-    };
-
-    const handleCabinChange = (value: SetStateAction<number | undefined>) => {
-        const nextCabinId =
-            typeof value === "function" ? value(cabinId) : value;
-        setCabinId(nextCabinId);
-
-        const nextCabin = cabins.find((val) => val.id === nextCabinId);
-        if (nextCabinId && nextCabin) {
-            setCustomErrors((prev) => ({ ...prev, cabinId: undefined }));
-        }
-    };
-
     const onSubmit: SubmitHandler<BookingFormDataType> = (data) => {
-        const isValid = validateCustomFields();
-        if (!isValid) return;
-
-        if (!range.startDate || !range.endDate) {
-            console.error("Please select date range");
-            return;
-        }
-
         if (!cabin) {
-            console.log("ga");
+            return;
+        }
+        if (numNights === null) {
             return;
         }
 
-        // * ALUR MEMBUAT BOOKINGS -> DALAM SATU SYNCHRONOUS OPERATION
-
-        const guestPayload: {
-            fullName: string | null;
-            email: string | null;
-            nationalID: string | null;
-            nationality: string | null;
-            countryFlag: string | null;
-        } = {
+        // createGuest payload for creating guest
+        const guestPayload: Omit<Guest, "created_at" | "id"> = {
             fullName: data.fullName,
             email: data.email,
-            nationality: flags[data.nationality],
+            nationality: flags ? flags.label : "🇺🇳",
             nationalID: nationalID,
             countryFlag: `https://flagcdn.com/${data.nationality}.svg`,
         };
 
-        if (isCreatingGuest) {
-            console.log("lagi loading");
-        }
-
-        const payload: {
-            cabinId?: number | null;
-            cabinPrice?: number | null;
-            endDate?: string | null;
-            extrasPrice?: number | null;
-            guestId?: number | null;
-            hasBreakfast?: boolean | null;
-            isPaid?: boolean | null;
-            numGuests?: number | null;
-            numNights?: number | null;
-            observations?: string | null;
-            startDate?: string | null;
-            status?: string | null;
-            totalPrice?: number | null;
-        } = {
-            startDate: format(range.startDate, "yyyy-MM-dd"),
-            endDate: format(range.endDate, "yyyy-MM-dd"),
+        // booking data
+        const bookingPayload: Omit<CreateBookingPayloadType, "guestId"> = {
+            startDate: format(startDate, "yyyy-MM-dd"),
+            endDate: format(endDate, "yyyy-MM-dd"),
             numNights,
             numGuests,
             cabinPrice: cabin.regularPrice,
             extrasPrice: optionalBreakfastPrice,
             totalPrice: cabin.regularPrice + optionalBreakfastPrice,
             status: "unconfirmed",
-            hasBreakfast,
+            hasBreakfast: data.hasBreakfast,
             isPaid: false,
-            observations: data.observations,
+            observations: data.observations ?? "",
             cabinId,
         };
 
-        // 1. insert guest
+        // Create guest first, then create booking using the returned guestId.
         createGuest(guestPayload, {
             onSuccess: (data) => {
-                console.log(data);
-
-                // 2. ambil guestId yang berhasil diinsert
-                // 3. insert booking dengan guestId
-                createBooking(
-                    { ...payload, guestId: data[0].id },
-                    {
-                        onSuccess: (data) => {
-                            console.log(data);
-                            onCloseModal();
-                        },
+                const payload = createBookingPayloadSchema.parse({
+                    ...bookingPayload,
+                    guestId: data[0].id,
+                });
+                createBooking(payload, {
+                    onSuccess: () => {
+                        onCloseModal();
                     },
-                );
+                    onError: (err) => {
+                        console.error(err);
+                    },
+                });
+            },
+            onError: (err) => {
+                console.error(err);
             },
         });
-
-        console.log(payload);
     };
+
+    // set boolean value to set either date or numGuests condition is true
+    const invalidDateAndNumGuests =
+        startDate?.getDate() === endDate?.getDate() || numGuests === 0;
+
+    /**
+     * Syncs nationality selection between local `countryCode` state and RHF `nationality`
+     * field so validation and submit payload always use the latest selected country code.
+     *
+     * @param e - Native `<select>` change event; reads `e.target.value` as the next
+     * country code and applies it to both local state and form state.
+     */
+    const handleNationalitySelectChange = (
+        e: React.ChangeEvent<HTMLSelectElement>,
+    ) => {
+        const nextCountryCode = e.target.value;
+        // setNationality(flags[nextCountryCode]);
+        setCountryCode(nextCountryCode);
+        setValue("nationality", nextCountryCode, {
+            shouldValidate: true,
+            shouldDirty: true,
+        });
+    };
+
+    const isLoading =
+        isSettingLoading ||
+        isCreatingBooking ||
+        isCreatingGuest ||
+        isSelectingCabins;
 
     return (
         <Form
@@ -250,47 +190,25 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
             <FormRow
                 label="Check-in & Check-out Dates"
                 htmlFor="dateRange"
-                error={customErrors.dateRange}
+                // error={customErrors.dateRange}
+                error={errors.dateRange?.message}
             >
-                <BookingDateRangePicker
-                    range={range}
-                    setRange={handleRangeChange}
-                />
-            </FormRow>
-            <FormRow
-                label="Full name"
-                htmlFor="fullName"
-                error={errors.fullName?.message}
-            >
-                <Input type="text" id="fullName" {...register("fullName")} />
-            </FormRow>
-            <FormRow
-                label="Email"
-                htmlFor="email"
-                error={errors.email?.message}
-            >
-                <Input type="text" id="email" {...register("email")} />
-            </FormRow>
-            <FormRow
-                label="Nationality"
-                htmlFor="nationality"
-                error={errors.nationality?.message}
-            >
-                <NationalitySelect
-                    value={countryCode}
-                    options={flagOptions}
-                    onChange={(e) => {
-                        const nextCountryCode = e.target.value;
-                        console.log(nextCountryCode);
-                        // setNationality(flags[nextCountryCode]);
-                        setCountryCode(nextCountryCode);
-                        setValue("nationality", nextCountryCode, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                        });
+                <Controller
+                    name="dateRange"
+                    control={control}
+                    render={({ field }) => {
+                        return (
+                            <BookingDateRangePicker
+                                // range={range}
+                                // setRange={handleRangeChange}
+                                range={field.value}
+                                setRange={field.onChange}
+                            />
+                        );
                     }}
                 />
             </FormRow>
+
             <FormRow
                 label="Guests"
                 htmlFor="numGuests"
@@ -299,7 +217,62 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
                 <Input
                     type="number"
                     id="numGuests"
+                    disabled={isLoading}
                     {...register("numGuests")}
+                />
+            </FormRow>
+            <FormRow
+                label="Select cabin"
+                htmlFor="cabin"
+                error={errors.cabinId?.message}
+            >
+                <Controller
+                    name="cabinId"
+                    control={control}
+                    render={({ field }) => (
+                        <BookingCabinSelect
+                            disabled={invalidDateAndNumGuests || isLoading}
+                            cabins={cabins}
+                            cabinId={field.value}
+                            setCabinId={field.onChange}
+                        />
+                    )}
+                />
+            </FormRow>
+            <FormRow
+                label="Full name"
+                htmlFor="fullName"
+                error={errors.fullName?.message}
+            >
+                <Input
+                    type="text"
+                    id="fullName"
+                    disabled={isLoading}
+                    {...register("fullName")}
+                />
+            </FormRow>
+            <FormRow
+                label="Email"
+                htmlFor="email"
+                error={errors.email?.message}
+            >
+                <Input
+                    type="text"
+                    id="email"
+                    disabled={isLoading}
+                    {...register("email")}
+                />
+            </FormRow>
+            <FormRow
+                label="Nationality"
+                htmlFor="nationality"
+                error={errors.nationality?.message}
+            >
+                {/* Calls handleNationalitySelectChange to sync local select UI + RHF value. */}
+                <NationalitySelect
+                    value={countryCode}
+                    options={flagOptions}
+                    onChange={handleNationalitySelectChange}
                 />
             </FormRow>
             <FormRow
@@ -307,30 +280,19 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
                 htmlFor="observations"
                 error={errors.observations?.message}
             >
-                <Textarea id="observations" {...register("observations")} />
-            </FormRow>
-
-            <FormRow
-                label="Select cabin"
-                htmlFor="cabin"
-                error={customErrors.cabinId}
-            >
-                <BookingCabinSelect
-                    // {...register("cabinId")}
-                    disabled={
-                        range.startDate?.getDate() === range.endDate?.getDate()
-                    }
-                    cabins={cabins}
-                    cabinId={cabinId}
-                    setCabinId={handleCabinChange}
+                <Textarea
+                    id="observations"
+                    {...register("observations")}
+                    disabled={isLoading}
                 />
             </FormRow>
-            <FormRow label="Optional breakfast">
+
+            <FormRow label="Optional breakfast" htmlFor="hasBreakfast">
                 <Checkbox
+                    disabled={invalidDateAndNumGuests || isLoading}
                     checked={hasBreakfast}
-                    onChange={() => setHasBreakfast((prev) => !prev)}
                     id="hasBreakfast"
-                    // {...register("hasBreakfast")}
+                    {...register("hasBreakfast")}
                 >
                     Add breakfast for {formatCurrency(optionalBreakfastPrice)}?
                 </Checkbox>
