@@ -59,6 +59,7 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
                 hasBreakfast: false,
             },
         });
+    const { errors } = formState;
 
     useEffect(() => {
         register("nationality");
@@ -69,10 +70,10 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
     const { createBooking, isCreatingBooking } = useCreateBooking();
 
     const cabinId = watch("cabinId");
-    const hasBreakfast = Boolean(watch("hasBreakfast"));
-    const numGuests = Number(watch("numGuests") ?? 0);
-    const startDate = watch("dateRange.startDate");
     const endDate = watch("dateRange.endDate");
+    const startDate = watch("dateRange.startDate");
+    const numGuests = Number(watch("numGuests") ?? 0);
+    const hasBreakfast = Boolean(watch("hasBreakfast"));
 
     const { selectableCabins, isSelectingCabins } = useSelectableCabins({
         checkIn: startDate ? `${format(startDate, "yyyy-MM-dd")}` : "",
@@ -93,8 +94,6 @@ export function CreateBookingForm({ onCloseModal }: CreateBookingFormProps) {
         numNights && setting
             ? setting.breakfastPrice * numNights * numGuests
             : 0;
-
-    const { errors } = formState;
 
     const onSubmit: SubmitHandler<BookingFormDataType> = (data) => {
         if (!cabin) {
