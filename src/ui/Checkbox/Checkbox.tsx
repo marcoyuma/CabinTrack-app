@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { InputHTMLAttributes, ReactNode } from "react";
 import styled from "styled-components";
 
 const StyledCheckbox = styled.div`
@@ -26,19 +26,37 @@ const StyledCheckbox = styled.div`
     }
 `;
 
-export const Checkbox = ({
+/**
+ * Reusable checkbox wrapper for form screens.
+ *
+ * Designed to work with native input props (including React Hook Form's
+ * `register()` output), while keeping label + spacing consistent.
+ */
+interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
+    /**
+     * Controlled state support.
+     * Omit this prop if you want uncontrolled behavior.
+     */
+    checked?: boolean;
+    disabled?: boolean;
+    /** Used by both `input#id` and `label[htmlFor]` for accessibility. */
+    id: string;
+    /** Label/content displayed next to the checkbox. */
+    children: ReactNode;
+}
+
+/**
+ * Checkbox with opinionated styling and accessible label binding.
+ * Spreads remaining input props so integrations (e.g. RHF) keep working.
+ */
+export function Checkbox({
     checked,
     onChange,
     disabled = false,
     id,
     children,
-}: {
-    checked: boolean;
-    onChange: () => void;
-    disabled?: boolean;
-    id: number;
-    children: ReactNode;
-}) => {
+    ...inputProps
+}: CheckboxProps) {
     return (
         <StyledCheckbox>
             <input
@@ -47,8 +65,9 @@ export const Checkbox = ({
                 checked={checked}
                 onChange={onChange}
                 disabled={disabled}
+                {...inputProps}
             />
             <label htmlFor={!disabled ? id.toString() : ""}>{children}</label>
         </StyledCheckbox>
     );
-};
+}

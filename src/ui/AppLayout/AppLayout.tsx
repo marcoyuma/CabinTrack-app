@@ -1,40 +1,52 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../Header/Header";
-import styled from "styled-components";
-import { Sidebar } from "../Sidebar/Sidebar";
+import styled, { css } from "styled-components";
+import { media } from "../../styles/breakpoints";
 
 const StyledAppLayout = styled.div`
-    display: grid;
-    grid-template-columns: 26rem 1fr;
     height: 100vh;
-    grid-template-rows: auto 1fr;
+    background-color: var(--color-grey-100);
 `;
 
 const Main = styled.main`
-    background-color: var(--color-grey-50);
-    padding: 4rem 4.8rem 6.4rem;
+    height: 100%;
     /* make this element scrollable if content overflows */
     overflow: scroll;
 `;
 
-const Container = styled.div`
-    max-width: 120rem;
-    margin: 0, auto;
-    display: flex;
-    flex-direction: column;
-    gap: 3.2rem;
+// Header has no background of its own, so it needs to sit inside Main's scroll context
+// (not in a separate grid row) for content to visibly scroll underneath it rather than
+// getting hard-clipped at a row boundary.
+const StickyHeader = styled.div`
+    position: sticky;
+    top: 0;
+    z-index: 10;
 `;
 
-export const AppLayout = () => {
+// Padding/gap match StatsGrid's 1.2rem (see Stats.tsx) — same value used for the header-to-
+// content gap, between sections, and on all four edges against the viewport.
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-section-gap);
+    padding: var(--spacing-section-gap) 1.6rem;
+
+    ${media.desktop(css`
+        padding: var(--spacing-section-gap) 2rem;
+    `)}
+`;
+
+export function AppLayout() {
     return (
         <StyledAppLayout>
-            <Header />
-            <Sidebar />
             <Main>
+                <StickyHeader>
+                    <Header />
+                </StickyHeader>
                 <Container>
                     <Outlet />
                 </Container>
             </Main>
         </StyledAppLayout>
     );
-};
+}

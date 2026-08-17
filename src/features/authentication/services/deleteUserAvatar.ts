@@ -6,6 +6,8 @@ import { fetchCurrentUser } from "./fetchCurrentUser";
  */
 export async function deleteUserAvatar() {
     const previousUser = await fetchCurrentUser();
+    console.log(previousUser);
+
     const previousAvatarName = (previousUser?.user_metadata.avatar as string)
         .split("/")
         .pop();

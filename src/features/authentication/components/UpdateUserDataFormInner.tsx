@@ -22,7 +22,7 @@ interface UserMetadata {
 /**
  * Handles updating the current user's profile information and avatar
  */
-export const UpdateUserDataFormInner = ({ user }: { user: User }) => {
+export function UpdateUserDataFormInner({ user }: { user: User }) {
     const email = user.email;
     const userMetaData: UserMetadata = user.user_metadata;
     const { fullName: currentFullName } = userMetaData;
@@ -109,4 +109,4 @@ export const UpdateUserDataFormInner = ({ user }: { user: User }) => {
             </FormRow>
         </Form>
     );
-};
+}

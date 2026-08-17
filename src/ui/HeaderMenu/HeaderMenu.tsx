@@ -1,33 +1,35 @@
 import styled from "styled-components";
-import { Logout } from "../../features/authentication/components/Logout";
-import { ButtonIcon } from "../ButtonIcon/ButtonIcon";
-import { HiOutlineUser } from "react-icons/hi2";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { UserAvatar } from "../../features/authentication/components/UserAvatar";
-import { DarkModeToggle } from "../DarkModeToggle/DarkModeToggle";
 
 const StyledHeaderMenu = styled.ul`
     display: flex;
-    gap: 0.4 rem;
+    align-items: center;
+    gap: 1.2rem;
 `;
 
-export const HeaderMenu = () => {
-    const navigate = useNavigate();
+const AccountLink = styled(Link)`
+    display: flex;
+    align-items: center;
+    background-color: var(--color-grey-0);
+    border: 1px solid var(--color-grey-100);
+    padding: 0.4rem 1.6rem 0.4rem 0.4rem;
+    border-radius: 9999px;
+    transition: background-color 0.3s;
 
+    &:hover {
+        background-color: var(--color-grey-100);
+    }
+`;
+
+export function HeaderMenu() {
     return (
         <StyledHeaderMenu>
-            <UserAvatar />
             <li>
-                <ButtonIcon onClick={() => navigate("/account")}>
-                    <HiOutlineUser />
-                </ButtonIcon>
-            </li>
-            <li>
-                <DarkModeToggle />
-            </li>
-            <li>
-                <Logout />
+                <AccountLink to="/account">
+                    <UserAvatar />
+                </AccountLink>
             </li>
         </StyledHeaderMenu>
     );
-};
+}

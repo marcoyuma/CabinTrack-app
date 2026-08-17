@@ -7,7 +7,7 @@ import { useLogin } from "../hooks/useLogin";
 import { useNavigate } from "react-router-dom";
 import { SpinnerMini } from "../../../ui/SpinnerMini/SpinnerMini";
 
-export const LoginForm = () => {
+export function LoginForm() {
     const [email, setEmail] = useState("marco@gmail.com");
     const [password, setPassword] = useState("Marco123");
 
@@ -30,7 +30,7 @@ export const LoginForm = () => {
                 onSettled: () => {
                     navigate("/dashboard", { replace: true });
                 },
-            }
+            },
         );
 
         console.log("diteken");
@@ -66,4 +66,4 @@ export const LoginForm = () => {
             </FormRowVertical>
         </Form>
     );
-};
+}

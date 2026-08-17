@@ -82,13 +82,13 @@ interface TableProps {
  * The role is set to 'table' to indicate that this is a table component
  * This allows child components to access the 'columns' prop without passing it down manually
  */
-export const Table = ({ children, columns }: TableProps) => {
+export function Table({ children, columns }: TableProps) {
     return (
         <TableContext.Provider value={{ columns }}>
             <StyledTable role="table">{children}</StyledTable>
         </TableContext.Provider>
     );
-};
+}
 
 /**
  * Header component that accepts children and renders them in a styled header

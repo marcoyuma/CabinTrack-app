@@ -1,17 +1,7 @@
-import DashboardFilter from "../../features/dashboard/components/DashboardFilter";
 import DashboardLayout from "../../features/dashboard/components/DashboardLayout";
-import { Heading } from "../../ui/Heading/Heading";
-import { Row } from "../../ui/Row/Row";
 
-export const Dashboard = () => {
-    return (
-        <>
-            <Row type="horizontal">
-                <Heading as="h1">Dashboard</Heading>
-                <DashboardFilter />
-            </Row>
-
-            <DashboardLayout />
-        </>
-    );
-};
+// The "last N days" filter now lives in the Header's nav pill (see MainNav) instead of a
+// row here, so this page is just the layout.
+export function Dashboard() {
+    return <DashboardLayout />;
+}

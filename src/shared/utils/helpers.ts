@@ -30,6 +30,28 @@ export const formatCurrency = (value: number) =>
         value
     );
 
+// stays.price_per_night is a whole-rupiah integer, not cents — see
+// ADMIN-PANEL-CONTEXT.md § "stays" ("Rupiah bulat, bukan sen").
+export const formatRupiah = (value: number) =>
+    new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0,
+    }).format(value);
+
+// Abbreviated Rupiah for compact widgets (e.g. leaderboard/summary cards) where a full
+// "Rp2.800.000" would wrap or crowd out other columns. Indonesian convention ("jt"/"rb"),
+// not Western "K"/"M" — matches the rest of the admin panel's language.
+export const formatRupiahCompact = (value: number): string => {
+    const abs = Math.abs(value);
+    const compact = (num: number) =>
+        new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(num);
+
+    if (abs >= 1_000_000) return `Rp${compact(value / 1_000_000)}jt`;
+    if (abs >= 1_000) return `Rp${compact(value / 1_000)}rb`;
+    return formatRupiah(value);
+};
+
 // AFTER REFACTOR 15-10-2025
 
 // BEFORE REFACTOR 15-10-2025

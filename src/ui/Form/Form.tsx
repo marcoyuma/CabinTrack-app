@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components";
+import { media } from "../../styles/breakpoints";
 
 type FormType = {
     type?: "modal" | "regular";
@@ -14,20 +15,28 @@ export const Form = styled.form<FormType>`
     ${({ type = "regular" }) =>
         type === "regular" &&
         css`
-            padding: 2.4rem 4rem;
+            padding: var(--spacing-card-padding) 2rem;
 
             /* Box */
             background-color: var(--color-grey-0);
             border: 1px solid var(--color-grey-100);
             border-radius: var(--border-radius-md);
+
+            ${media.tablet(css`
+                padding: 2.4rem 4rem;
+            `)}
         `}
 
     ${({ type }) =>
         type === "modal" &&
         css`
-            width: 80rem;
+            width: 100%;
+
+            ${media.tablet(css`
+                width: 80rem;
+            `)}
         `}
-        
+
     overflow: hidden;
     font-size: 1.4rem;
 `;

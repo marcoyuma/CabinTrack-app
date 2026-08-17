@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Heading } from "../../../ui/Heading/Heading";
 import {
     Cell,
@@ -8,16 +8,21 @@ import {
     ResponsiveContainer,
     Tooltip,
 } from "recharts";
-import { useDarkModeContext } from "../../../context/useDarkModeContext";
+import { BookingFinancialRow } from "../types/dashboard.schema";
+import { media } from "../../../styles/breakpoints";
+import { useBreakpoint } from "../../../hooks/useBreakpoint";
 
+// grid-column: 3/span 2 only makes sense once DashboardLayout's 4-col grid exists (desktop) —
+// below that, this stacks full-width and the grid also stretches its height for free via the
+// 40rem row, so an explicit height is only needed while stacked.
 const ChartBox = styled.div`
     /* Box */
     background-color: var(--color-grey-0);
     border: 1px solid var(--color-grey-100);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--border-radius-lg);
 
-    padding: 2.4rem 3.2rem;
-    grid-column: 3 / span 2;
+    padding: var(--spacing-card-padding);
+    height: 32rem;
 
     & > *:first-child {
         margin-bottom: 1.6rem;
@@ -26,106 +31,40 @@ const ChartBox = styled.div`
     & .recharts-pie-label-text {
         font-weight: 600;
     }
+
+    ${media.desktop(css`
+        grid-column: 3 / span 2;
+        height: auto;
+    `)}
 `;
 
-const startDataLight = [
-    {
-        duration: "1 night",
-        value: 0,
-        color: "#ef4444",
-    },
-    {
-        duration: "2 nights",
-        value: 0,
-        color: "#f97316",
-    },
-    {
-        duration: "3 nights",
-        value: 0,
-        color: "#eab308",
-    },
-    {
-        duration: "4-5 nights",
-        value: 0,
-        color: "#84cc16",
-    },
-    {
-        duration: "6-7 nights",
-        value: 0,
-        color: "#22c55e",
-    },
-    {
-        duration: "8-14 nights",
-        value: 0,
-        color: "#14b8a6",
-    },
-    {
-        duration: "15-21 nights",
-        value: 0,
-        color: "#3b82f6",
-    },
-    {
-        duration: "21+ nights",
-        value: 0,
-        color: "#a855f7",
-    },
+type DurationBucket = {
+    duration: string;
+    value: number;
+    color: string;
+};
+
+const startDataLight: DurationBucket[] = [
+    { duration: "1 night", value: 0, color: "#ef4444" },
+    { duration: "2 nights", value: 0, color: "#f97316" },
+    { duration: "3 nights", value: 0, color: "#eab308" },
+    { duration: "4-5 nights", value: 0, color: "#84cc16" },
+    { duration: "6-7 nights", value: 0, color: "#22c55e" },
+    { duration: "8-14 nights", value: 0, color: "#14b8a6" },
+    { duration: "15-21 nights", value: 0, color: "#3b82f6" },
+    { duration: "21+ nights", value: 0, color: "#a855f7" },
 ];
 
-const startDataDark = [
-    {
-        duration: "1 night",
-        value: 0,
-        color: "#b91c1c",
-    },
-    {
-        duration: "2 nights",
-        value: 0,
-        color: "#c2410c",
-    },
-    {
-        duration: "3 nights",
-        value: 0,
-        color: "#a16207",
-    },
-    {
-        duration: "4-5 nights",
-        value: 0,
-        color: "#4d7c0f",
-    },
-    {
-        duration: "6-7 nights",
-        value: 0,
-        color: "#15803d",
-    },
-    {
-        duration: "8-14 nights",
-        value: 0,
-        color: "#0f766e",
-    },
-    {
-        duration: "15-21 nights",
-        value: 0,
-        color: "#1d4ed8",
-    },
-    {
-        duration: "21+ nights",
-        value: 0,
-        color: "#7e22ce",
-    },
-];
+function incArrayValue(arr: DurationBucket[], field: string) {
+    return arr.map((obj) =>
+        obj.duration === field ? { ...obj, value: obj.value + 1 } : obj,
+    );
+}
 
-function prepareData(startData, stays) {
-    // A bit ugly code, but sometimes this is what it takes when working with real data 😅
-
-    function incArrayValue(arr, field) {
-        return arr.map((obj) =>
-            obj.duration === field ? { ...obj, value: obj.value + 1 } : obj
-        );
-    }
-
+function prepareData(startData: DurationBucket[], stays: { num_nights: number }[]) {
     const data = stays
         .reduce((arr, cur) => {
-            const num = cur.numNights;
+            const num = cur.num_nights;
             if (num === 1) return incArrayValue(arr, "1 night");
             if (num === 2) return incArrayValue(arr, "2 nights");
             if (num === 3) return incArrayValue(arr, "3 nights");
@@ -143,15 +82,19 @@ function prepareData(startData, stays) {
 }
 
 interface DurationChartProps {
-    confirmedStays: {
-        numNights: number;
-        status: "checked-in" | "checked-out" | "unconfirmed";
-    }[];
+    confirmedStays: BookingFinancialRow[];
 }
+
+// Restored PieChart donut from the original DurationChart — same bucket logic, now
+// sourced from admin_booking_financials() (num_nights, filtered to checked_in/checked_out)
+// instead of the old bookings table directly.
 export function DurationChart({ confirmedStays }: DurationChartProps) {
-    const { isDarkMode } = useDarkModeContext();
-    const startData = isDarkMode ? startDataDark : startDataLight;
-    const data = prepareData(startData, confirmedStays);
+    const data = prepareData(startDataLight, confirmedStays);
+    // CSS media queries can't reach Recharts' numeric props (Pie radius, Legend width) — they're
+    // read once per render, not resolved from CSS. A vertical right-aligned legend next to a
+    // full-size donut has no room in a narrow stacked ChartBox, so it moves below the donut and
+    // both shrink together below desktop.
+    const { isMobile } = useBreakpoint();
 
     return (
         <ChartBox>
@@ -162,11 +105,11 @@ export function DurationChart({ confirmedStays }: DurationChartProps) {
                         data={data}
                         nameKey="duration"
                         dataKey="value"
-                        innerRadius={85}
-                        outerRadius={110}
+                        innerRadius={isMobile ? 55 : 85}
+                        outerRadius={isMobile ? 75 : 110}
                         paddingAngle={3}
-                        cx="40%"
-                        cy="50%"
+                        cx={isMobile ? "50%" : "40%"}
+                        cy={isMobile ? "40%" : "50%"}
                     >
                         {data.map((arg) => (
                             <Cell
@@ -177,14 +120,24 @@ export function DurationChart({ confirmedStays }: DurationChartProps) {
                         ))}
                     </Pie>
                     <Tooltip />
-                    <Legend
-                        align="right"
-                        verticalAlign="middle"
-                        width={170}
-                        layout="vertical"
-                        iconSize={15}
-                        iconType="circle"
-                    />
+                    {isMobile ? (
+                        <Legend
+                            align="center"
+                            verticalAlign="bottom"
+                            layout="horizontal"
+                            iconSize={12}
+                            iconType="circle"
+                        />
+                    ) : (
+                        <Legend
+                            align="right"
+                            verticalAlign="middle"
+                            width={170}
+                            layout="vertical"
+                            iconSize={15}
+                            iconType="circle"
+                        />
+                    )}
                 </PieChart>
             </ResponsiveContainer>
         </ChartBox>

@@ -1,8 +1,8 @@
 import { PageNotFound } from "../../../pages/PageNotFound/PageNotFound";
 import { Empty } from "../../../ui/Empty/Empty";
 import { Spinner } from "../../../ui/Spinner/Spinner";
-import { useBooking } from "../../bookings/hooks/useBooking";
-import { useSettings } from "../../settings/hooks/useSettings";
+import { useBooking } from "../hooks/useBooking";
+import { useSettings } from "../hooks/useSettings";
 import { CheckinBookingInner } from "./CheckinBookingInner";
 
 /**

@@ -1,20 +1,20 @@
 import styled from "styled-components";
+import { HiOutlineChevronDown } from "react-icons/hi2";
 import { useUser } from "../hooks/useUser";
 
 import defaultUser from "/default-user.jpg";
 
 const StyledUserAvatar = styled.div`
     display: flex;
-    gap: 1.2rem;
+    gap: 1rem;
     align-items: center;
     font-weight: 500;
     font-size: 1.4rem;
-    color: var(--color-grey-600);
+    color: var(--color-grey-700);
 `;
 
 const Avatar = styled.img`
     display: block;
-    width: 4rem;
     width: 3.6rem;
     aspect-ratio: 1;
     object-fit: cover;
@@ -23,24 +23,30 @@ const Avatar = styled.img`
     outline: 2px solid var(--color-grey-100);
 `;
 
+const Chevron = styled(HiOutlineChevronDown)`
+    width: 1.6rem;
+    height: 1.6rem;
+    color: var(--color-grey-400);
+`;
+
 interface UserMetadata {
     fullName?: string;
     avatar?: string;
 }
 
-export const UserAvatar = () => {
+export function UserAvatar() {
     const { user } = useUser();
 
     if (!user) return null;
 
     const userMetadata: UserMetadata = user.user_metadata;
     const { fullName, avatar } = userMetadata;
-    console.log(fullName);
 
     return (
         <StyledUserAvatar>
             <Avatar src={avatar || defaultUser} alt={`avatar of ${fullName}`} />
             <span>{fullName}</span>
+            <Chevron />
         </StyledUserAvatar>
     );
-};
+}

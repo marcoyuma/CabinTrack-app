@@ -16,8 +16,5 @@ export const fetchCurrentUser = async () => {
         throw new Error("Failed to get current user");
     }
 
-    console.log(`user di getCurrentUser: ${user}`);
-    console.log(`user role di getCurrentUser: ${user?.role}`);
-
     return user;
 };
