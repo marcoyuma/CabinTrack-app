@@ -28,6 +28,11 @@ const Guest = styled.div`
     font-weight: 500;
 `;
 
+// NOTE: kept only because `features/check-in-out/components/TodayActivity.tsx` still
+// imports it — that feature is out of scope for the Seaspace migration (see
+// ADMIN-PANEL-WRITE-PATH-PLAN.md dashboard-migration plan, decision #3) and is left as-is,
+// still pointed at the old `bookings`/`guests` schema. `features/dashboard` itself no
+// longer uses this component — see `BookingRosterList.tsx` instead.
 function TodayItem({ activity }) {
     const { id, status, guests, numNights } = activity;
 

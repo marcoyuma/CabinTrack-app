@@ -42,6 +42,9 @@ const StyledList = styled.ul<StyledListProps>`
     box-shadow: var(--shadow-md);
     border-radius: var(--border-radius-md);
 
+    /* ensure the modal list is on top everything in ui */
+    z-index: 101;
+
     /* 'right' and 'top' receive props value for dynamic style rule */
     right: ${(props) => (props.position ? props.position.x : 0)}px;
     top: ${(props) => (props.position ? props.position.y : 0)}px;
@@ -82,7 +85,7 @@ interface Menus {
 }
 
 // parent of the compound component
-export const Menus = ({ children }: Menus) => {
+export function Menus({ children }: Menus) {
     const [openId, setOpenId] = useState("");
     const [position, setPosition] = useState<PositionType | null>(null);
 
@@ -96,7 +99,7 @@ export const Menus = ({ children }: Menus) => {
             {children}
         </MenusContext.Provider>
     );
-};
+}
 
 // childrens of 'Menus' component
 // component for detecting click
@@ -144,7 +147,7 @@ const List = ({ id, children }: { id: string; children: ReactNode }) => {
         <StyledList position={position} ref={ref}>
             {children}
         </StyledList>,
-        document.body
+        document.body,
     );
 };
 

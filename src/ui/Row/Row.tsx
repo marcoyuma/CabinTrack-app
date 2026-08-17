@@ -11,6 +11,8 @@ export const Row = styled.div<RowType>`
         switch (props.type) {
             case "horizontal":
                 return css`
+                    flex-wrap: wrap;
+                    gap: 0.8rem 1.6rem;
                     justify-content: space-between;
                     align-items: center;
                 `;

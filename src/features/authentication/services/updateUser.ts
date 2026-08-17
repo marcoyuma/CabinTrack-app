@@ -1,5 +1,5 @@
 import supabase from "../../../supabase/supabase";
-import { formatImagePath } from "../../cabins/services/formatImagePath";
+import { formatImagePath } from "../../../shared/utils/formatImagePath";
 import { deleteUserAvatar } from "./deleteUserAvatar";
 import { uploadImage } from "./uploadImage";
 
@@ -34,6 +34,8 @@ export async function updateUser({
         const isAvatar = isNewAvatar && avatarName && avatarPath;
 
         if (isAvatar) {
+            console.log("some");
+
             // delete previous avatar from bucket storage
             await deleteUserAvatar();
 

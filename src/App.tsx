@@ -10,18 +10,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { AppLayout } from "./ui/AppLayout/AppLayout";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
-import { Bookings } from "./pages/Bookings/Bookings";
-import { Cabins } from "./pages/Cabins/Cabins";
-import { Users } from "./pages/Users/Users";
-import { Settings } from "./pages/Settings/Settings";
 import { Account } from "./pages/Account/Account";
 import { Login } from "./pages/Login/Login";
 import { PageNotFound } from "./pages/PageNotFound/PageNotFound";
 
-import { Booking } from "./pages/Booking/Booking";
 import { Checkin } from "./pages/Checkin/Checkin";
+import { Stays } from "./pages/Stays/Stays";
+import { Bookings } from "./pages/Bookings/Bookings";
 import { ProtectedRoute } from "./ui/ProtectedRoute/ProtectedRoute";
-import { DarkModeProvider } from "./context/DarkModeProvider";
+import { StaffOnlyRoute } from "./ui/StaffOnlyRoute/StaffOnlyRoute";
 import { ErrorFallback } from "./ui/ErrorFallback/ErrorFallback";
 
 export function App() {
@@ -47,13 +44,24 @@ export function App() {
             children: [
                 { index: true, element: <Navigate replace to="dashboard" /> },
                 { path: "dashboard", element: <Dashboard /> },
-                { path: "bookings/:bookingId", element: <Booking /> },
                 { path: "checkin/:bookingId", element: <Checkin /> },
-                { path: "bookings", element: <Bookings /> },
-                { path: "cabins", element: <Cabins /> },
-                { path: "users", element: <Users /> },
-                { path: "settings", element: <Settings /> },
                 { path: "account", element: <Account /> },
+                {
+                    path: "stays",
+                    element: (
+                        <StaffOnlyRoute>
+                            <Stays />
+                        </StaffOnlyRoute>
+                    ),
+                },
+                {
+                    path: "bookings",
+                    element: (
+                        <StaffOnlyRoute>
+                            <Bookings />
+                        </StaffOnlyRoute>
+                    ),
+                },
             ],
         },
         // public route
@@ -63,32 +71,28 @@ export function App() {
         // path opened as soon as the app is open then directly navigate to 'dashboard' path
     ]);
     return (
-        // dark mode context provider
-        <DarkModeProvider>
-            {/* wrap up our provider with query client provider */}
-            <QueryClientProvider client={queryClient}>
-                <ReactQueryDevtools initialIsOpen={false} />
-                <GlobalStyles />
-                <RouterProvider router={router} />
-                <Toaster
-                    position="top-center"
-                    gutter={12}
-                    containerStyle={{ margin: "8px" }}
-                    toastOptions={{
-                        success: {
-                            duration: 3000,
-                        },
-                        error: { duration: 5000 },
-                        style: {
-                            fontSize: "16px",
-                            maxWidth: "500px",
-                            padding: "16px 24px",
-                            backgroundColor: "var(--color-grey-0)",
-                            color: "var(--color-grey-700)",
-                        },
-                    }}
-                />
-            </QueryClientProvider>
-        </DarkModeProvider>
+        <QueryClientProvider client={queryClient}>
+            <ReactQueryDevtools initialIsOpen={false} />
+            <GlobalStyles />
+            <RouterProvider router={router} />
+            <Toaster
+                position="top-center"
+                gutter={12}
+                containerStyle={{ margin: "8px" }}
+                toastOptions={{
+                    success: {
+                        duration: 3000,
+                    },
+                    error: { duration: 5000 },
+                    style: {
+                        fontSize: "16px",
+                        maxWidth: "500px",
+                        padding: "16px 24px",
+                        backgroundColor: "var(--color-grey-0)",
+                        color: "var(--color-grey-700)",
+                    },
+                }}
+            />
+        </QueryClientProvider>
     );
 }

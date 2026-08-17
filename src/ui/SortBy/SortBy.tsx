@@ -12,11 +12,11 @@ interface SortByPropsType {
 }
 
 // component for sorting data by specified options
-export const SortBy = ({ options }: SortByPropsType) => {
+export function SortBy({ options }: SortByPropsType) {
     // custom hook for get and set value to url
     const [params, setParams] = useBatchSearchParams();
 
-    const sortByParam = params.get("sortBy") || "";
+    const sortByParam = params.get("sortBy") || options[0].value;
 
     const handleClick = (e: ChangeEvent<HTMLSelectElement>) => {
         setParams({ sortBy: e.target.value });
@@ -26,8 +26,9 @@ export const SortBy = ({ options }: SortByPropsType) => {
         <Select
             options={options}
             value={sortByParam}
+            defaultPlaceholder={sortByParam}
             type="white"
             onChange={handleClick}
         />
     );
-};
+}

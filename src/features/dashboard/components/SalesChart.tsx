@@ -10,9 +10,10 @@ import {
 } from "recharts";
 import styled from "styled-components";
 import DashboardBox from "./DashboardBox";
-import { useDarkModeContext } from "../../../context/useDarkModeContext";
 import { Heading } from "../../../ui/Heading/Heading";
-import { RecentBooking } from "../types/dashboard.schema";
+import { formatRupiah } from "../../../shared/utils/helpers";
+import { BookingFinancialRow } from "../types/dashboard.schema";
+import { useBreakpoint } from "../../../hooks/useBreakpoint";
 
 const StyledSalesChart = styled(DashboardBox)`
     grid-column: 1 / -1;
@@ -20,11 +21,11 @@ const StyledSalesChart = styled(DashboardBox)`
     justify-content: center;
     align-items: center;
 
-    /* child pertama ke kiri */
+    /* Heading left-aligned, everything else in DashboardBox stays centered. Box padding
+       (added to DashboardBox) now gives the chart its own breathing room, so this no longer
+       needs to hack extra offset in on top of it. */
     > :first-child {
         align-self: flex-start;
-        padding-left: 55px;
-        padding-top: 20px;
     }
 
     /* Hack to change grid line colors */
@@ -35,13 +36,19 @@ const StyledSalesChart = styled(DashboardBox)`
 `;
 
 type SalesChartProps = {
-    recentBookings: RecentBooking[] | undefined;
+    bookingFinancials: BookingFinancialRow[] | undefined;
     numDays: number;
 };
 
-export function SalesChart({ recentBookings, numDays }: SalesChartProps) {
-    // In the chart we need to set colors, but we can't do it based on CSS variables, because we have no access to them here. So let's set them manually
-    const { isDarkMode } = useDarkModeContext();
+// Restored AreaChart shape from the original SalesChart. The only real change: the
+// Seaspace `bookings` schema has no `extras_price` column (no breakfast/extras concept in
+// the villa domain) — see dashboard-migration plan, decision #6 — so there's one series
+// ("Total sales") instead of the old two ("Total sales" + "Extras sales").
+export function SalesChart({ bookingFinancials, numDays }: SalesChartProps) {
+    // ResponsiveContainer's fixed height={250} and YAxis's fixed width={100} are numeric
+    // Recharts props, not CSS — media queries can't shrink them, so a breakpoint value drives
+    // them directly.
+    const { isMobile } = useBreakpoint();
 
     // Generate a list of all dates from N days ago up to today (inclusive)
     const allDates = eachDayOfInterval({
@@ -49,133 +56,95 @@ export function SalesChart({ recentBookings, numDays }: SalesChartProps) {
         end: new Date(),
     });
 
-    console.log("alldates: " + allDates);
-    allDates.forEach(console.log);
-
-    // Build daily sales data by iterating over each date, selecting recentBookings made on that day, and summing total and extras revenue
+    // Build daily sales data by iterating over each date, selecting bookings created on
+    // that day, and summing total revenue
     const data = allDates.map((date) => {
-        // define a formatted date into a short, human-readable label (e.g., "Jan 05") for display
         const label = format(date, "MMM dd");
 
-        if (!recentBookings) return { label, totalSales: 0, extrasSales: 0 };
+        if (!bookingFinancials) return { label, totalSales: 0 };
 
-        // Filter bookings to include only those created on the same calendar day as the given date
-        const bookingsOnDate = recentBookings.filter((recentBooking) =>
-            isSameDay(date, new Date(recentBooking.created_at))
+        // Exclude cancelled bookings — `total_price` is a generated column that's computed
+        // regardless of payment status, so an unpaid booking auto-cancelled by the hourly
+        // lifecycle cron (see ADMIN-PANEL-CONTEXT.md) still carries a price. Counting it as
+        // revenue overstates Sales for money that was never actually collected.
+        const bookingsOnDate = bookingFinancials.filter(
+            (row) =>
+                isSameDay(date, new Date(row.created_at)) &&
+                row.status !== "cancelled",
         );
 
-        // Accumulate total and extras sales by summing prices from all bookings on the selected date
-        const { totalSales, extrasSales } = bookingsOnDate.reduce(
-            (acc, curr) => {
-                acc.totalSales += curr.totalPrice;
-                acc.extrasSales += curr.extrasPrice;
-                return acc;
-            },
-            { totalSales: 0, extrasSales: 0 }
+        const totalSales = bookingsOnDate.reduce(
+            (acc, curr) => acc + curr.total_price,
+            0,
         );
 
-        return {
-            label,
-            totalSales,
-            extrasSales,
-        };
+        return { label, totalSales };
     });
-    console.log(data);
 
-    const colors = isDarkMode
-        ? {
-              totalSales: { stroke: "#4f46e5", fill: "#4f46e5" },
-              extrasSales: { stroke: "#22c55e", fill: "#22c55e" },
-              text: "#e5e7eb",
-              background: "#18212f",
-          }
-        : {
-              totalSales: { stroke: "#4f46e5", fill: "#c7d2fe" },
-              extrasSales: { stroke: "#16a34a", fill: "#dcfce7" },
-              text: "#374151",
-              background: "#fff",
-          };
+    const colors = {
+        totalSales: { stroke: "#4f46e5", fill: "#c7d2fe" },
+        text: "#374151",
+        background: "#fff",
+    };
+
+    // Y-axis tick has too little width for full "RpX.XXX.XXX" labels — they get clipped by
+    // the chart edge. Compact to "RpXk" here; the Tooltip keeps the full formatRupiah since
+    // it has room.
+    const formatRupiahCompact = (value: number) =>
+        `Rp${Math.round(value / 1000).toLocaleString("id-ID")}k`;
 
     return (
         <StyledSalesChart>
             <Heading as="h2">
-                Sales from {format(allDates.at(0), "MMM dd yyyy")} &mdash;{" "}
-                {format(allDates.at(-1), "MMM dd yyyy")}
+                Sales from {format(allDates.at(0) ?? new Date(), "MMM dd yyyy")}{" "}
+                &mdash;{" "}
+                {format(allDates.at(-1) ?? new Date(), "MMM dd yyyy")}
             </Heading>
 
-            <ResponsiveContainer width="90%" height={250}>
-                {/* <AreaChart data={data} width={700} height={300}> */}
-                <AreaChart data={data}>
+            <ResponsiveContainer width="100%" height={isMobile ? 200 : 250}>
+                <AreaChart
+                    data={data}
+                    margin={{
+                        top: 10,
+                        right: isMobile ? 16 : 10,
+                        left: isMobile ? 0 : 10,
+                    }}
+                >
                     <XAxis
                         dataKey="label"
-                        tick={{ fill: colors.text }}
+                        tick={{ fill: colors.text, fontSize: isMobile ? 11 : 12 }}
                         tickLine={{ stroke: colors.text }}
+                        interval="preserveStartEnd"
+                        padding={{ left: 25, right: isMobile ? 12 : 0 }}
                     />
                     <YAxis
-                        unit="$"
-                        tick={{ fill: colors.text }}
+                        width={isMobile ? 60 : 100}
+                        tickMargin={isMobile ? 6 : 12}
+                        tick={{ fill: colors.text, fontSize: isMobile ? 11 : 12 }}
                         tickLine={{ stroke: colors.text }}
+                        tickFormatter={(value?: number) =>
+                            value === undefined
+                                ? ""
+                                : formatRupiahCompact(value)
+                        }
                     />
                     <CartesianGrid strokeDasharray="4" />
                     <Tooltip
                         contentStyle={{ backgroundColor: colors.background }}
+                        formatter={(value?: number) =>
+                            value === undefined ? "" : formatRupiah(value)
+                        }
                     />
                     <Area
                         type="monotone"
                         dataKey="totalSales"
-                        // stroke='#4f46e5'
-                        // fill='#c7d2fe'
                         stroke={colors.totalSales.stroke}
                         fill={colors.totalSales.fill}
                         strokeWidth={2}
-                        unit="$"
                         name="Total sales"
-                    />
-                    <Area
-                        type="monotone"
-                        dataKey="extrasSales"
-                        // stroke='#15803d'
-                        // fill='#dcfce7'
-                        stroke={colors.extrasSales.stroke}
-                        fill={colors.extrasSales.fill}
-                        strokeWidth={2}
-                        unit="$"
-                        name="Extras sales"
                     />
                 </AreaChart>
             </ResponsiveContainer>
         </StyledSalesChart>
     );
 }
-
-const OLDdata = [
-    { label: "Jan 09", totalSales: 480, extrasSales: 320 - 300 },
-    { label: "Jan 10", totalSales: 580, extrasSales: 400 - 300 },
-    { label: "Jan 11", totalSales: 550, extrasSales: 450 - 300 },
-    { label: "Jan 12", totalSales: 600, extrasSales: 350 - 300 },
-    { label: "Jan 13", totalSales: 700, extrasSales: 550 - 300 },
-    { label: "Jan 14", totalSales: 800, extrasSales: 650 - 500 },
-    { label: "Jan 15", totalSales: 700, extrasSales: 700 - 500 },
-    { label: "Jan 16", totalSales: 650, extrasSales: 500 - 300 },
-    { label: "Jan 17", totalSales: 600, extrasSales: 600 - 300 },
-    { label: "Jan 18", totalSales: 550, extrasSales: 400 - 300 },
-    { label: "Jan 19", totalSales: 700, extrasSales: 600 - 500 },
-    { label: "Jan 20", totalSales: 800, extrasSales: 700 - 500 },
-    { label: "Jan 21", totalSales: 700, extrasSales: 600 - 500 },
-    { label: "Jan 22", totalSales: 810, extrasSales: 550 - 500 },
-    { label: "Jan 23", totalSales: 950, extrasSales: 750 - 500 },
-    { label: "Jan 24", totalSales: 970, extrasSales: 600 - 500 },
-    { label: "Jan 25", totalSales: 900, extrasSales: 700 - 500 },
-    { label: "Jan 26", totalSales: 950, extrasSales: 800 - 500 },
-    { label: "Jan 27", totalSales: 850, extrasSales: 700 - 500 },
-    { label: "Jan 28", totalSales: 900, extrasSales: 600 - 500 },
-    { label: "Jan 29", totalSales: 800, extrasSales: 800 - 500 },
-    { label: "Jan 30", totalSales: 950, extrasSales: 700 - 500 },
-    { label: "Jan 31", totalSales: 1100, extrasSales: 800 - 500 },
-    { label: "Feb 01", totalSales: 1200, extrasSales: 900 - 500 },
-    { label: "Feb 02", totalSales: 1250, extrasSales: 800 - 500 },
-    { label: "Feb 03", totalSales: 1400, extrasSales: 950 - 500 },
-    { label: "Feb 04", totalSales: 1500, extrasSales: 1000 - 500 },
-    { label: "Feb 05", totalSales: 1400, extrasSales: 1100 - 500 },
-    { label: "Feb 06", totalSales: 1450, extrasSales: 900 - 500 },
-];

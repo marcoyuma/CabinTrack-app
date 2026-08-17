@@ -1,16 +1,21 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Heading } from "../../ui/Heading/Heading";
 
 import { useMoveBack } from "../../hooks/useMoveBack";
 import { Button } from "../../ui/Button/Button";
+import { media } from "../../styles/breakpoints";
 
 const StyledPageNotFound = styled.main`
-    height: 100vh;
+    min-height: 100vh;
     background-color: var(--color-grey-50);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4.8rem;
+    padding: 2rem;
+
+    ${media.tablet(css`
+        padding: 4.8rem;
+    `)}
 `;
 
 const Box = styled.div`
@@ -19,7 +24,7 @@ const Box = styled.div`
     border: 1px solid var(--color-grey-100);
     border-radius: var(--border-radius-md);
 
-    padding: 4.8rem;
+    padding: var(--spacing-card-padding);
     flex: 0 1 96rem;
     text-align: center;
 
@@ -28,7 +33,7 @@ const Box = styled.div`
     }
 `;
 
-export const PageNotFound = () => {
+export function PageNotFound() {
     const moveBack = useMoveBack();
 
     return (
@@ -43,4 +48,4 @@ export const PageNotFound = () => {
             </Box>
         </StyledPageNotFound>
     );
-};
+}

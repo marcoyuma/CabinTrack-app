@@ -11,7 +11,7 @@ import {
 import { Button } from "../../../ui/Button/Button";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 
-export const UpdateUserPasswordForm = () => {
+export function UpdateUserPasswordForm() {
     const {
         register,
         handleSubmit,
@@ -83,4 +83,4 @@ export const UpdateUserPasswordForm = () => {
             </FormRow>
         </Form>
     );
-};
+}

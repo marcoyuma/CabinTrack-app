@@ -12,7 +12,7 @@ const FullPage = styled.div`
     justify-content: center;
 `;
 
-export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+export function ProtectedRoute({ children }: { children: ReactNode }) {
     // get the authenticated user
     const { isUserLoading, isAuthenticated, user } = useUser();
     console.log(isAuthenticated);
@@ -39,4 +39,4 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
     // render app
     if (isAuthenticated && user) return children;
-};
+}

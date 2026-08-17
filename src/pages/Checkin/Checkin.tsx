@@ -3,6 +3,6 @@ import { CheckinBooking } from "../../features/check-in-out/components/CheckinBo
 /**
  * Page component that renders the check-in booking flow
  */
-export const Checkin = () => {
+export function Checkin() {
     return <CheckinBooking />;
-};
+}

@@ -1,12 +1,17 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Heading } from "../Heading/Heading";
 import { Button } from "../Button/Button";
+import { media } from "../../styles/breakpoints";
 
 const StyledConfirmDelete = styled.div`
-    width: 40rem;
+    width: min(40rem, 100%);
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
+
+    ${media.tablet(css`
+        width: 40rem;
+    `)}
 
     & p {
         color: var(--color-grey-500);
@@ -15,6 +20,7 @@ const StyledConfirmDelete = styled.div`
 
     & div {
         display: flex;
+        flex-wrap: wrap;
         justify-content: flex-end;
         gap: 1.2rem;
     }
@@ -26,12 +32,12 @@ interface ConfirmDeleteProps {
     onConfirm: () => void;
     onCancel: () => void;
 }
-export const ConfirmDelete = ({
+export function ConfirmDelete({
     resourceName,
     disabled,
     onConfirm,
     onCancel,
-}: ConfirmDeleteProps) => {
+}: ConfirmDeleteProps) {
     const handleDelete = () => onConfirm();
     const handleCancel = () => onCancel();
     return (
@@ -60,4 +66,4 @@ export const ConfirmDelete = ({
             </div>
         </StyledConfirmDelete>
     );
-};
+}

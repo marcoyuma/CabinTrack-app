@@ -168,12 +168,224 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            // --- Seaspace catalog (source of truth: ADMIN-PANEL-CONTEXT.md § "Kontrak data") ---
+            stays: {
+                Row: {
+                    id: number;
+                    created_at: string;
+                    slug: string;
+                    name: string;
+                    location: string;
+                    price_per_night: number;
+                    discount: number;
+                    capacity: number;
+                    beds: number;
+                    area: number;
+                    is_new: boolean;
+                    is_featured: boolean;
+                    description: string;
+                    lat: number;
+                    lng: number;
+                };
+                Insert: {
+                    id?: number;
+                    created_at?: string;
+                    slug: string;
+                    name: string;
+                    location: string;
+                    price_per_night: number;
+                    discount?: number;
+                    capacity: number;
+                    beds: number;
+                    area: number;
+                    is_new?: boolean;
+                    is_featured?: boolean;
+                    description: string;
+                    lat: number;
+                    lng: number;
+                };
+                Update: {
+                    id?: number;
+                    created_at?: string;
+                    slug?: string;
+                    name?: string;
+                    location?: string;
+                    price_per_night?: number;
+                    discount?: number;
+                    capacity?: number;
+                    beds?: number;
+                    area?: number;
+                    is_new?: boolean;
+                    is_featured?: boolean;
+                    description?: string;
+                    lat?: number;
+                    lng?: number;
+                };
+                Relationships: [];
+            };
+            stay_images: {
+                Row: {
+                    stay_id: number;
+                    storage_path: string;
+                    alt: string;
+                    blur_data_url: string | null;
+                    width: number | null;
+                    height: number | null;
+                    sort_order: number;
+                };
+                Insert: {
+                    stay_id: number;
+                    storage_path: string;
+                    alt: string;
+                    blur_data_url?: string | null;
+                    width?: number | null;
+                    height?: number | null;
+                    sort_order: number;
+                };
+                Update: {
+                    stay_id?: number;
+                    storage_path?: string;
+                    alt?: string;
+                    blur_data_url?: string | null;
+                    width?: number | null;
+                    height?: number | null;
+                    sort_order?: number;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "stay_images_stay_id_fkey";
+                        columns: ["stay_id"];
+                        isOneToOne: false;
+                        referencedRelation: "stays";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
+            amenities: {
+                Row: {
+                    id: number;
+                    slug: string;
+                    label: string;
+                    detail: string;
+                    is_shared: boolean;
+                };
+                Insert: {
+                    id?: number;
+                    slug: string;
+                    label: string;
+                    detail: string;
+                    is_shared?: boolean;
+                };
+                Update: {
+                    id?: number;
+                    slug?: string;
+                    label?: string;
+                    detail?: string;
+                    is_shared?: boolean;
+                };
+                Relationships: [];
+            };
+            stay_amenities: {
+                Row: {
+                    stay_id: number;
+                    amenity_id: number;
+                    sort_order: number;
+                };
+                Insert: {
+                    stay_id: number;
+                    amenity_id: number;
+                    sort_order: number;
+                };
+                Update: {
+                    stay_id?: number;
+                    amenity_id?: number;
+                    sort_order?: number;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "stay_amenities_stay_id_fkey";
+                        columns: ["stay_id"];
+                        isOneToOne: false;
+                        referencedRelation: "stays";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "stay_amenities_amenity_id_fkey";
+                        columns: ["amenity_id"];
+                        isOneToOne: false;
+                        referencedRelation: "amenities";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
+            // --- Staff identity (source of truth: 0014_admin_staff_access.sql, owned by the
+            // customer-site repo — mirrored here read-only because `public.staff` is what
+            // admin_booking_roster() checks against `auth.uid()`). ---
+            staff: {
+                Row: {
+                    id: string;
+                    display_name: string;
+                    role: "staff" | "manager";
+                    created_at: string;
+                };
+                Insert: {
+                    id: string;
+                    display_name: string;
+                    role: "staff" | "manager";
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    display_name?: string;
+                    role?: "staff" | "manager";
+                    created_at?: string;
+                };
+                Relationships: [];
+            };
         };
         Views: {
             [_ in never]: never;
         };
         Functions: {
-            [_ in never]: never;
+            // Returns front-desk roster rows for bookings overlapping [p_from, p_to].
+            // Deliberately omits total_price/num_nights/nationality/avatar_path — see
+            // ADMIN-PANEL-CONTEXT.md § "Akses baca staff/manager ke data guest".
+            admin_booking_roster: {
+                Args: { p_from: string; p_to: string };
+                Returns: {
+                    booking_id: number;
+                    stay_name: string;
+                    guest_name: string;
+                    phone_country_code: string | null;
+                    phone: string | null;
+                    start_date: string;
+                    end_date: string;
+                    status: string;
+                }[];
+            };
+            // Filtered by created_at (not start/end date overlap) — a "Last N days"
+            // financial/occupancy read, not an arrivals/departures roster. Never touches
+            // public.guests. See 0015_admin_staff_booking_financials.sql.
+            admin_booking_financials: {
+                Args: { p_from: string; p_to: string };
+                Returns: {
+                    booking_id: number;
+                    stay_id: number;
+                    stay_name: string;
+                    start_date: string;
+                    end_date: string;
+                    num_nights: number;
+                    total_price: number;
+                    status: string;
+                    created_at: string;
+                }[];
+            };
+            // Count-only, PII-free — no guest row ever leaves Postgres. See
+            // 0017_admin_new_guests_count.sql.
+            admin_new_guests_count: {
+                Args: { p_from: string; p_to: string };
+                Returns: number;
+            };
         };
         Enums: {
             [_ in never]: never;

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { updateBooking } from "../../../services/apiBookings";
+import { updateBooking } from "../services/apiBookings";
 
 /**
  * Custom React Query hook to handle booking check-in by updating booking status,

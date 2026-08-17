@@ -2,11 +2,12 @@ import { useSearchParams } from "react-router-dom";
 
 // type for 'updates' props type
 export type SetManyParamsPropsType = Record<string, string | null | undefined>;
+export type SetManyParamsFn = (...updates: SetManyParamsPropsType[]) => void;
 
 // custom hooks for setting new params value into url
 export const useBatchSearchParams = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const setManyParams = (
+    const setManyParams: SetManyParamsFn = (
         // ...updates: Record<string, string | null | undefined>[]
         ...updates: SetManyParamsPropsType[]
     ) => {

@@ -1,12 +1,16 @@
 import { ReactNode, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { ModalContext } from "./context/ModalContext";
 import { useModalContext } from "./hooks/useModalContext";
+import { media } from "../../styles/breakpoints";
 
-// This component is a modal that can be used to display content in a popup window.
+// This component is a modal that can be used to display content in a popup window. Its own
+// fixed padding (3.2rem 4rem at desktop) eats into a form's max-width budget before the form's
+// own max-width even applies — content max-height is left to the content itself (e.g.
+// StayFormLayout's FormShell), since not every Modal consumer needs internal scroll.
 const StyledModal = styled.div`
     position: fixed;
     top: 50%;
@@ -15,8 +19,14 @@ const StyledModal = styled.div`
     background-color: var(--color-grey-0);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg);
-    padding: 3.2rem 4rem;
+    padding: 2rem;
+    max-width: calc(100vw - 2.4rem);
     transition: all 0.5s;
+
+    ${media.tablet(css`
+        padding: 3.2rem 4rem;
+        max-width: none;
+    `)}
 `;
 
 // This component is an overlay that covers the entire screen when the modal is open, providing a backdrop effect.
@@ -29,7 +39,7 @@ const Overlay = styled.div`
     height: 100vh;
     background-color: var(--backdrop-color);
     backdrop-filter: blur(4px);
-    z-index: 1000;
+    z-index: 100;
     transition: all 0.5s;
 `;
 
@@ -68,7 +78,7 @@ interface ModalProps {
 // This is the main Modal component that provides the context for managing the modal's open state.
 // It uses the 'ModalContext' to provide the 'open' and 'close' functions, as well as the current open name.
 // The 'children' of this component will have access to the modal context.
-export const Modal = ({ children }: ModalProps) => {
+export function Modal({ children }: ModalProps) {
     const [openName, setOpenName] = useState("");
 
     // This function sets the open name to the provided name, effectively opening the modal.
@@ -81,7 +91,7 @@ export const Modal = ({ children }: ModalProps) => {
             {children}
         </ModalContext.Provider>
     );
-};
+}
 
 // interface for Open props
 interface OpenProps {
@@ -134,7 +144,7 @@ interface WindowProps {
 }
 
 // This component renders the modal with an overlay and a close button.
-export const Window = ({ children, name }: WindowProps) => {
+export function Window({ children, name }: WindowProps) {
     const { openName, close } = useModalContext();
 
     // This function is called when the modal is closed. It calls the 'close' function from the modal context to reset the open name.
@@ -165,9 +175,9 @@ export const Window = ({ children, name }: WindowProps) => {
                 </div>
             </StyledModal>
         </Overlay>,
-        document.body
+        document.body,
     );
-};
+}
 
 // Export the Modal components for use in other parts of the application.
 Modal.Open = Open;
