@@ -7,22 +7,23 @@ const StyledLogo = styled.div`
 `;
 
 const Img = styled.img`
-    height: 3.2rem;
+    height: 2.6rem;
     width: auto;
+    border-radius: var(--border-radius-lg);
 
     ${media.tablet(css`
-        height: 3.6rem;
+        height: 3rem;
     `)}
 
     ${media.desktop(css`
-        height: 4rem;
+        height: 3.6rem;
     `)}
 `;
 
 export function Logo() {
     return (
         <StyledLogo>
-            <Img src="/cabinTrack-logo.png" alt="Logo" />
+            <Img src="/seaspace-logo-final.png" alt="Logo" />
         </StyledLogo>
     );
 }
