@@ -32,13 +32,11 @@ export function LoginForm() {
                 },
             },
         );
-
-        console.log("diteken");
     }
 
     return (
         <Form onSubmit={handleSubmit} id="login" name="login">
-            <FormRowVertical label="Email address" orientation="vertical">
+            <FormRowVertical label="Email address" htmlFor="email">
                 <Input
                     type="email"
                     id="email"
@@ -49,7 +47,7 @@ export function LoginForm() {
                     disabled={isLoggingIn}
                 />
             </FormRowVertical>
-            <FormRowVertical label="Password" orientation="vertical">
+            <FormRowVertical label="Password" htmlFor="password">
                 <Input
                     type="password"
                     id="password"
@@ -59,7 +57,7 @@ export function LoginForm() {
                     disabled={isLoggingIn}
                 />
             </FormRowVertical>
-            <FormRowVertical orientation="vertical">
+            <FormRowVertical>
                 <Button size="large" disabled={isLoggingIn}>
                     {!isLoggingIn ? "Login" : <SpinnerMini />}
                 </Button>

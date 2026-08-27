@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactNode } from "react";
 import styled from "styled-components";
 
 const StyledFormRow = styled.div`
@@ -18,17 +18,19 @@ const Error = styled.span`
 `;
 
 export function FormRowVertical({
+    htmlFor,
     label,
     error,
     children,
 }: {
-    label: string;
-    error: string | undefined;
-    children: ReactElement<{ id: string }>;
+    htmlFor?: string;
+    label?: string;
+    error?: string;
+    children: ReactNode;
 }) {
     return (
         <StyledFormRow>
-            {label && <Label htmlFor={children.props.id}>{label}</Label>}
+            {label && <Label htmlFor={htmlFor}>{label}</Label>}
             {children}
             {error && <Error>{error}</Error>}
         </StyledFormRow>
