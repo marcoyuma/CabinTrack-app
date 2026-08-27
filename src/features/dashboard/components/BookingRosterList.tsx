@@ -91,7 +91,8 @@ function RosterItem({ row }: { row: BookingRosterRow }) {
 
 /**
  * Arrival/departure roster for staff, sourced from admin_booking_roster() — replaces the
- * old TodayActivity (which queried `bookings` directly, outside admin panel authority).
+ * now-deleted TodayActivity (which queried `bookings` directly, outside admin panel
+ * authority).
  * An empty result here can legitimately mean "no bookings in range" OR "signed-in account
  * has no public.staff row" — both render as the same empty state by design (see
  * ADMIN-PANEL-CONTEXT.md: "pemanggil yang tidak berhak mendapat 0 baris, bukan error").

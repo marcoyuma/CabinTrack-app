@@ -30,10 +30,10 @@ const getBookingRoster = async (
 };
 
 /**
- * "Today" panel — replaces the old TodayActivity (which queried `bookings`/`guests`
+ * "Today" panel — replaces the now-deleted TodayActivity (which queried `bookings`/`guests`
  * directly, outside admin panel authority). Always today, independent of the
- * DashboardFilter "Last N days" — matches the original TodayActivity behavior, which was
- * never tied to that filter either.
+ * DashboardFilter "Last N days" — matches the original behavior, which was never tied to
+ * that filter either.
  */
 export const useBookingRoster = () => {
     const today = new Date();
