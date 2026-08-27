@@ -8,7 +8,7 @@ import {
 } from "react-icons/hi2";
 
 import { Flag } from "../../../ui/Flag/Flag";
-import DataItem from "../../../ui/DataItem/DataItem";
+import { DataItem } from "../../../ui/DataItem/DataItem";
 
 import {
     formatCurrency,
