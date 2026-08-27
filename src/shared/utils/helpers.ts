@@ -27,7 +27,7 @@ export const getToday = function (options?: { end: boolean }) {
 
 export const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en", { style: "currency", currency: "USD" }).format(
-        value
+        value,
     );
 
 // stays.price_per_night is a whole-rupiah integer, not cents — see
@@ -45,7 +45,9 @@ export const formatRupiah = (value: number) =>
 export const formatRupiahCompact = (value: number): string => {
     const abs = Math.abs(value);
     const compact = (num: number) =>
-        new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(num);
+        new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(
+            num,
+        );
 
     if (abs >= 1_000_000) return `Rp${compact(value / 1_000_000)}jt`;
     if (abs >= 1_000) return `Rp${compact(value / 1_000)}rb`;
@@ -80,7 +82,7 @@ export const sortData = <T>(
     data: T[] | undefined,
 
     // base string to sort data
-    sortBy: string
+    sortBy: string,
 ): T[] => {
     // early return if empty array received
     if (!data) return [];
@@ -137,10 +139,6 @@ export const safeBoolean = (fallback = false) =>
         .transform((arg) => arg ?? fallback)
         .default(fallback);
 
-export const removeUndefined = <T>(obj: T) => {
-    Object.entries(obj);
-};
-
 // safety for form
 export const stringSafeForm = (min = 1, max?: number, message?: string) => {
     let safe = z.string().trim();
@@ -148,7 +146,7 @@ export const stringSafeForm = (min = 1, max?: number, message?: string) => {
         safe = safe
             .min(
                 min,
-                message ?? `minimal ${min} or ${max} length input is required`
+                message ?? `minimal ${min} or ${max} length input is required`,
             )
             .max(max);
     } else {
