@@ -13,22 +13,49 @@ const LoginLayout = styled.main`
     grid-template-columns: minmax(0, 40rem);
     align-content: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 2.4rem;
     padding: 2rem;
-    background-color: var(--color-grey-50);
+    background-color: var(--color-grey-100);
 
     ${media.tablet(css`
         grid-template-columns: 48rem;
         gap: 3.2rem;
-        padding: 0;
+        padding: 2rem 0;
     `)}
+`;
+
+// Logo, title and tagline read as one block, so they sit closer to each other than the
+// grid gap that separates them from the form card.
+const Branding = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+`;
+
+// Logo itself is left-aligned because the Header depends on that — centering is the
+// login page's job.
+const LogoWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+`;
+
+const Tagline = styled.p`
+    font-size: var(--font-size-body);
+    color: var(--color-grey-500);
+    text-align: center;
 `;
 
 export function Login() {
     return (
         <LoginLayout>
-            <Logo />
-            <Heading as="h4">Log in to your account</Heading>
+            <Branding>
+                <LogoWrapper>
+                    <Logo />
+                </LogoWrapper>
+                <Heading as="h4">Log in to your account</Heading>
+                <Tagline>Seaspace villa admin panel</Tagline>
+            </Branding>
             <LoginForm />
         </LoginLayout>
     );
