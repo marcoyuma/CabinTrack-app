@@ -100,16 +100,21 @@ const DayCell = styled.button<{
     $isOutOfMonth: boolean;
     $isToday: boolean;
 }>`
-    position: relative;
     aspect-ratio: 1;
     width: 100%;
     border-radius: 50%;
     font-size: var(--font-size-small);
     font-weight: 500;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.3rem;
     transition: all 0.2s;
+
+    ${media.desktop(css`
+        gap: 0.6rem;
+    `)}
 
     background-color: ${(props) =>
         props.$isSelected ? "var(--color-brand-600)" : "transparent"};
@@ -136,14 +141,15 @@ const DayCell = styled.button<{
     }
 `;
 
-const BookingDot = styled.span<{ $isSelected: boolean }>`
-    position: absolute;
-    bottom: 0.4rem;
-    left: 50%;
-    transform: translateX(-50%);
+// Always rendered, hidden when the day has no booking: keeping it in flow on every cell means
+// the date number sits at the same height across the whole grid, instead of shifting up only
+// on days that happen to have a dot.
+const BookingDot = styled.span<{ $isSelected: boolean; $isVisible: boolean }>`
     width: 4px;
     height: 4px;
+    flex-shrink: 0;
     border-radius: 50%;
+    visibility: ${(props) => (props.$isVisible ? "visible" : "hidden")};
     background-color: ${(props) =>
         props.$isSelected ? "var(--color-grey-0)" : "var(--color-brand-600)"};
 `;
@@ -220,9 +226,10 @@ export function BookingCalendarGrid({
                             onClick={() => onSelectDate(day)}
                         >
                             {format(day, "d")}
-                            {hasBooking && (
-                                <BookingDot $isSelected={isSelected} />
-                            )}
+                            <BookingDot
+                                $isSelected={isSelected}
+                                $isVisible={hasBooking}
+                            />
                         </DayCell>
                     );
                 })}
