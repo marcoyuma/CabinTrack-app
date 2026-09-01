@@ -11,7 +11,7 @@ const toDateString = (date: Date) => date.toISOString().slice(0, 10);
 // Same admin_booking_roster() RPC as useBookingRoster, but scoped to a whole month instead of
 // a single day — one call per visible month is enough to drive both the calendar's "has
 // booking" dot indicators and the selected date's list, since the RPC already does start/end
-// overlap filtering server-side. See ADMIN-PANEL-CONTEXT.md § "Akses baca staff/manager ke
+// overlap filtering server-side. See ADMIN-PANEL-CONTEXT.md § "Akses baca staf ke
 // data guest".
 const getMonthBookingRoster = async (
     monthAnchor: Date,

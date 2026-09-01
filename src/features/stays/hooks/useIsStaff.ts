@@ -11,6 +11,10 @@ import { useUser } from "../../authentication/hooks/useUser";
 // 0014_admin_staff_access.sql already allows. .maybeSingle() (not .single()) because a
 // non-staff authenticated user legitimately has zero rows there — that's an expected outcome,
 // not an error.
+//
+// Membership is the whole answer: 0018_drop_manager_role.sql collapsed the staff/manager
+// tiers, so there is nothing to read beyond "does a row exist". Selecting id rather than *
+// keeps that explicit.
 export const useIsStaff = () => {
     const { user, isUserLoading } = useUser();
 
@@ -19,7 +23,7 @@ export const useIsStaff = () => {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from("staff")
-                .select("role")
+                .select("id")
                 .eq("id", user!.id)
                 .maybeSingle();
 
@@ -35,7 +39,6 @@ export const useIsStaff = () => {
 
     return {
         isStaff: !!data,
-        role: data?.role,
         isLoading: isUserLoading || isPending,
     };
 };

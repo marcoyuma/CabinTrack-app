@@ -12,10 +12,10 @@
 -- any circumstance, and the three functions 0014_admin_staff_access.sql already introduced
 -- (admin_booking_roster, admin_guest_nationality_stats, admin_export_guests) don't fit this
 -- job: admin_booking_roster is scoped to booking/stay-date overlap, not guest signup date;
--- admin_guest_nationality_stats and admin_export_guests are manager-only and either aggregate
--- something unrelated (nationality) or return full per-guest PII logged to
--- admin_export_log — using either just to put a number on a dashboard card would be misusing
--- a manager-gated, audited PII export for a job that needs zero PII at all.
+-- admin_guest_nationality_stats and admin_export_guests either aggregate something unrelated
+-- (nationality) or return full per-guest PII logged to admin_export_log — using either just to
+-- put a number on a dashboard card would be misusing an audited PII export for a job that needs
+-- zero PII at all.
 --
 -- ---------------------------------------------------------------------------
 -- Why this is safe where the others aren't a fit
@@ -27,11 +27,11 @@
 -- is nothing here for that log to meaningfully audit.
 --
 -- ---------------------------------------------------------------------------
--- Why staff AND manager, not manager-only
+-- Why the plain staff gate is enough
 -- ---------------------------------------------------------------------------
 -- The gate that matters for public.guests is "does this response expose anything a guest would
--- consider private" — a count has nothing to expose, so there's no reason to restrict it past
--- the baseline "is this caller staff at all" check every other staff-facing function uses.
+-- consider private" — a count has nothing to expose, so the baseline "is this caller staff at
+-- all" check every other staff-facing function uses is the right level.
 
 create or replace function public.admin_new_guests_count(p_from date, p_to date)
 returns bigint

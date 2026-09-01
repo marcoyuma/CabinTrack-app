@@ -61,23 +61,27 @@ follows the same internal shape: `services/` → `hooks/` → `types/` → `comp
   enforces `discount < price_per_night`) so the same rule is never defined twice and drifting
   out of sync with the database.
 
-### Two-tier authorization: RLS as the real boundary, `StaffOnlyRoute` as UX
+### Authorization: RLS as the real boundary, `StaffOnlyRoute` as UX
 
 Routes like `/stays` and `/bookings` are wrapped in `StaffOnlyRoute` (`src/ui/StaffOnlyRoute/`),
 which checks a `useIsStaff()` hook and redirects non-staff back to `/dashboard`. The code itself
 documents that this is **not** the actual security boundary — it's UX polish so a non-staff user
 doesn't even see a page they can't act on. The real boundary is Postgres Row-Level Security:
-every write policy on the four catalogue tables calls a shared helper, `public.is_staff(min_role)`,
-that checks the logged-in session's row in `public.staff`. If someone bypassed the frontend
-entirely and hit Supabase directly, RLS still rejects the write.
+every write policy on the four catalogue tables checks the logged-in session's `auth.uid()`
+against `public.staff`. If someone bypassed the frontend entirely and hit Supabase directly, RLS
+still rejects the write.
 
-This split matters because of *what* it protects against: a `staff` role (as opposed to
-`manager`) can insert/update everything but is blocked from deleting a villa or an `amenities`
-row — and per the documented contract, an unauthorized delete from RLS returns **zero rows
-affected, not an error**. That's a real footgun if you only build the UI-level check: a `staff`
-user pressing "Delete" would see a "successful" operation that silently did nothing. The UI
-therefore hides/disables the delete action for `staff` rather than relying on error handling
-that will never fire.
+The permission model is deliberately flat — membership in `public.staff` grants the whole panel.
+An earlier two-tier design reserved villa deletion and guest exports for a `manager` role; it was
+removed (`0018_drop_manager_role.sql`) because every account trusted enough to be hand-provisioned
+into `public.staff` at all was trusted with those operations anyway, so the tier only produced
+dead buttons.
+
+The split that remains matters because of *what* it protects against: per the documented
+contract, an unauthorized write from RLS returns **zero rows affected, not an error**. That's a
+real footgun if you only build the UI-level check — a signed-in non-staff user pressing "Delete"
+would see a "successful" operation that silently did nothing. The UI therefore hides the entry
+points entirely rather than relying on error handling that will never fire.
 
 ### Local, scoped React Context — not a global store
 
@@ -105,9 +109,10 @@ via custom hooks like `useBatchSearchParams` and `useURL` instead of Context.
   first, *then* deletes the `stays` row (which cascades to `stay_images`/`stay_amenities` in the
   DB). Doing it in the opposite order would leave orphaned files in Storage with no database row
   left to know they exist.
-- **Role gating enforced in two independent places, deliberately redundant.** UI-level (`StayRow.tsx`
-  checks `useIsStaff().role`) and RLS-level (`0015_staff_catalog_writes.sql`) — the UI check is
-  explicitly documented as defense-in-depth, RLS is the actual enforcement.
+- **Access gating enforced in two independent places, deliberately redundant.** UI-level
+  (`StaffOnlyRoute` and the nav links both check `useIsStaff()`) and RLS-level
+  (`0016_admin_staff_catalog_writes.sql`) — the UI check is explicitly documented as
+  defense-in-depth, RLS is the actual enforcement.
 - **Client-side vs. server-side filtering chosen based on actual data scale, not habit.** The
   villa table's sort/filter logic (`useStayTableState.ts`) is deliberately plain in-memory
   `.filter()`/`.sort()` rather than reusing the existing `useBatchSearchParams` URL-param

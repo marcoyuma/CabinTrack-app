@@ -1,5 +1,5 @@
 // phone is PII the admin panel is deliberately, narrowly allowed to see (see
-// ADMIN-PANEL-CONTEXT.md § "Akses baca staff/manager ke data guest") — mask most of it by
+// ADMIN-PANEL-CONTEXT.md § "Akses baca staf ke data guest") — mask most of it by
 // default instead of rendering it in full.
 export const maskPhone = (
     phoneCountryCode: string | null,

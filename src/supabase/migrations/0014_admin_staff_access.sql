@@ -1,6 +1,10 @@
 -- 0014_admin_staff_access.sql
--- Read-only, scoped access into public.guests for the admin panel's staff and
--- managers, without touching public.guests itself.
+-- Read-only, scoped access into public.guests for the admin panel's staff,
+-- without touching public.guests itself.
+--
+-- SUPERSEDED IN PART by 0018_drop_manager_role.sql: the `role` column and the
+-- manager-only gates below no longer exist. This file is kept as written for
+-- migration history; read 0018 for the model that is actually in force.
 --
 -- Run FOURTEENTH, after 0013_booking_lifecycle_cron.sql.
 -- Idempotent: safe to re-run.
@@ -43,15 +47,14 @@
 -- something, scoped further by date range.
 --
 -- ---------------------------------------------------------------------------
--- Two roles, not three
+-- Tiering (removed in 0018)
 -- ---------------------------------------------------------------------------
--- Industry practice for larger properties often has three tiers
--- (owner/manager/staff), separated mainly by export/approval power rather
--- than day-to-day visibility. For a single-property admin panel, two is
--- enough: 'staff' reads the booking roster; 'manager' additionally reads
--- aggregate nationality stats and can export guest contact data (logged).
--- Because role lives in a column rather than a second table, adding a third
--- tier later is an UPDATE to the check constraint, not a schema migration.
+-- This migration originally split public.staff into two tiers via a `role`
+-- column, reserving the two guest-data functions below for the upper one.
+-- 0018_drop_manager_role.sql dropped that column: every row in public.staff
+-- now carries the same full authority, and the gates below were rewritten to
+-- test membership only. The column is still created here so this file remains
+-- a faithful record of what ran; 0018 removes it on the way past.
 
 -- ---------------------------------------------------------------------------
 -- public.staff
@@ -240,12 +243,13 @@ where proname in (
     'admin_booking_roster', 'admin_guest_nationality_stats', 'admin_export_guests'
 );
 
--- Manual smoke test once at least one staff/manager row exists (replace the
--- uuids with real auth.users ids before running, e.g. via
--- `select id, email from auth.users limit 5;`):
+-- Manual smoke test once at least one staff row exists (replace the uuid with
+-- a real auth.users id before running, e.g. via
+-- `select id, email from auth.users limit 5;`). Written for the post-0018
+-- schema, where public.staff has no `role` column and every row is fully
+-- authorised:
 --
--- insert into public.staff (id, display_name, role)
---   values ('<uuid>', 'Test Staff', 'staff');
+-- insert into public.staff (id, display_name) values ('<uuid>', 'Test Staff');
 -- select * from public.admin_booking_roster(current_date, current_date + 30);
--- select * from public.admin_guest_nationality_stats(); -- expect 0 rows for 'staff'
--- select * from public.admin_export_guests();            -- expect 0 rows for 'staff'
+-- select * from public.admin_guest_nationality_stats();
+-- select * from public.admin_export_guests();

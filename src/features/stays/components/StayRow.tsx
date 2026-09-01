@@ -11,7 +11,6 @@ import { Modal } from "../../../ui/Modal/Modal";
 import { ConfirmDelete } from "../../../ui/ConfirmDelete/ConfirmDelete";
 import { Stay } from "../types/stay.schema";
 import { useDeleteStay } from "../hooks/useDeleteStay";
-import { useIsStaff } from "../hooks/useIsStaff";
 import { supabaseUrl } from "../../../supabase/supabase";
 import { EditStayForm } from "./EditStayForm";
 import { CellLabel, Field, TableRowItem } from "./stayTable.styles";
@@ -136,21 +135,6 @@ const IconButton = styled.button`
     }
 `;
 
-const DisabledMenuItem = styled.li`
-    display: flex;
-    align-items: center;
-    gap: 1.6rem;
-    padding: 1.2rem 2.4rem;
-    font-size: 1.4rem;
-    color: var(--color-grey-400);
-    cursor: not-allowed;
-
-    & svg {
-        width: 1.6rem;
-        height: 1.6rem;
-    }
-`;
-
 interface StayRowProps {
     stay: Stay;
     coverPath?: string;
@@ -160,9 +144,7 @@ interface StayRowProps {
 
 export function StayRow({ stay, coverPath, imageCount, featuredCount }: StayRowProps) {
     const { removeStay, isDeleting } = useDeleteStay();
-    const { role } = useIsStaff();
 
-    const canDeleteVilla = role === "manager";
     const isReady = imageCount > 0;
 
     return (
@@ -237,23 +219,16 @@ export function StayRow({ stay, coverPath, imageCount, featuredCount }: StayRowP
                 </Actions>
 
                 <Menus.List id={String(stay.id)}>
-                    {canDeleteVilla ? (
-                        // Function form is required: Modal.Open only wires its open handler when
-                        // children is a render function — an element child is passed through
-                        // untouched and the button would silently do nothing.
-                        <Modal.Open opens="delete-stay">
-                            {(open: () => void) => (
-                                <Menus.Button icon={<HiOutlineTrash />} onClick={open}>
-                                    Delete
-                                </Menus.Button>
-                            )}
-                        </Modal.Open>
-                    ) : (
-                        <DisabledMenuItem title="Only a manager can delete a villa">
-                            <HiOutlineTrash />
-                            <span>Delete</span>
-                        </DisabledMenuItem>
-                    )}
+                    {/* Function form is required: Modal.Open only wires its open handler when
+                        children is a render function — an element child is passed through
+                        untouched and the button would silently do nothing. */}
+                    <Modal.Open opens="delete-stay">
+                        {(open: () => void) => (
+                            <Menus.Button icon={<HiOutlineTrash />} onClick={open}>
+                                Delete
+                            </Menus.Button>
+                        )}
+                    </Modal.Open>
                 </Menus.List>
 
                 <Modal.Window name="edit-stay">
@@ -266,21 +241,19 @@ export function StayRow({ stay, coverPath, imageCount, featuredCount }: StayRowP
                     )}
                 </Modal.Window>
 
-                {canDeleteVilla && (
-                    <Modal.Window name="delete-stay">
-                        {(close: () => void) => (
-                            <ConfirmDelete
-                                resourceName="villa"
-                                disabled={isDeleting}
-                                onConfirm={() => {
-                                    removeStay(stay.id);
-                                    close();
-                                }}
-                                onCancel={close}
-                            />
-                        )}
-                    </Modal.Window>
-                )}
+                <Modal.Window name="delete-stay">
+                    {(close: () => void) => (
+                        <ConfirmDelete
+                            resourceName="villa"
+                            disabled={isDeleting}
+                            onConfirm={() => {
+                                removeStay(stay.id);
+                                close();
+                            }}
+                            onCancel={close}
+                        />
+                    )}
+                </Modal.Window>
             </Modal>
         </TableRowItem>
     );

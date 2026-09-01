@@ -320,24 +320,22 @@ export type Database = {
             };
             // --- Staff identity (source of truth: 0014_admin_staff_access.sql, owned by the
             // customer-site repo — mirrored here read-only because `public.staff` is what
-            // admin_booking_roster() checks against `auth.uid()`). ---
+            // admin_booking_roster() checks against `auth.uid()`). Membership is the whole
+            // permission model: 0018_drop_manager_role.sql dropped the `role` column. ---
             staff: {
                 Row: {
                     id: string;
                     display_name: string;
-                    role: "staff" | "manager";
                     created_at: string;
                 };
                 Insert: {
                     id: string;
                     display_name: string;
-                    role: "staff" | "manager";
                     created_at?: string;
                 };
                 Update: {
                     id?: string;
                     display_name?: string;
-                    role?: "staff" | "manager";
                     created_at?: string;
                 };
                 Relationships: [];
@@ -349,7 +347,7 @@ export type Database = {
         Functions: {
             // Returns front-desk roster rows for bookings overlapping [p_from, p_to].
             // Deliberately omits total_price/num_nights/nationality/avatar_path — see
-            // ADMIN-PANEL-CONTEXT.md § "Akses baca staff/manager ke data guest".
+            // ADMIN-PANEL-CONTEXT.md § "Akses baca staf ke data guest".
             admin_booking_roster: {
                 Args: { p_from: string; p_to: string };
                 Returns: {

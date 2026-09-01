@@ -11,7 +11,7 @@ const toDateString = (date: Date) => date.toISOString().slice(0, 10);
 // direct table query. It runs on the SAME client (anon key + the staff's own auth session)
 // already used everywhere else in this app; no second Supabase client is needed. A caller
 // without a public.staff row gets 0 rows back (not an error) — see
-// ADMIN-PANEL-CONTEXT.md § "Akses baca staff/manager ke data guest".
+// ADMIN-PANEL-CONTEXT.md § "Akses baca staf ke data guest".
 const getBookingRoster = async (
     today: Date,
 ): Promise<BookingRosterRow[]> => {

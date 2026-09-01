@@ -28,14 +28,12 @@
 -- benefit to splitting them, only extra manual-run overhead later.
 --
 -- ---------------------------------------------------------------------------
--- Why `exists (select 1 from public.staff where id = auth.uid())`, not a
--- role check
+-- Why `exists (select 1 from public.staff where id = auth.uid())`
 -- ---------------------------------------------------------------------------
--- Unlike admin_guest_nationality_stats()/admin_export_guests() in 0014 (which
--- gate on role = 'manager' because they expose PII), catalog writes are not
--- PII-sensitive — any provisioned staff account, 'staff' or 'manager', may
--- create/edit/delete villas. So the check only needs "is this uid a staff
--- row at all", the same predicate admin_booking_roster() already uses.
+-- Membership in public.staff is the whole permission model (0018 removed the
+-- one tier that ever existed above it): any provisioned staff account may
+-- create/edit/delete villas. So the check only needs "is this uid a staff row
+-- at all", the same predicate admin_booking_roster() already uses.
 --
 -- ---------------------------------------------------------------------------
 -- Why per-command syntax differs

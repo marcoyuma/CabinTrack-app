@@ -134,7 +134,7 @@ function nightsFor(row: BookingRosterRow): number {
  * Bookings active on `selectedDate` — receives already filtered + sorted rows from
  * BookingCalendarSection. Guest avatar is a generic icon, never a real photo: avatar_path is
  * deliberately never exposed to the admin panel through any RPC (see ADMIN-PANEL-CONTEXT.md
- * § "Akses baca staff/manager ke data guest").
+ * § "Akses baca staf ke data guest").
  */
 export function BookingCalendarList({
     bookings,

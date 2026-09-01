@@ -1,37 +1,65 @@
 # CLAUDE.md — Admin Panel (Seaspace)
 
-@ADMIN-PANEL-CONTEXT.md
-
 ## Apa aplikasi ini
 
-Admin panel internal untuk mengelola katalog villa Seaspace. Read-write ke Supabase lewat
-service role key, dipakai staf internal (bukan customer publik). Lihat
-`ADMIN-PANEL-CONTEXT.md` (di-import di atas) untuk kontrak lengkap dengan situs customer —
-skema tabel, wewenang, pipeline upload gambar, dan alasan di balik tiap batasan.
+Admin panel internal untuk mengelola katalog villa Seaspace. Dipakai staf internal (bukan
+customer publik) untuk mengelola katalog 4 villa: `stays`, `stay_images`, `amenities`,
+`stay_amenities`, plus bucket storage `stays`. Jumlah staf pengguna belum diketahui — jangan
+menebak.
 
-Dipakai staf internal untuk mengelola katalog 4 villa (`stays`, `stay_images`, `amenities`,
-`stay_amenities`). Jumlah staf pengguna belum diketahui — jangan menebak.
+Repo ini separuh dari sistem dua-repo. Separuh lainnya adalah situs booking Seaspace yang
+publik — codebase terpisah yang tidak pernah saling impor. Satu-satunya yang dibagi adalah
+project Supabase, jadi batas antar keduanya ditegakkan di database, bukan di kode aplikasi.
 
-## Aturan tegas — jangan dilanggar tanpa membaca alasannya di ADMIN-PANEL-CONTEXT.md
+**Akses tulis lewat anon key + RLS, bukan service role key.** Staf login sebagai user Supabase
+biasa; setiap policy tulis di empat tabel katalog mencocokkan `auth.uid()` sesi itu ke tabel
+`public.staff`. Hanya ada satu Supabase client di app ini.
+
+**Cuma ada satu tingkatan staf.** Punya baris di `public.staff` = wewenang penuh di app ini.
+Tidak ada kolom `role`, tidak ada tier di atas atau di bawah — lihat
+`0018_drop_manager_role.sql`. Yang masih dibedakan hanya staf vs bukan-staf.
+
+## Aturan tegas — jangan dilanggar
 
 - **Hanya menulis ke `stays`, `stay_images`, `amenities`, `stay_amenities`, dan bucket `stays`.**
-  Jangan menulis ke `auth.users`, `public.guests`, `public.reviews`, `public.bookings`, atau
-  bucket `guests` — walau service role key secara teknis bisa. Baca
-  [Batas wewenang admin panel](./ADMIN-PANEL-CONTEXT.md#batas-wewenang-admin-panel) sebelum
-  menambah fitur yang mendekati batas ini.
-- **Service role key tidak boleh menyentuh browser.** Semua tulisan lewat server (route
-  handler / server action / backend) — tidak pernah dikirim ke client bundle.
-- **Setiap upload gambar wajib mengisi `blur_data_url`, `width`, `height`.** Replikasi pipeline
-  di [Kontrak upload gambar](./ADMIN-PANEL-CONTEXT.md#-kontrak-upload-gambar) persis — resize,
-  strip EXIF, WebP quality 80, generate blur 16px. Baris yang lolos tanpa ini akan meng-crash
-  halaman villa di situs customer.
-- **Villa yang punya booking tidak bisa dihapus** (`on delete restrict`). Tangani error dari
-  Postgres sebagai aturan bisnis di UI (mis. tombol "Delete" disabled + tooltip), bukan sebagai
-  bug yang perlu di-debug tiap kali muncul.
-- **Perubahan tidak langsung terlihat customer** — cache situs customer bertahan sampai
-  ~1 jam (time-based) sampai webhook revalidasi dibangun. Jangan buka bug report untuk ini;
-  lihat [penjelasan lengkapnya](./ADMIN-PANEL-CONTEXT.md#kenapa-perubahan-anda-tidak-langsung-terlihat-customer).
-- **Mengubah `slug` mengubah URL publik villa.** Beri peringatan di UI edit, atau kunci field
+  Jangan menulis ke `auth.users`, `public.guests`, `public.reviews`, `public.bookings`, bucket
+  `guests`, atau `public.staff`. Ini keputusan produk, bukan keadaan sementara: baris `guests`
+  hanya lahir dari trigger signup dan primary key-nya **adalah** `auth.users.id`, sementara
+  `bookings` tidak punya policy INSERT/UPDATE/DELETE sama sekali — bahkan situs customer
+  menulisnya lewat fungsi `security definer`. Kalau suatu hari admin perlu membuat booking
+  manual, itu butuh fungsi `security definer` baru yang disetujui dulu di repo situs customer,
+  bukan jalan pintas menulis baris langsung.
+- **Ada satu pengecualian baca-saja.** Tiga fungsi `security definer` —
+  `admin_booking_roster()`, `admin_guest_nationality_stats()`, `admin_export_guests()` — memberi
+  sesi staf yang sah jalur baca terbatas ke data guest untuk layar Bookings dan
+  Check-in. Jangan pernah `SELECT * FROM public.guests` langsung. Larangan **menulis** ke
+  `guests`/`reviews`/`bookings` tidak berubah sedikit pun.
+- **Jangan pernah menaruh service role key di repo ini.** Ini SPA murni tanpa server runtime —
+  tidak ada tempat menyembunyikan secret, dan Vite akan meng-inline-nya ke bundle browser. Key
+  itu mem-bypass seluruh RLS, jadi justru ia opsi paling berbahaya di app tanpa server.
+- **Menghapus villa itu aksi yang menjangkau jauh** — semua staf boleh, tapi tetap wajib pakai
+  dialog konfirmasi. `stay_images` dan `stay_amenities` ikut terhapus (`on delete cascade`), dan
+  review villa itu diputus diam-diam dari villa mana pun (`reviews.stay_id`
+  `on delete set null`).
+- **Tulis yang tidak berhak mengembalikan 0 baris, BUKAN error.** User yang sudah login tapi
+  tidak punya baris di `public.staff` akan melihat operasi "berhasil" tanpa ada yang berubah.
+  Karena itu entry point-nya wajib disembunyikan di UI — jangan mengandalkan pesan error dari
+  Postgres, karena tidak akan ada. RLS adalah batas keamanan sebenarnya; `StaffOnlyRoute` dan
+  link nav yang disembunyikan itu lapisan UX supaya user tidak pernah ditawari aksi yang
+  diam-diam tidak melakukan apa pun.
+- **Setiap upload gambar wajib mengisi `blur_data_url`, `width`, `height`.** Pipeline-nya harus
+  direplikasi persis: resize, strip EXIF, WebP quality 80, generate blur 16px. Situs customer
+  me-render foto villa dengan blur placeholder dan dimensi tetap — baris yang lolos tanpa salah
+  satu dari tiga kolom itu akan meng-crash halaman villa terkait.
+- **Villa yang punya booking tidak bisa dihapus** (`bookings.stay_id` `on delete restrict`).
+  Postgres akan melempar foreign-key error. Tangani sebagai aturan bisnis di UI (mis. tombol
+  "Delete" disabled + tooltip), bukan sebagai bug yang perlu di-debug tiap kali muncul.
+- **Perubahan tidak langsung terlihat customer** — situs customer di-prerender dan di-cache,
+  saat ini hanya time-based sampai ~1 jam; webhook revalidasi belum dibangun. Ini desain:
+  situs itu halaman marketing berat gambar untuk ribuan pengunjung, dan mematikan cache berarti
+  menukar kecepatan mereka demi kesegaran satu admin. Jangan buka bug report untuk ini.
+- **Mengubah `slug` mengubah URL publik villa.** Link yang sudah beredar akan rusak. Beri
+  peringatan di UI edit, atau kunci field ini setelah villa dipublikasikan.
   ini setelah villa dipublikasikan.
 
 ## Stack
@@ -51,8 +79,6 @@ Router (SSR/ISR, SEO, image optimization untuk pengunjung publik) tidak relevan 
 Migrasi berarti menulis ulang routing, pola fetching, dan `styled-components` (butuh
 registry khusus di bawah React Server Components) untuk aplikasi yang sudah jalan, tanpa
 manfaat fungsional. Jangan mengusulkan migrasi ke Next.js tanpa alasan baru yang konkret.
-
-@AGENTS.md
 
 ## Planning & Language
 
@@ -86,40 +112,93 @@ manfaat fungsional. Jangan mengusulkan migrasi ke Next.js tanpa alasan baru yang
 
 Feature-based di bawah `src/`:
 
-- `features/{bookings,cabins,guests,dashboard,settings,check-in-out,authentication}` —
-  masing-masing punya `components/`, `hooks/`, `types/`, sebagian `services/`.
-- `ui/` — komponen generik dipakai lintas fitur.
-- `pages/` — komponen halaman yang dipetakan router.
-- `services/` — pemanggil Supabase per domain, mis. `apiCabins`, `apiBookings`.
-- `context/`, `hooks/`, `shared/` — util dan state lintas fitur.
-- `supabase/` — client (`supabase.ts`) + `types/database.types.ts` hasil generate.
+- `features/{authentication,bookings,check-in-out,dashboard,stays}` — masing-masing punya
+  `components/`, `hooks/`, `types/`, sebagian `services/`. Layering di dalam tiap fitur selalu
+  sama: `services/` (panggilan Supabase) → `hooks/` (pembungkus React Query) → `types/` (skema
+  Zod, sekaligus sumber tipe TypeScript lewat `z.infer<>`) → `components/`.
+- `pages/` — komponen halaman yang dipetakan router: `Dashboard`, `Stays`, `Bookings`,
+  `Checkin`, `Account`, `Login`, `PageNotFound`.
+- `ui/` — komponen generik dipakai lintas fitur (`Modal`, `Table`, `Menus`, `ProtectedRoute`,
+  `StaffOnlyRoute`, `ErrorFallback`, dll).
+- `services/` — hanya `apiSettings.ts`. Panggilan Supabase lain tinggal di `services/` milik
+  fitur masing-masing, bukan di sini.
+- `hooks/`, `shared/utils/`, `types/` — util dan state lintas fitur.
+- `styles/` — global styles dan breakpoints.
+- `data/` — data seed untuk pengembangan.
+- `supabase/` — client (`supabase.ts`), `types/database.types.ts` hasil generate, dan migrasi.
 
 ## Environment variables
 
 - `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_KEY` — ini **anon key**, bukan service role key. Lihat
-  [Catatan terbuka: anon key vs service role key](#catatan-terbuka-anon-key-vs-service-role-key)
-  di atas untuk kenapa ini jadi pertanyaan terbuka.
+- `VITE_SUPABASE_KEY` — ini **anon/publishable key**, bukan service role key. Ini keputusan
+  final (bukan pertanyaan terbuka): wewenang tulis datang dari sesi staf yang login plus policy
+  RLS, bukan dari key yang istimewa. Jangan pernah menggantinya dengan service role key.
 
 Dibaca lewat `import.meta.env.*` (konvensi Vite — wajib prefix `VITE_` agar ter-expose ke
-client bundle).
+client bundle). Karena di-inline saat build, mengubah nilainya di Vercel butuh redeploy —
+mengganti value saja tidak mengubah bundle yang sudah jadi.
 
 ## Testing & verifikasi sebelum menganggap selesai
 
-**Belum ada test suite** — tidak ada vitest/jest/testing-library/cypress/playwright
-terpasang, tidak ada file `*.test.ts(x)`. Yang tersedia:
+**Belum ada test suite** — tidak ada vitest/jest/testing-library/cypress/playwright terpasang,
+tidak ada file `*.test.ts(x)`. Yang tersedia:
 
 - `npm run build` — `tsc -b && vite build`, dipakai sebagai pengecekan tipe.
 - `npm run lint` — eslint.
 
-Sebelum menandai perubahan tulis-ke-database selesai, jalankan tiga query verifikasi di
-[Cara menguji dari sisi Anda](./ADMIN-PANEL-CONTEXT.md#cara-menguji-dari-sisi-anda) — baris
-gambar lengkap, setiap villa punya cover, villa baru dapat 6 fasilitas shared. Wajib manual
-karena tidak ada test otomatis yang mengecek ini.
+Karena tidak ada test otomatis yang menjaga invariant database, perubahan tulis-ke-database
+wajib diverifikasi manual di Supabase SQL Editor. Empat query berikut harus mengembalikan
+**nol baris**:
+
+```sql
+-- 1. Baris gambar lengkap. Kurang satu kolom saja = halaman villa itu crash.
+select stay_id, storage_path
+from stay_images
+where blur_data_url is null or width is null or height is null;
+
+-- 2. Setiap villa punya cover (sort_order = 0).
+select slug from stays s
+where not exists (
+    select 1 from stay_images i where i.stay_id = s.id and i.sort_order = 0
+);
+
+-- 3. Tidak ada villa tanpa gambar sama sekali — ini error, bukan sekadar tampil polos.
+select s.slug from stays s
+where not exists (select 1 from stay_images i where i.stay_id = s.id);
+
+-- 4. Tidak ada `alt` kembar dalam satu villa.
+select stay_id, alt, count(*)
+from stay_images
+group by stay_id, alt having count(*) > 1;
+```
+
+Dua query lagi yang **tidak** mengembalikan nol baris:
+
+```sql
+-- 5. Setiap villa dapat 6 amenity shared. shared_count harus 6 untuk tiap baris.
+select s.slug, count(*) filter (where a.is_shared) as shared_count
+from stays s
+left join stay_amenities sa on sa.stay_id = s.id
+left join amenities a on a.id = sa.amenity_id
+group by s.slug order by shared_count;
+
+-- 6. Jalankan dari sesi staff yang login (BUKAN SQL Editor, yang berjalan sebagai
+--    service role dan selalu menjawab beda) untuk memastikan sesinya dikenali.
+select exists (select 1 from public.staff where id = auth.uid()) as boleh_tulis;
+```
+
+Kalau `boleh_tulis` bernilai `false`, akun itu belum punya baris di `public.staff` dan setiap
+INSERT dari sesinya akan ditolak. Ini penyebab paling mungkin dari "kenapa simpan villa selalu
+gagal padahal datanya benar".
+
+Untuk memastikan gambar yang diupload benar-benar bisa diakses publik, pakai `GET`, **bukan**
+`curl -I` — Supabase Storage melayani HEAD lewat jalur berbeda yang selalu membalas `no-cache`
+dan membuat objek yang sehat terlihat rusak.
 
 ## Kalau ragu soal wewenang atau skema
 
-Jangan menebak. `ADMIN-PANEL-CONTEXT.md` di root repo ini adalah kontrak yang disepakati
-dengan repo situs customer — kalau sesuatu tidak tercakup di sana (mis. kolom baru yang
-sepertinya berguna untuk fitur admin), itu artinya perlu perubahan skema di repo situs
-customer dulu, bukan sesuatu yang boleh ditambahkan sepihak dari sini.
+Jangan menebak. Batas wewenang di bagian "Aturan tegas" di atas adalah kontrak yang disepakati
+dengan repo situs customer, bukan preferensi yang bisa dilonggarkan sepihak. Kalau sesuatu
+tidak tercakup di sana — misalnya kolom baru yang sepertinya berguna untuk fitur admin — itu
+artinya perlu perubahan skema di repo situs customer dulu, bukan sesuatu yang boleh ditambahkan
+dari sini.

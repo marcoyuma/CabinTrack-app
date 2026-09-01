@@ -1,6 +1,6 @@
 -- 0015_admin_staff_booking_financials.sql
 -- Read-only, scoped access into public.bookings financial columns for the admin
--- panel's staff and managers, without adding a raw SELECT policy to the table.
+-- panel's staff, without adding a raw SELECT policy to the table.
 --
 -- Run FIFTEENTH, after 0014_admin_staff_access.sql.
 -- Idempotent: safe to re-run.
@@ -82,7 +82,7 @@ select proname, pg_get_functiondef(oid)
 from pg_proc
 where proname = 'admin_booking_financials';
 
--- Manual smoke test (run as an authenticated staff/manager session — a row
+-- Manual smoke test (run as an authenticated staff session — a row
 -- must already exist in public.staff for the caller, provisioned in 0014):
 --
 -- select * from public.admin_booking_financials(current_date - 30, current_date);

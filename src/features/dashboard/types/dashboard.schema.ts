@@ -2,7 +2,7 @@ import z from "zod";
 import { safeString } from "../../../shared/utils/helpers";
 
 // Return shape of public.admin_booking_roster(p_from, p_to) — see
-// ADMIN-PANEL-CONTEXT.md § "Akses baca staff/manager ke data guest". Deliberately does NOT
+// ADMIN-PANEL-CONTEXT.md § "Akses baca staf ke data guest". Deliberately does NOT
 // include total_price/num_nights/nationality/avatar_path.
 export const bookingRosterRowSchema = z.object({
     booking_id: z.number(),

@@ -24,11 +24,11 @@
 > **Sejak 2026-08-15, admin panel punya akses BACA (bukan tulis) ke sebagian data
 > `public.guests`.** Tiga fungsi `security definer` baru — `admin_booking_roster()`,
 > `admin_guest_nationality_stats()`, `admin_export_guests()` — plus tabel `public.staff`
-> memberi staff/manager yang sah jalur baca terbatas, tanpa membuka `guests` itu sendiri.
+> memberi sesi staf yang sah jalur baca terbatas, tanpa membuka `guests` itu sendiri.
 > Ini pengecualian pertama pada batas di
 > [Batas wewenang admin panel](#batas-wewenang-admin-panel); larangan **menulis** ke
 > `guests`/`reviews`/`bookings` sama sekali tidak berubah. Detail lengkap ada di
-> [Akses baca staff/manager ke data guest](#akses-baca-staffmanager-ke-data-guest).
+> [Akses baca staf ke data guest](#akses-baca-staf-ke-data-guest).
 >
 > **Sejak 2026-08-16, jalur tulis admin panel sudah diputuskan — dan berubah dari yang
 > tertulis di versi sebelumnya.** Admin panel **tidak lagi memerlukan service role key
@@ -50,7 +50,7 @@
 - [Peta sistem](#peta-sistem)
 - [Batas wewenang admin panel](#batas-wewenang-admin-panel)
 - [Villa yang punya booking tidak bisa dihapus](#villa-yang-punya-booking-tidak-bisa-dihapus)
-- [Akses baca staff/manager ke data guest](#akses-baca-staffmanager-ke-data-guest)
+- [Akses baca staf ke data guest](#akses-baca-staf-ke-data-guest)
 - [Keputusan: jalur tulis admin panel](#keputusan-jalur-tulis-admin-panel)
 - [Kenapa perubahan Anda tidak langsung terlihat customer](#kenapa-perubahan-anda-tidak-langsung-terlihat-customer)
 - [Villa baru belum bisa dibuka sampai situs di-deploy ulang](#villa-baru-belum-bisa-dibuka-sampai-situs-di-deploy-ulang)
@@ -119,32 +119,34 @@ Ditetapkan pemilik proyek, dan ini **keputusan produk**, bukan sekadar keadaan s
 |                                                       | `public.bookings`                             |
 |                                                       | `public.staff` (dibuat manual pemilik proyek) |
 
-Di dalam kolom kiri itu pun izinnya tidak rata — `staff` dan `manager` beda wewenang:
+Di dalam kolom kiri itu izinnya rata: punya baris di `public.staff` = boleh semua aksi di
+bawah ini. Tidak ada tingkatan di dalam `public.staff` — pembagian dua tingkat yang dulu ada
+(`staff` vs `manager`) sudah dihapus lewat `0018_drop_manager_role.sql`.
 
-| Aksi                                                                | `staff` | `manager` |
-| ------------------------------------------------------------------- | ------- | --------- |
-| Insert/update `stays`, `stay_images`, `amenities`, `stay_amenities` | ✅      | ✅        |
-| Upload/ganti/hapus file di bucket `stays`                           | ✅      | ✅        |
-| Delete baris `stay_images`, `stay_amenities`                        | ✅      | ✅        |
-| **Delete villa (`stays`)**                                          | ❌      | ✅        |
-| **Delete baris `amenities`**                                        | ❌      | ✅        |
+| Aksi                                                                | Sesi staf |
+| ------------------------------------------------------------------- | --------- |
+| Insert/update `stays`, `stay_images`, `amenities`, `stay_amenities` | ✅        |
+| Upload/ganti/hapus file di bucket `stays`                           | ✅        |
+| Delete baris `stay_images`, `stay_amenities`                        | ✅        |
+| Delete villa (`stays`)                                              | ✅        |
+| Delete baris `amenities`                                            | ✅        |
 
-**Kenapa hapus dibedakan.** Menghapus satu villa bukan aksi seukuran mengedit villa:
-`stay_images` dan `stay_amenities` ikut terhapus (`on delete cascade`), dan review-review
+**Menghapus tetap butuh konfirmasi di UI.** Menghapus satu villa bukan aksi seukuran mengedit
+villa: `stay_images` dan `stay_amenities` ikut terhapus (`on delete cascade`), dan review-review
 villa itu **diputus diam-diam** dari villa manapun (`reviews.stay_id` `on delete set null`).
 Baris `amenities` sama — satu baris bisa dipakai bersama semua villa (`is_shared`), jadi
-menghapusnya menjangkau ke luar villa yang sedang Anda buka. Menambah dan mengoreksi villa
-itu pekerjaan harian; menghapus villa bukan.
+menghapusnya menjangkau ke luar villa yang sedang Anda buka. Semua staf boleh melakukannya,
+tapi tidak boleh terjadi tanpa dialog konfirmasi.
 
 **Pemanggil yang tidak berhak dapat 0 baris terhapus, bukan error** — sama seperti pola
-fungsi `admin_*`. `staff` yang menekan tombol Delete villa akan melihat operasi "berhasil"
-tanpa ada yang hilang. Tangani di UI (sembunyikan/disable tombolnya untuk `staff`), jangan
+fungsi `admin_*`. User yang sudah login tapi tidak punya baris di `public.staff` akan melihat
+operasi "berhasil" tanpa ada yang hilang. Tangani di UI (sembunyikan entry point-nya), jangan
 andalkan pesan error dari Postgres, karena tidak akan ada.
 
 > **Kolom "Tidak boleh disentuh" di atas soal MENULIS, dan itu masih berlaku 100% untuk
 > `public.guests`.** Sejak 2026-08-15 ada satu pengecualian **baca saja**: tiga fungsi
-> `security definer` yang bisa dipanggil sesi staff/manager yang sah — lihat
-> [Akses baca staff/manager ke data guest](#akses-baca-staffmanager-ke-data-guest). Admin
+> `security definer` yang bisa dipanggil sesi staf yang sah — lihat
+> [Akses baca staf ke data guest](#akses-baca-staf-ke-data-guest). Admin
 > panel tetap tidak pernah `SELECT * FROM public.guests` langsung, dan tetap tidak bisa
 > menulis satu baris pun ke tabel ini.
 
@@ -220,7 +222,7 @@ constraint ini.
 
 ---
 
-## Akses baca staff/manager ke data guest
+## Akses baca staf ke data guest
 
 **Dibangun dan live sejak 2026-08-15** (`0014_admin_staff_access.sql` di repo situs customer —
 repo admin panel tidak dan tidak perlu punya file migrasi apa pun untuk ini; skemanya dimiliki
@@ -231,7 +233,7 @@ tamu (dan telepon) memang harus terlihat staff — bukan sekadar statistik.
 ### Jalur yang sama dengan tulis katalog — satu client saja
 
 Ketiga fungsi ini dipanggil lewat **anon/publishable key + sesi `authenticated`**:
-staff/manager login sebagai user Supabase biasa (email/password atau metode lain), dan
+staf login sebagai user Supabase biasa (email/password atau metode lain), dan
 `auth.uid()` sesi itu yang dicek fungsinya sendiri terhadap tabel `public.staff`. Bukan RLS di
 `guests` (tetap tanpa policy untuk siapa pun selain guest itu sendiri, tidak berubah).
 
@@ -251,8 +253,9 @@ const { data } = await supabaseClient.rpc("admin_booking_roster", {
 
 ### `public.staff` — siapa yang boleh memanggil
 
-Tabel identitas terpisah dari `guests`, pola sama (`id` uuid **adalah** `auth.users.id`), plus
-kolom `role` bernilai `'staff'` atau `'manager'`. **Provisioning manual, bukan self-signup** —
+Tabel identitas terpisah dari `guests`, pola sama (`id` uuid **adalah** `auth.users.id`).
+Isinya murni daftar keanggotaan — tidak ada kolom `role`, jadi ada baris di sini artinya
+wewenang penuh. **Provisioning manual, bukan self-signup** —
 tidak ada trigger otomatis seperti `handle_new_guest()`. Akun staff dibuat oleh pemilik proyek
 situs customer langsung lewat dashboard Supabase / SQL Editor. **Admin panel tidak bisa membuat
 baris `staff` sendiri** — tidak ada policy INSERT untuk siapa pun. Kalau admin panel butuh staff
@@ -262,22 +265,22 @@ baru, itu permintaan ke repo situs customer, bukan sesuatu yang bisa dilakukan s
 
 | Fungsi                                         | Siapa boleh panggil                                                                                    | Mengembalikan                                                                                                                           | Yang sengaja TIDAK dikembalikan                          |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `admin_booking_roster(p_from date, p_to date)` | `staff` dan `manager`                                                                                  | `booking_id, stay_name, guest_name, phone_country_code, phone, start_date, end_date, status` untuk booking yang overlap rentang tanggal | `nationality`, `avatar_path`                             |
-| `admin_guest_nationality_stats()`              | **`manager` saja**                                                                                     | `nationality, guest_count` teragregasi, nationality dengan < 5 guest digabung `'Other'`                                                 | nationality per-baris individu                           |
-| `admin_export_guests()`                        | **`manager` saja**, setiap panggilan dicatat ke `public.admin_export_log` (siapa, kapan, berapa baris) | `guest_id, full_name, phone_country_code, phone, nationality, created_at` untuk seluruh guests                                          | `avatar_path` — tidak pernah keluar lewat fungsi manapun |
+| `admin_booking_roster(p_from date, p_to date)` | Sesi staf manapun                                                                                      | `booking_id, stay_name, guest_name, phone_country_code, phone, start_date, end_date, status` untuk booking yang overlap rentang tanggal | `nationality`, `avatar_path`                             |
+| `admin_guest_nationality_stats()`              | Sesi staf manapun                                                                                      | `nationality, guest_count` teragregasi, nationality dengan < 5 guest digabung `'Other'`                                                 | nationality per-baris individu                           |
+| `admin_export_guests()`                        | Sesi staf manapun, setiap panggilan dicatat ke `public.admin_export_log` (siapa, kapan, berapa baris)  | `guest_id, full_name, phone_country_code, phone, nationality, created_at` untuk seluruh guests                                          | `avatar_path` — tidak pernah keluar lewat fungsi manapun |
 
 **`admin_booking_roster()` di-scope lewat booking, bukan direktori guest terbuka.** Guest yang
 belum pernah booking tidak pernah muncul di hasilnya — ini bukan `SELECT * FROM guests` yang
 kolomnya difilter, tapi join ke `bookings` yang membatasi _baris_-nya juga.
 
-**Pemanggil yang tidak berhak mendapat 0 baris, bukan error.** `staff` biasa yang memanggil
-`admin_guest_nationality_stats()` atau `admin_export_guests()` dapat hasil kosong — tangani itu di
-UI sebagai "tidak ada akses", bukan sebagai bug yang perlu di-debug.
+**Pemanggil yang tidak berhak mendapat 0 baris, bukan error.** User login yang tidak punya baris
+di `public.staff` memanggil fungsi manapun di atas akan dapat hasil kosong — tangani itu di UI
+sebagai "tidak ada akses", bukan sebagai bug yang perlu di-debug.
 
 **`avatar_path` (foto profil tamu) tidak pernah tersedia untuk admin panel lewat jalur apa pun.**
 Tetap PII murni — ini keputusan sadar, bukan sesuatu yang lupa ditambahkan.
 
-**`nationality` per-baris juga tidak pernah tersedia**, bahkan untuk `manager` — hanya versi
+**`nationality` per-baris juga tidak pernah tersedia**, untuk siapa pun — hanya versi
 teragregasi dengan ambang minimal 5 guest per kelompok. Alasannya: nationality yang dipasangkan
 dengan `display_name` dan kutipan review publik (mis. "Amara L." + "Swedish" + kutipannya) bisa
 mengidentifikasi satu orang di properti sekecil ini — situs customer sudah menganggap ini serius
@@ -308,14 +311,12 @@ tidak punya tempat sembunyi di bundle browser.
 ### Cara kerjanya
 
 Staff login sebagai user Supabase biasa. Setiap policy tulis di keempat tabel katalog
-memanggil satu helper, `public.is_staff(min_role)`, yang mencocokkan `auth.uid()` sesi itu ke
-`public.staff` — tabel yang sama yang sudah dipakai tiga fungsi
-[`admin_*`](#akses-baca-staffmanager-ke-data-guest). Tidak ada tabel staff kedua, tidak ada
+mencocokkan `auth.uid()` sesi itu ke `public.staff` — tabel yang sama yang sudah dipakai tiga
+fungsi [`admin_*`](#akses-baca-staf-ke-data-guest). Tidak ada tabel staff kedua, tidak ada
 mekanisme identitas baru.
 
-Pembagian `staff` vs `manager` ada di [Wewenang admin panel](#wewenang-admin-panel) — ringkasnya,
-keduanya boleh menambah dan mengedit, tapi hanya `manager` yang boleh menghapus villa dan
-menghapus baris `amenities`.
+Predikatnya cuma "ada baris di `public.staff`", tanpa cek tingkatan apa pun — daftar aksi
+lengkapnya di [Wewenang admin panel](#wewenang-admin-panel).
 
 Bucket `stays` ikut dibuka di migrasi yang sama (insert/update/delete untuk sesi staff, tanpa
 pembatasan folder per-user seperti bucket `guests` — foto villa milik tim, bukan milik satu
@@ -761,7 +762,7 @@ policy untuk `anon` sama sekali**, karena tabel ini menyimpan nomor telepon.
 Sejak 2026-08-15, sebagian kolom ini (semua kecuali `nationality` dan `avatar_path`) bisa
 terlihat admin panel — tapi hanya lewat `admin_booking_roster()`, di-scope ke guest yang punya
 booking, tidak pernah lewat query langsung ke tabel ini. Lihat
-[Akses baca staff/manager ke data guest](#akses-baca-staffmanager-ke-data-guest).
+[Akses baca staf ke data guest](#akses-baca-staf-ke-data-guest).
 
 ### `public.reviews`
 
@@ -967,14 +968,13 @@ bisa dibuka sampai situs di-deploy ulang](#villa-baru-belum-bisa-dibuka-sampai-s
 | `import { revalidateTag } from "next/cache"`                                        | Khusus runtime Next.js. Tidak berfungsi dari aplikasi lain, bahkan kalau admin panel juga Next.js — cache-nya milik proses yang berbeda                      |
 | `updateTag()`                                                                       | Hanya bisa dipanggil dari Server Action di aplikasi yang sama                                                                                                |
 | Menulis **tanpa sesi login staff**                                                  | Anon key saja hanya dapat `SELECT`. Policy tulis mensyaratkan `auth.uid()` yang punya baris di `public.staff` — [detail](#keputusan-jalur-tulis-admin-panel) |
-| `staff` menghapus villa atau baris `amenities`                                      | Hanya `manager`. Bukan error — **0 baris terhapus**, jadi UI harus mencegahnya sendiri                                                                       |
 | Membuat baris `public.staff` sendiri                                                | Tidak ada policy INSERT untuk siapa pun. Akun staff dibuat manual pemilik proyek situs customer                                                              |
 | Mengandalkan `id` numerik di URL                                                    | Situs merutekan berdasarkan `slug`                                                                                                                           |
 | Mengatur urutan villa di halaman `/stays`                                           | Urutannya mengikuti `id`. Villa baru selalu paling akhir; belum ada kolom untuk mengurutkan                                                                  |
 | Membuka halaman villa yang baru dibuat                                              | Butuh deploy ulang situs — [penjelasan](#villa-baru-belum-bisa-dibuka-sampai-situs-di-deploy-ulang)                                                          |
 | Membuat akun, guest, atau booking                                                   | Keputusan produk — lihat [Batas wewenang admin panel](#batas-wewenang-admin-panel). Akun adalah tanggung jawab user yang memesan                             |
 | Menulis ke `public.guests` / `public.reviews` / `public.bookings` / bucket `guests` | Di luar wewenang. `guests` hanya lahir dari trigger signup; `reviews` dan `bookings` ditulis tamu                                                            |
-| `SELECT * FROM public.guests` langsung, dengan cara apa pun                         | Baca guests hanya lewat tiga fungsi tertentu, sesi staff/manager — [detail](#akses-baca-staffmanager-ke-data-guest)                                          |
+| `SELECT * FROM public.guests` langsung, dengan cara apa pun                         | Baca guests hanya lewat tiga fungsi tertentu, sesi staf — [detail](#akses-baca-staf-ke-data-guest)                                          |
 | Menghapus villa yang punya booking                                                  | `bookings.stay_id` memakai `on delete restrict` — [penjelasan lengkap](#villa-yang-punya-booking-tidak-bisa-dihapus)                                         |
 
 Satu-satunya jalur komunikasi antar kedua aplikasi adalah **database** dan (nanti) **satu
@@ -1068,8 +1068,7 @@ order by tablename, cmd;
 (bukan SQL Editor, yang berjalan sebagai service role dan selalu menjawab dengan cara berbeda):
 
 ```sql
-select public.is_staff() as boleh_tulis,
-       public.is_staff('manager') as boleh_hapus_villa;
+select exists (select 1 from public.staff where id = auth.uid()) as boleh_tulis;
 ```
 
 Kalau `boleh_tulis` bernilai `false`, akun itu belum punya baris di `public.staff` — dan setiap
@@ -1143,9 +1142,9 @@ customer — skema tabel, wewenang, pipeline upload gambar, dan alasan di balik 
   `auth.uid()` yang punya baris di `public.staff`. **Jangan menambahkan service role key ke repo
   ini** — ia mem-bypass seluruh RLS dan tidak punya tempat aman di aplikasi tanpa server.
   Latar belakangnya di [Keputusan: jalur tulis admin panel](./ADMIN-PANEL-CONTEXT.md#keputusan-jalur-tulis-admin-panel).
-- **Hapus villa dan hapus `amenities` hanya untuk `manager`.** Yang ditolak RLS **tidak**
-  memunculkan error — cuma 0 baris terhapus. Jadi UI wajib menyembunyikan/men-disable tombolnya
-  untuk `staff`, karena tanpa itu operasinya terlihat "berhasil" padahal tidak terjadi apa-apa.
+- **Tulis yang ditolak RLS tidak memunculkan error** — cuma 0 baris terpengaruh. Jadi UI wajib
+  menyembunyikan entry point-nya dari user yang bukan staf, karena tanpa itu operasinya terlihat
+  "berhasil" padahal tidak terjadi apa-apa.
 - **Setiap upload gambar wajib mengisi `blur_data_url`, `width`, `height`.** Replikasi pipeline
   di [Kontrak upload gambar](./ADMIN-PANEL-CONTEXT.md#-kontrak-upload-gambar) persis — resize,
   strip EXIF, WebP quality 80, generate blur 16px. Baris yang lolos tanpa ini akan meng-crash
@@ -1206,7 +1205,7 @@ gambar lengkap, setiap villa punya cover, `sort_order` rapat mulai 0, `alt` tida
 villa baru dapat 6 fasilitas shared.
 
 Kalau menulis selalu gagal padahal datanya benar, cek dulu apakah sesi login-nya dikenali:
-`select public.is_staff();` dari sesi itu. `false` berarti akunnya belum punya baris di
+`select exists (select 1 from public.staff where id = auth.uid());` dari sesi itu. `false` berarti akunnya belum punya baris di
 `public.staff` — dan baris itu **hanya bisa dibuat pemilik proyek situs customer**, bukan dari
 sini.
 
